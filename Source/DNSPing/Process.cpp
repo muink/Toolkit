@@ -840,7 +840,7 @@ size_t __fastcall PrintProcess(
 			fwprintf_s(ConfigurationParameter.OutputFile, L"   Receive: %lu\n", (ULONG)ConfigurationParameter.Statistics_RecvNum);
 		}
 
-		if ((SSIZE_T)ConfigurationParameter.Statistics_RealSend - (SSIZE_T)ConfigurationParameter.Statistics_RecvNum >= 0)
+		if (ConfigurationParameter.Statistics_RealSend >= ConfigurationParameter.Statistics_RecvNum)
 		{
 			fwprintf_s(stderr, L"   Lost: %lu", (ULONG)(ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum));
 			if (ConfigurationParameter.Statistics_RealSend > 0)

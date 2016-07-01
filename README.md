@@ -3,7 +3,7 @@
 A useful and powerful toolkit
 
 ### Updated
-**0.3.0.0**
+**0.3.1.0**
 
 ### Usage
 * Windows/Linux/Mac - Please visit [ReadMe documents](https://github.com/chengr28/Toolkit/tree/master/Documents).

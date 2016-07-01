@@ -187,7 +187,6 @@
 		#include <VersionHelpers.h>        //Windows Version Helpers
 	#endif
 
-
 //Static libraries
 	#pragma comment(lib, "ws2_32.lib")                      //WinSock 2.0+
 	#define __LITTLE_ENDIAN              1U                 //Little Endian

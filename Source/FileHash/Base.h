@@ -229,7 +229,7 @@
 #endif
 
 //Version definitions
-#define FULL_VERSION                 L"0.3.0.0"
+#define FULL_VERSION                 L"0.3.1.0"
 #define COPYRIGHT_MESSAGE            L"Copyright (C) 2012-2016 Chengr28"
 
 //Command definitions
@@ -302,6 +302,9 @@
 //Linux and Mac OS X compatible
 	#define __fastcall
 	#define RETURN_ERROR                                                 (-1)
+	#if defined(PLATFORM_LINUX)
+		#define _fcloseall                                                       fcloseall
+	#endif
 	#define fwprintf_s                                                   fwprintf
 	#define strnlen_s                                                    strnlen
 	#define _set_errno(Value)                                            errno = Value

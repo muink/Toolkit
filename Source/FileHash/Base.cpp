@@ -17,7 +17,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#include "FileHash.h"
+#include "Base.h"
 
 //Check empty buffer
 bool __fastcall CheckEmptyBuffer(

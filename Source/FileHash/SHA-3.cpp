@@ -77,6 +77,7 @@ bool __fastcall ReadCommands_SHA3(
 			SHA3_HashFunctionID = HASH_ID_SHA3_SHAKE_128;
 
 		//SHA-3 SHAKE output length.
+			_set_errno(0);
 		#if defined(PLATFORM_WIN)
 			auto Result = wcstoul(Command.c_str() + Offset, nullptr, 0);
 		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
@@ -97,6 +98,7 @@ bool __fastcall ReadCommands_SHA3(
 			SHA3_HashFunctionID = HASH_ID_SHA3_SHAKE_256;
 
 		//SHA-3 SHAKE output length.
+			_set_errno(0);
 		#if defined(PLATFORM_WIN)
 			auto Result = wcstoul(Command.c_str() + wcslen(COMMAND_SHA3_SHAKE_256), nullptr, 0);
 		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))

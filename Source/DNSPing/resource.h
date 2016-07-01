@@ -34,5 +34,6 @@
 
 
 //Resource including and defining
-#define FULL_VERSION      L"0.3.0.0"
-#define DETACH_VERSION    0,3,0,0
+#define FULL_VERSION        L"0.3.1.0"
+#define DETACH_VERSION      0,3,1,0
+#define COPYRIGHT_MESSAGE   L"Copyright (C) 2012-2016 Chengr28"

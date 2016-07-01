@@ -22,41 +22,39 @@
 //////////////////////////////////////////////////
 // Main header
 // 
-#if defined(PLATFORM_WIN)
-	#define MBSTOWCS_NULLTERMINATE       (-1)        //MultiByteToWideChar() find null-terminate.
-#endif
-#define HIGHEST_MOVE_BIT_U16         15U         //Move 15 bits to get highest bit in uint16_t/16 bits data.
-#define BYTES_TO_BITS                8U
-#define NUM_HEX                      16
-#define UINT4_MAX                    0x000F
-#define HIGHEST_BIT_U16              0x7FFF      //Get highest bit in uint16_t/16 bits data
-#define U16_NUM_ONE                  0x0001
-#define PACKET_MINSIZE               64U         //Minimum size of packets in Ethernet network.
-#define PACKET_MAXSIZE               1500U       //Maximum size of packets, Standard MTU of Ethernet II network
-#define LARGE_PACKET_MAXSIZE         4096U       //Maximum size of packets(4KB/4096 bytes) of TCP protocol
 #define ADDR_STRING_MAXSIZE          64U         //Maximum size of addresses(IPv4/IPv6) words
+#define BYTES_TO_BITS                8U
 #if defined(PLATFORM_WIN)
-	#define STANDARD_TIME_OUT            1000U       //Standard timeout, 1000 ms(1 second)
 	#define DEFAULT_TIME_OUT             2000U       //Default timeout, 2000 ms(2 seconds)
+	#define MBSTOWCS_NULLTERMINATE       (-1)        //MultiByteToWideChar() find null-terminate.
+	#define STANDARD_TIME_OUT            1000U       //Standard timeout, 1000 ms(1 second)
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-	#define STANDARD_TIME_OUT            1000000U    //Standard timeout, 1000000 us(1000 ms or 1 second)
-	#define SECOND_TO_MILLISECOND        1000U       //1000 milliseconds(1 second)
 	#define DEFAULT_TIME_OUT             2U          //Default timeout, 2 seconds
+	#define SECOND_TO_MILLISECOND        1000U       //1000 milliseconds(1 second)
+	#define STANDARD_TIME_OUT            1000000U    //Standard timeout, 1000000 us(1000 ms or 1 second)
 #endif
-#define MICROSECOND_TO_MILLISECOND   1000U       //1000 microseconds(1 millisecond)
-#define TIME_OUT_MIN                 500U        //Minimum timeout, 500 ms
 #define DEFAULT_SEND_TIMES           4U          //Default send times
-#define SECONDS_IN_YEAR              31536000U   //31536000 seconds in a year(30 days in a month and 12 months in a year)
-#define SECONDS_IN_MONTH             2592000U    //2592000 seconds in a month(30 days in a month)
+#define DOMAIN_MAXSIZE               256U        //Maximum size of whole level domain is 256 bytes(Section 2.3.1 in RFC 1035).
+#define DOMAIN_MINSIZE               2U          //Minimum size of whole level domain is 3 bytes(Section 2.3.1 in RFC 1035).
+#define HIGHEST_BIT_U16              0x7FFF      //Get highest bit in uint16_t/16 bits data
+#define HIGHEST_MOVE_BIT_U16         15U         //Move 15 bits to get highest bit in uint16_t/16 bits data.
+#define LARGE_PACKET_MAXSIZE         4096U       //Maximum size of packets(4KB/4096 bytes) of TCP protocol
+#define MICROSECOND_TO_MILLISECOND   1000U       //1000 microseconds(1 millisecond)
+#define NUM_HEX                      16
+#define PACKET_MAXSIZE               1500U       //Maximum size of packets, Standard MTU of Ethernet II network
+#define PACKET_MINSIZE               64U         //Minimum size of packets in Ethernet network.
 #define SECONDS_IN_DAY               86400U      //86400 seconds in a day
 #define SECONDS_IN_HOUR              3600U       //3600 seconds in an hour
 #define SECONDS_IN_MINUTE            60U         //60 seconds in a minute
-#define DOMAIN_MAXSIZE               256U        //Maximum size of whole level domain is 256 bytes(Section 2.3.1 in RFC 1035).
-#define DOMAIN_MINSIZE               2U          //Minimum size of whole level domain is 3 bytes(Section 2.3.1 in RFC 1035).
+#define SECONDS_IN_MONTH             2592000U    //2592000 seconds in a month(30 days in a month)
+#define SECONDS_IN_YEAR              31536000U   //31536000 seconds in a year(30 days in a month and 12 months in a year)
+#define TIME_OUT_MIN                 500U        //Minimum timeout, 500 ms
+#define U16_NUM_ONE                  0x0001
+#define UINT4_MAX                    0x000F
 #define DNS_PACKET_MINSIZE           (sizeof(dns_hdr) + 4U + sizeof(dns_qry))   //Minimum DNS packet size(DNS Header + Minimum Domain + DNS Query)
 
 //Version definitions
-#define FULL_VERSION                                  L"0.3.0.0"
+#define FULL_VERSION                                  L"0.3.1.0"
 #define COPYRIGHT_MESSAGE                             L"Copyright (C) 2014-2016 Chengr28"
 
 
@@ -74,6 +72,7 @@
 	#define fwprintf_s                                                       fwprintf
 	#define GetCurrentProcessId                                              pthread_self
 	#define GetLastError()                                                   errno
+	#define _set_errno(Value)                                                errno = Value
 	#define strnlen_s                                                        strnlen
 	#define wcsnlen_s                                                        wcsnlen
 	#define WSAGetLastError                                                  GetLastError
@@ -152,7 +151,7 @@ public:
 //Member functions
 	ConfigurationTable(
 		void);
-#if (defined(PLATFORM_WIN) || defined(PLATFORM_LINUX))
+#if (defined(PLATFORM_WIN) || (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT)))
 	~ConfigurationTable(
 		void);
 #endif

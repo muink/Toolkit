@@ -17,7 +17,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#include "FileHash.h"
+#include "Base.h"
 
 //The MD5 block size and message digest size
 #define MD5_SIZE_BLOCK    64U

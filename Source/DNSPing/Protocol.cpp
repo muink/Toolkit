@@ -103,7 +103,8 @@ size_t __fastcall AddressStringToBinary(
 	const uint16_t Protocol, 
 	SSIZE_T &ErrCode)
 {
-	SSIZE_T Result = 0;
+	SSIZE_T SignedResult = 0;
+	size_t UnsignedResult = 0;
 
 //Minimum supported system of inet_ntop and inet_pton functions is Windows Vista. [Roy Tam]
 #if defined(PLATFORM_WIN_XP)
@@ -116,10 +117,12 @@ size_t __fastcall AddressStringToBinary(
 	if (Protocol == AF_INET6)
 	{
 	//Check IPv6 addresses
-		for (Result = 0;Result < (SSIZE_T)strlen(AddrString);++Result)
+		for (UnsignedResult = 0;UnsignedResult < strlen(AddrString);++UnsignedResult)
 		{
-			if (AddrString[Result] < ASCII_ZERO || (AddrString[Result] > ASCII_COLON && AddrString[Result] < ASCII_UPPERCASE_A) || (AddrString[Result] > ASCII_UPPERCASE_F && AddrString[Result] < ASCII_LOWERCASE_A) || AddrString[Result] > ASCII_LOWERCASE_F)
-				break;
+			if (AddrString[UnsignedResult] < ASCII_ZERO || (AddrString[UnsignedResult] > ASCII_COLON && 
+				AddrString[UnsignedResult] < ASCII_UPPERCASE_A) || (AddrString[UnsignedResult] > ASCII_UPPERCASE_F && 
+				AddrString[UnsignedResult] < ASCII_LOWERCASE_A) || AddrString[UnsignedResult] > ASCII_LOWERCASE_F)
+					break;
 		}
 
 		std::string sAddrString(AddrString);
@@ -140,8 +143,8 @@ size_t __fastcall AddressStringToBinary(
 		SockLength = sizeof(sockaddr_in6);
 		if (WSAStringToAddressA((char *)sAddrString.c_str(), AF_INET6, nullptr, (PSOCKADDR)&SockAddr, &SockLength) == SOCKET_ERROR)
 	#else 
-		Result = inet_pton(AF_INET6, sAddrString.c_str(), pAddr);
-		if (Result == SOCKET_ERROR || Result == FALSE)
+		SignedResult = inet_pton(AF_INET6, sAddrString.c_str(), pAddr);
+		if (SignedResult == SOCKET_ERROR || SignedResult == FALSE)
 	#endif
 		{
 			ErrCode = WSAGetLastError();
@@ -154,11 +157,11 @@ size_t __fastcall AddressStringToBinary(
 //IPv4
 	else {
 		size_t CommaNum = 0;
-		for (Result = 0;Result < (SSIZE_T)strlen(AddrString);++Result)
+		for (UnsignedResult = 0;UnsignedResult < strlen(AddrString);++UnsignedResult)
 		{
-			if ((AddrString[Result] != ASCII_PERIOD && AddrString[Result] < ASCII_ZERO) || AddrString[Result] > ASCII_NINE)
+			if ((AddrString[UnsignedResult] != ASCII_PERIOD && AddrString[UnsignedResult] < ASCII_ZERO) || AddrString[UnsignedResult] > ASCII_NINE)
 				return EXIT_FAILURE;
-			else if (AddrString[Result] == ASCII_PERIOD)
+			else if (AddrString[UnsignedResult] == ASCII_PERIOD)
 				++CommaNum;
 		}
 
@@ -198,8 +201,8 @@ size_t __fastcall AddressStringToBinary(
 		SockLength = sizeof(sockaddr_in);
 		if (WSAStringToAddressA((char *)sAddrString.c_str(), AF_INET, nullptr, (PSOCKADDR)&SockAddr, &SockLength) == SOCKET_ERROR)
 	#else 
-		Result = inet_pton(AF_INET, sAddrString.c_str(), pAddr);
-		if (Result == SOCKET_ERROR || Result == FALSE)
+		SignedResult = inet_pton(AF_INET, sAddrString.c_str(), pAddr);
+		if (SignedResult == SOCKET_ERROR || SignedResult == FALSE)
 	#endif
 		{
 			ErrCode = WSAGetLastError();

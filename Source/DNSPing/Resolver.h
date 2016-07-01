@@ -19,6 +19,7 @@
 
 #include "Base.h"
 
+//Functions
 void __fastcall PrintFlags(
 	const uint16_t Flags, 
 	FILE *FileHandle);

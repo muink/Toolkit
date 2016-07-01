@@ -41,15 +41,13 @@ ConfigurationTable::ConfigurationTable(
 	return;
 }
 
-#if (defined(PLATFORM_WIN) || defined(PLATFORM_LINUX))
+#if (defined(PLATFORM_WIN) || (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT)))
 //GlobalStatus class destructor
 ConfigurationTable::~ConfigurationTable(
 	void)
 {
-//Close all file and network handles.
-#if !defined(PLATFORM_OPENWRT)
+//Close all file and network handles and WinSock cleanup.
 	_fcloseall();
-#endif
 #if defined(PLATFORM_WIN)
 	if (Initialization_WinSock)
 		WSACleanup();

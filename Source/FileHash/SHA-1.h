@@ -17,7 +17,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#include "FileHash.h"
+#include "Base.h"
 
 //The SHA-1 block size, message digest size in bytes and some useful types.
 #define SHA1_SIZE_BLOCK         64U

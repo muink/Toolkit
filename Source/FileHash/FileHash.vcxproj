@@ -248,7 +248,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CRC.h" />
-    <ClInclude Include="FileHash.h" />
+    <ClInclude Include="Base.h" />
     <ClInclude Include="MD2.h" />
     <ClInclude Include="MD4.h" />
     <ClInclude Include="MD5.h" />

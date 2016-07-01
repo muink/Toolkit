@@ -24,9 +24,6 @@
     <ClInclude Include="CRC.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="FileHash.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="MD2.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -68,6 +65,9 @@
     </ClInclude>
     <ClInclude Include="SHA3\SnP-Relaned.h">
       <Filter>SHA-3</Filter>
+    </ClInclude>
+    <ClInclude Include="Base.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

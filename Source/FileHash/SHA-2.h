@@ -17,7 +17,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#include "FileHash.h"
+#include "Base.h"
 
 //Hash function ID
 #define HASH_ID_SHA2_224           1U
