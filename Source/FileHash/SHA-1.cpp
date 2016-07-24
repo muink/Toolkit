@@ -20,7 +20,7 @@
 #include "SHA-1.h"
 
 //SHA-1 compress process
-static void __fastcall SHA1_Compress(
+static void SHA1_Compress(
 	SHA1_State *sha1, 
 	uint8_t *buf)
 {
@@ -107,7 +107,7 @@ static void __fastcall SHA1_Compress(
 	Initialize the hash state
 	@param sha1   The hash state you wish to initialize
 */
-void __fastcall SHA1_Init(
+void SHA1_Init(
 	SHA1_State *sha1)
 {
 	sha1->State[0] = 0x67452301UL;
@@ -127,7 +127,7 @@ void __fastcall SHA1_Init(
 	@param in     The data to hash
 	@param inlen  The length of the data (octets)
 */
-void __fastcall SHA1_Process(
+void SHA1_Process(
 	SHA1_State *sha1, 
 	const uint8_t *in, 
 	unsigned long inlen)
@@ -165,7 +165,7 @@ void __fastcall SHA1_Process(
 	@param sha1  The hash state
 	@param out [out] The destination of the hash (20 bytes)
 */
-void __fastcall SHA1_Done(
+void SHA1_Done(
 	SHA1_State *sha1, 
 	uint8_t *out)
 {
@@ -173,7 +173,7 @@ void __fastcall SHA1_Done(
 	sha1->Length += sha1->Curlen * 8;
 
 //Append the '1' bit.
-	sha1->Buffer[sha1->Curlen++] = (unsigned char)0x80;
+	sha1->Buffer[sha1->Curlen++] = (uint8_t)0x80;
 
 /** if the length is currently above 56 bytes we append zeros
   * then compress.  Then we can fall back to padding zeros and length
@@ -182,14 +182,14 @@ void __fastcall SHA1_Done(
 	if (sha1->Curlen > 56)
 	{
 		while (sha1->Curlen < 64)
-			sha1->Buffer[sha1->Curlen++] = (unsigned char)0;
+			sha1->Buffer[sha1->Curlen++] = (uint8_t)0;
 		SHA1_Compress(sha1, sha1->Buffer);
 		sha1->Curlen = 0;
 	}
 
 //Pad upto 56 bytes of zeroes.
 	while (sha1->Curlen < 56)
-		sha1->Buffer[sha1->Curlen++] = (unsigned char)0;
+		sha1->Buffer[sha1->Curlen++] = (uint8_t)0;
 
 //Store length.
 	STORE64H(sha1->Length, sha1->Buffer + 56);
@@ -203,7 +203,7 @@ void __fastcall SHA1_Done(
 }
 
 //SHA-1 hash function
-bool __fastcall SHA1_Hash(
+bool SHA1_Hash(
 	FILE *FileHandle)
 {
 //Parameters check
@@ -214,11 +214,11 @@ bool __fastcall SHA1_Hash(
 	}
 
 //Initialization
-	std::shared_ptr<char> Buffer(new char[FILE_BUFFER_SIZE]()), StringBuffer(new char[FILE_BUFFER_SIZE]());
+	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	SHA1_State HashInstance;
-	memset(&HashInstance, 0, sizeof(SHA1_State));
+	memset(&HashInstance, 0, sizeof(HashInstance));
 	size_t ReadLength = 0;
 
 //SHA-1 initialization
@@ -229,7 +229,7 @@ bool __fastcall SHA1_Hash(
 	{
 		memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 		_set_errno(0);
-		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(char), FILE_BUFFER_SIZE, FileHandle);
+		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(uint8_t), FILE_BUFFER_SIZE, FileHandle);
 		if (ReadLength == 0)
 		{
 			fwprintf_s(stderr, L"Hash process error");
@@ -241,21 +241,21 @@ bool __fastcall SHA1_Hash(
 			return false;
 		}
 		else {
-			SHA1_Process(&HashInstance, (uint8_t *)Buffer.get(), (unsigned long)ReadLength);
+			SHA1_Process(&HashInstance, Buffer.get(), (unsigned long)ReadLength);
 		}
 	}
 
 //Binary to hex
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
-	SHA1_Done(&HashInstance, (uint8_t *)Buffer.get());
-	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const unsigned char *)Buffer.get(), SHA1_SIZE_DIGEST) == nullptr)
+	SHA1_Done(&HashInstance, Buffer.get());
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA1_SIZE_DIGEST) == nullptr)
 	{
 		fwprintf_s(stderr, L"Convert binary to hex error.\n");
 		return false;
 	}
 	else {
 	//Print to screen.
-		std::string HashResult = StringBuffer.get();
+		std::string HashResult = (const char *)StringBuffer.get();
 		CaseConvert(true, HashResult);
 		for (size_t Index = 0;Index < HashResult.length();++Index)
 			fwprintf_s(stderr, L"%c", HashResult.c_str()[Index]);

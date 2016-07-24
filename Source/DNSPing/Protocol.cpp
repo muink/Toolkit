@@ -22,11 +22,11 @@
 //Minimum supported system of Windows Version Helpers is Windows Vista.
 #if defined(PLATFORM_WIN_XP)
 //Check current operation system which higher than Windows 7.
-bool __fastcall IsLowerThanWin8(
+bool IsLowerThanWin8(
 	void)
 {
 	OSVERSIONINFOEX OSVI;
-	memset(&OSVI, 0, sizeof(OSVERSIONINFOEX));
+	memset(&OSVI, 0, sizeof(OSVI));
 	OSVI.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 	BOOL bOsVersionInfoEx = GetVersionExW((OSVERSIONINFO *)&OSVI);
 
@@ -39,7 +39,7 @@ bool __fastcall IsLowerThanWin8(
 #endif
 
 //Check empty buffer
-bool __fastcall CheckEmptyBuffer(
+bool CheckEmptyBuffer(
 	const void *Buffer, 
 	const size_t Length)
 {
@@ -61,11 +61,11 @@ bool __fastcall CheckEmptyBuffer(
 //Convert multiple bytes to wide char string
 void MBSToWCSString(
 	std::wstring &Target, 
-	const char *Buffer)
+	const uint8_t *Buffer)
 {
-	std::shared_ptr<wchar_t> TargetPTR(new wchar_t[strnlen(Buffer, LARGE_PACKET_MAXSIZE) + 1U]());
-	wmemset(TargetPTR.get(), 0, strnlen(Buffer, LARGE_PACKET_MAXSIZE) + 1U);
-	mbstowcs(TargetPTR.get(), Buffer, strnlen(Buffer, LARGE_PACKET_MAXSIZE));
+	std::shared_ptr<wchar_t> TargetPTR(new wchar_t[strnlen((const char *)Buffer, LARGE_PACKET_MAXSIZE) + 1U]());
+	wmemset(TargetPTR.get(), 0, strnlen((const char *)Buffer, LARGE_PACKET_MAXSIZE) + 1U);
+	mbstowcs(TargetPTR.get(), (const char *)Buffer, strnlen((const char *)Buffer, LARGE_PACKET_MAXSIZE));
 	Target = TargetPTR.get();
 
 	return;
@@ -73,9 +73,9 @@ void MBSToWCSString(
 #endif
 
 //Convert lowercase/uppercase word(s) to uppercase/lowercase word(s).
-size_t __fastcall CaseConvert(
+size_t CaseConvert(
 	const bool IsLowerUpper, 
-	char *Buffer, 
+	uint8_t *Buffer, 
 	const size_t Length)
 {
 	for (size_t Index = 0;Index < Length;++Index)
@@ -97,19 +97,21 @@ size_t __fastcall CaseConvert(
 }
 
 //Convert address strings to binary.
-size_t __fastcall AddressStringToBinary(
-	const char *AddrString, 
+size_t AddressStringToBinary(
+	const uint8_t *AddrString, 
 	void *pAddr, 
 	const uint16_t Protocol, 
-	SSIZE_T &ErrCode)
+	ssize_t &ErrCode)
 {
-	SSIZE_T SignedResult = 0;
+#if !defined(PLATFORM_WIN_XP)
+	ssize_t SignedResult = 0;
+#endif
 	size_t UnsignedResult = 0;
 
 //Minimum supported system of inet_ntop and inet_pton functions is Windows Vista. [Roy Tam]
 #if defined(PLATFORM_WIN_XP)
 	sockaddr_storage SockAddr;
-	memset(&SockAddr, 0, sizeof(sockaddr_storage));
+	memset(&SockAddr, 0, sizeof(SockAddr));
 	int SockLength = 0;
 #endif
 
@@ -117,7 +119,7 @@ size_t __fastcall AddressStringToBinary(
 	if (Protocol == AF_INET6)
 	{
 	//Check IPv6 addresses
-		for (UnsignedResult = 0;UnsignedResult < strlen(AddrString);++UnsignedResult)
+		for (UnsignedResult = 0;UnsignedResult < strnlen_s((const char *)AddrString, ADDR_STRING_MAXSIZE);++UnsignedResult)
 		{
 			if (AddrString[UnsignedResult] < ASCII_ZERO || (AddrString[UnsignedResult] > ASCII_COLON && 
 				AddrString[UnsignedResult] < ASCII_UPPERCASE_A) || (AddrString[UnsignedResult] > ASCII_UPPERCASE_F && 
@@ -125,13 +127,13 @@ size_t __fastcall AddressStringToBinary(
 					break;
 		}
 
-		std::string sAddrString(AddrString);
+		std::string sAddrString((const char *)AddrString);
 	//Check abbreviation format.
 		if (sAddrString.find(ASCII_COLON) == std::string::npos)
 		{
 			sAddrString.clear();
 			sAddrString.append("::");
-			sAddrString.append(AddrString);
+			sAddrString.append((const char *)AddrString);
 		}
 		else if (sAddrString.find(ASCII_COLON) == sAddrString.rfind(ASCII_COLON))
 		{
@@ -157,7 +159,7 @@ size_t __fastcall AddressStringToBinary(
 //IPv4
 	else {
 		size_t CommaNum = 0;
-		for (UnsignedResult = 0;UnsignedResult < strlen(AddrString);++UnsignedResult)
+		for (UnsignedResult = 0;UnsignedResult < strnlen_s((const char *)AddrString, ADDR_STRING_MAXSIZE);++UnsignedResult)
 		{
 			if ((AddrString[UnsignedResult] != ASCII_PERIOD && AddrString[UnsignedResult] < ASCII_ZERO) || AddrString[UnsignedResult] > ASCII_NINE)
 				return EXIT_FAILURE;
@@ -165,7 +167,7 @@ size_t __fastcall AddressStringToBinary(
 				++CommaNum;
 		}
 
-		std::string sAddrString(AddrString);
+		std::string sAddrString((const char *)AddrString);
 	//Delete zero(s) before whole data.
 		while (sAddrString.length() > 1U && sAddrString[0] == ASCII_ZERO && sAddrString[1U] != ASCII_PERIOD)
 			sAddrString.erase(0, 1U);
@@ -175,7 +177,7 @@ size_t __fastcall AddressStringToBinary(
 		{
 			sAddrString.clear();
 			sAddrString.append("0.0.0.");
-			sAddrString.append(AddrString);
+			sAddrString.append((const char *)AddrString);
 		}
 		else if (CommaNum == 1U)
 		{
@@ -217,7 +219,7 @@ size_t __fastcall AddressStringToBinary(
 }
 
 //Convert protocol name to hex
-uint16_t __fastcall ProtocolNameToPort(
+uint16_t ProtocolNameToPort(
 	const std::wstring &Buffer)
 {
 //Internet Protocol Number(Part 1)
@@ -519,7 +521,7 @@ uint16_t __fastcall ProtocolNameToPort(
 }
 
 //Convert service name to port
-uint16_t __fastcall ServiceNameToPort(
+uint16_t ServiceNameToPort(
 	const std::wstring &Buffer)
 {
 //Server name
@@ -706,7 +708,7 @@ uint16_t __fastcall ServiceNameToPort(
 }
 
 //Convert DNS classes name to hex
-uint16_t __fastcall DNSClassesNameToBinary(
+uint16_t DNSClassesNameToBinary(
 	const std::wstring &Buffer)
 {
 //DNS classes name
@@ -729,7 +731,7 @@ uint16_t __fastcall DNSClassesNameToBinary(
 }
 
 //Convert DNS type name to hex
-uint16_t __fastcall DNSTypeNameToBinary(
+uint16_t DNSTypeNameToBinary(
 	const std::wstring &Buffer)
 {
 //DNS type name
@@ -904,11 +906,11 @@ uint16_t __fastcall DNSTypeNameToBinary(
 }
 
 //Convert data from char(s) to DNS query
-size_t __fastcall CharToDNSQuery(
-	const char *FName, 
-	char *TName)
+size_t CharToDNSQuery(
+	const uint8_t *FName, 
+	uint8_t *TName)
 {
-	int Index[] = {(int)strnlen_s(FName, DOMAIN_MAXSIZE) - 1, 0, 0};
+	int Index[] = {(int)strnlen_s((const char *)FName, DOMAIN_MAXSIZE) - 1, 0, 0};
 	Index[2U] = Index[0] + 1;
 	TName[Index[0] + 2] = 0;
 
@@ -916,7 +918,7 @@ size_t __fastcall CharToDNSQuery(
 	{
 		if (FName[Index[0]] == ASCII_PERIOD)
 		{
-			TName[Index[2U]] = (char)Index[1U];
+			TName[Index[2U]] = (uint8_t)Index[1U];
 			Index[1U] = 0;
 		}
 		else
@@ -926,14 +928,14 @@ size_t __fastcall CharToDNSQuery(
 		}
 	}
 
-	TName[Index[2U]] = (char)Index[1U];
-	return strnlen_s(TName, DOMAIN_MAXSIZE - 1U) + 1U;
+	TName[Index[2U]] = (uint8_t)Index[1U];
+	return strnlen_s((const char *)TName, DOMAIN_MAXSIZE - 1U) + 1U;
 }
 
 //Convert data from DNS query to char(s)
-size_t __fastcall DNSQueryToChar(
-	const char *TName, 
-	char *FName, 
+size_t DNSQueryToChar(
+	const uint8_t *TName, 
+	uint8_t *FName, 
 	uint16_t &Truncated)
 {
 //Initialization
@@ -944,11 +946,11 @@ size_t __fastcall DNSQueryToChar(
 	for (uIndex = 0;uIndex < DOMAIN_MAXSIZE;++uIndex)
 	{
 	//Pointer
-		if ((UCHAR)TName[uIndex] >= 0xC0)
+		if (TName[uIndex] >= 0xC0)
 		{
-			Truncated = (UCHAR)(TName[uIndex] & 0x3F);
-			Truncated = Truncated << sizeof(char) * BYTES_TO_BITS;
-			Truncated += (UCHAR)TName[uIndex + 1U];
+			Truncated = (uint8_t)(TName[uIndex] & 0x3F);
+			Truncated = Truncated << sizeof(uint8_t) * BYTES_TO_BITS;
+			Truncated += (uint8_t)TName[uIndex + 1U];
 			return uIndex + sizeof(uint16_t);
 		}
 		else if (uIndex == 0)
@@ -974,8 +976,8 @@ size_t __fastcall DNSQueryToChar(
 }
 
 //Validate packets
-bool __fastcall ValidatePacket(
-	const char *Buffer, 
+bool ValidatePacket(
+	const uint8_t *Buffer, 
 	const size_t Length, 
 	const uint16_t DNS_ID)
 {
@@ -1012,7 +1014,7 @@ bool __fastcall ValidatePacket(
 }
 
 //Print date from seconds to file
-void __fastcall PrintSecondsInDateTime(
+void PrintSecondsInDateTime(
 	const time_t Seconds, 
 	FILE *FileHandle)
 {
@@ -1028,7 +1030,7 @@ void __fastcall PrintSecondsInDateTime(
 //Years
 	if (DateTime / SECONDS_IN_YEAR > 0)
 	{
-		fwprintf_s(FileHandle, L"%u year", (UINT)(DateTime / SECONDS_IN_YEAR));
+		fwprintf_s(FileHandle, L"%u year", (unsigned int)(DateTime / SECONDS_IN_YEAR));
 		if (DateTime / SECONDS_IN_YEAR > 1U)
 			fwprintf_s(FileHandle, L"s");
 		DateTime %= SECONDS_IN_YEAR;
@@ -1039,7 +1041,7 @@ void __fastcall PrintSecondsInDateTime(
 	{
 		if (Before)
 			fwprintf_s(FileHandle, L" ");
-		fwprintf_s(FileHandle, L"%u month", (UINT)(DateTime / SECONDS_IN_MONTH));
+		fwprintf_s(FileHandle, L"%u month", (unsigned int)(DateTime / SECONDS_IN_MONTH));
 		if (DateTime / SECONDS_IN_MONTH > 1U)
 			fwprintf_s(FileHandle, L"s");
 		DateTime %= SECONDS_IN_MONTH;
@@ -1050,7 +1052,7 @@ void __fastcall PrintSecondsInDateTime(
 	{
 		if (Before)
 			fwprintf_s(FileHandle, L" ");
-		fwprintf_s(FileHandle, L"%u day", (UINT)(DateTime / SECONDS_IN_DAY));
+		fwprintf_s(FileHandle, L"%u day", (unsigned int)(DateTime / SECONDS_IN_DAY));
 		if (DateTime / SECONDS_IN_DAY > 1U)
 			fwprintf_s(FileHandle, L"s");
 		DateTime %= SECONDS_IN_DAY;
@@ -1061,7 +1063,7 @@ void __fastcall PrintSecondsInDateTime(
 	{
 		if (Before)
 			fwprintf_s(FileHandle, L" ");
-		fwprintf_s(FileHandle, L"%u hour", (UINT)(DateTime / SECONDS_IN_HOUR));
+		fwprintf_s(FileHandle, L"%u hour", (unsigned int)(DateTime / SECONDS_IN_HOUR));
 		if (DateTime / SECONDS_IN_HOUR > 1U)
 			fwprintf_s(FileHandle, L"s");
 		DateTime %= SECONDS_IN_HOUR;
@@ -1072,7 +1074,7 @@ void __fastcall PrintSecondsInDateTime(
 	{
 		if (Before)
 			fwprintf_s(FileHandle, L" ");
-		fwprintf_s(FileHandle, L"%u minute", (UINT)(DateTime / SECONDS_IN_MINUTE));
+		fwprintf_s(FileHandle, L"%u minute", (unsigned int)(DateTime / SECONDS_IN_MINUTE));
 		if (DateTime / SECONDS_IN_MINUTE > 1U)
 			fwprintf_s(FileHandle, L"s");
 		DateTime %= SECONDS_IN_MINUTE;
@@ -1083,7 +1085,7 @@ void __fastcall PrintSecondsInDateTime(
 	{
 		if (Before)
 			fwprintf_s(FileHandle, L" ");
-		fwprintf_s(FileHandle, L"%u second", (UINT)(DateTime));
+		fwprintf_s(FileHandle, L"%u second", (unsigned int)(DateTime));
 		if (DateTime > 1U)
 			fwprintf_s(FileHandle, L"s");
 	}
@@ -1093,12 +1095,12 @@ void __fastcall PrintSecondsInDateTime(
 }
 
 //Print Date and Time with UNIX time to file
-void __fastcall PrintDateTime(
+void PrintDateTime(
 	const time_t Time, 
 	FILE *FileHandle)
 {
 	tm TimeStructure;
-	memset(&TimeStructure, 0, sizeof(tm));
+	memset(&TimeStructure, 0, sizeof(TimeStructure));
 	localtime_s(&TimeStructure, &Time);
 	fwprintf_s(FileHandle, L"%d-%02d-%02d %02d:%02d:%02d", TimeStructure.tm_year + 1900, TimeStructure.tm_mon + 1, TimeStructure.tm_mday, TimeStructure.tm_hour, TimeStructure.tm_min, TimeStructure.tm_sec);
 

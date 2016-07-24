@@ -20,14 +20,14 @@
 #include "Process.h"
 
 //Send DNS request process
-size_t __fastcall SendProcess(
+size_t SendProcess(
 	const sockaddr_storage &Target, 
 	const bool LastSend)
 {
 //Initialization(Part 1)
 	SOCKET Socket_Normal = 0, Socket_SOCKS = 0, *Socket_Exchange = nullptr;
 	sockaddr_storage SockAddr_SOCKS_UDP;
-	memset(&SockAddr_SOCKS_UDP, 0, sizeof(sockaddr_storage));
+	memset(&SockAddr_SOCKS_UDP, 0, sizeof(SockAddr_SOCKS_UDP));
 	socklen_t AddrLen_Normal = 0, AddrLen_SOCKS = 0;
 
 //IPv6
@@ -164,20 +164,18 @@ size_t __fastcall SendProcess(
 	}
 
 //Initialization(Part 2)
-	std::shared_ptr<char> Buffer(new char[ConfigurationParameter.BufferSize]()), RecvBuffer(new char[ConfigurationParameter.BufferSize]());
+	std::shared_ptr<uint8_t> Buffer(new uint8_t[ConfigurationParameter.BufferSize]()), RecvBuffer(new uint8_t[ConfigurationParameter.BufferSize]());
 	memset(Buffer.get(), 0, ConfigurationParameter.BufferSize);
 	memset(RecvBuffer.get(), 0, ConfigurationParameter.BufferSize);
-	SSIZE_T DataLength = 0;
+	ssize_t DataLength = 0;
 #if defined(PLATFORM_WIN)
 	LARGE_INTEGER CPUFrequency, BeforeTime, AfterTime;
-	memset(&CPUFrequency, 0, sizeof(LARGE_INTEGER));
-	memset(&AfterTime, 0, sizeof(LARGE_INTEGER));
-	memset(&AfterTime, 0, sizeof(LARGE_INTEGER));
+	memset(&CPUFrequency, 0, sizeof(CPUFrequency));
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
 	timeval BeforeTime, AfterTime;
-	memset(&BeforeTime, 0, sizeof(timeval));
-	memset(&AfterTime, 0, sizeof(timeval));
 #endif
+	memset(&BeforeTime, 0, sizeof(BeforeTime));
+	memset(&AfterTime, 0, sizeof(AfterTime));
 
 //Make standard packet.
 	dns_hdr *pdns_hdr = nullptr;
@@ -206,7 +204,7 @@ size_t __fastcall SendProcess(
 		#endif
 		}
 		DataLength += sizeof(dns_hdr);
-		DataLength += CharToDNSQuery((char *)ConfigurationParameter.TestDomain.c_str(), Buffer.get() + DataLength);
+		DataLength += CharToDNSQuery((const uint8_t *)ConfigurationParameter.TestDomain.c_str(), Buffer.get() + DataLength);
 		memcpy_s(Buffer.get() + DataLength, ConfigurationParameter.BufferSize - DataLength, &ConfigurationParameter.Parameter_Query, sizeof(dns_qry));
 		DataLength += sizeof(dns_qry);
 		if (ConfigurationParameter.EDNS)
@@ -239,7 +237,7 @@ size_t __fastcall SendProcess(
 
 	//SOCKS Local UDP socket connecting and get UDP socket infomation.
 		sockaddr_storage SockAddr_SOCKS_Local;
-		memset(&SockAddr_SOCKS_Local, 0, sizeof(sockaddr_storage));
+		memset(&SockAddr_SOCKS_Local, 0, sizeof(SockAddr_SOCKS_Local));
 		uint16_t SOCKS_Local_Port = 0;
 		if (connect(Socket_SOCKS, (PSOCKADDR)&SockAddr_SOCKS_UDP, AddrLen_SOCKS) == SOCKET_ERROR || 
 			getsockname(Socket_SOCKS, (PSOCKADDR)&SockAddr_SOCKS_Local, &AddrLen_SOCKS) == SOCKET_ERROR)
@@ -350,7 +348,7 @@ size_t __fastcall SendProcess(
 		closesocket(Socket_SOCKS);
 		return EXIT_FAILURE;
 	}
-	else if (send(*Socket_Exchange, Buffer.get(), (int)DataLength, 0) == SOCKET_ERROR)
+	else if (send(*Socket_Exchange, (const char *)Buffer.get(), (int)DataLength, 0) == SOCKET_ERROR)
 	{
 		fwprintf_s(stderr, L"Send packet error, error code is %d.\n", (int)WSAGetLastError());
 
@@ -363,7 +361,7 @@ size_t __fastcall SendProcess(
 
 //Receive response.
 #if defined(PLATFORM_WIN)
-	DataLength = recv(*Socket_Exchange, RecvBuffer.get(), (int)ConfigurationParameter.BufferSize, 0);
+	DataLength = recv(*Socket_Exchange, (char *)RecvBuffer.get(), (int)ConfigurationParameter.BufferSize, 0);
 	if (QueryPerformanceCounter(&AfterTime) == 0)
 	{
 		fwprintf_s(stderr, L"Get current time from High Precision Event Timer/HPET error, error code is %d.\n", (int)GetLastError());
@@ -398,14 +396,14 @@ size_t __fastcall SendProcess(
 #endif
 
 //Print to screen.
-	if (DataLength >= (SSIZE_T)DNS_PACKET_MINSIZE)
+	if (DataLength >= (ssize_t)DNS_PACKET_MINSIZE)
 	{
 	//SOCKS mode
 		if (ConfigurationParameter.SockAddr_SOCKS.ss_family > 0)
 		{
 		//SOCKS reply check
 			if (((psocks_udp_relay_request)RecvBuffer.get())->Reserved > 0 || ((psocks_udp_relay_request)RecvBuffer.get())->FragmentNumber > 0 || 
-				DataLength < (SSIZE_T)sizeof(socks_udp_relay_request))
+				DataLength < (ssize_t)sizeof(socks_udp_relay_request))
 			{
 				fwprintf_s(stderr, L"SOCKS receive data format error.\n");
 
@@ -477,7 +475,7 @@ size_t __fastcall SendProcess(
 				//Receive.
 					memset(RecvBuffer.get(), 0, ConfigurationParameter.BufferSize);
 				#if defined(PLATFORM_WIN)
-					DataLength = recv(*Socket_Exchange, RecvBuffer.get(), (int)ConfigurationParameter.BufferSize, 0);
+					DataLength = recv(*Socket_Exchange, (char *)RecvBuffer.get(), (int)ConfigurationParameter.BufferSize, 0);
 					if (QueryPerformanceCounter(&AfterTime) == 0)
 					{
 						fwprintf_s(stderr, L"Get current time from High Precision Event Timer/HPET error, error code is %d.\n", (int)GetLastError());
@@ -648,7 +646,7 @@ size_t __fastcall SendProcess(
 }
 
 //SOCKS UDP-ASSOCIATE process
-size_t __fastcall SOCKS_UDP_ASSOCIATE(
+size_t SOCKS_UDP_ASSOCIATE(
 	sockaddr_storage &SockAddr_SOCKS_UDP, 
 	const uint16_t SOCKS_Local_Port, 
 	const SOCKET Socket_Normal, 
@@ -663,13 +661,13 @@ size_t __fastcall SOCKS_UDP_ASSOCIATE(
 	}
 
 //Make SOCKS client selection packet and send.
-	std::shared_ptr<char> Buffer(new char[LARGE_PACKET_MAXSIZE]());
+	std::shared_ptr<uint8_t> Buffer(new uint8_t[LARGE_PACKET_MAXSIZE]());
 	memset(Buffer.get(), 0, LARGE_PACKET_MAXSIZE);
 	((psocks_client_selection)Buffer.get())->Version = SOCKS_VERSION_5;
 	((psocks_client_selection)Buffer.get())->Methods_Number = SOCKS_METHOD_SUPPORT_NUM;
 	((psocks_client_selection)Buffer.get())->Methods_A = SOCKS_METHOD_NO_AUTHENTICATION_REQUIRED;
 	((psocks_client_selection)Buffer.get())->Methods_B = SOCKS_METHOD_USERNAME_PASSWORD;
-	if (send(Socket_Normal, Buffer.get(), sizeof(socks_client_selection), 0) == SOCKET_ERROR)
+	if (send(Socket_Normal, (const char *)Buffer.get(), sizeof(socks_client_selection), 0) == SOCKET_ERROR)
 	{
 		fwprintf_s(stderr, L"Send packet error, error code is %d.\n", (int)WSAGetLastError());
 		return EXIT_FAILURE;
@@ -680,7 +678,7 @@ size_t __fastcall SOCKS_UDP_ASSOCIATE(
 
 //Receive SOCKS server selection.
 	size_t DataLength = 0;
-	SSIZE_T Result = recv(Socket_Normal, Buffer.get(), LARGE_PACKET_MAXSIZE, 0);
+	ssize_t Result = recv(Socket_Normal, (char *)Buffer.get(), LARGE_PACKET_MAXSIZE, 0);
 	if (Result > 0)
 	{
 		if (((psocks_server_selection)Buffer.get())->Version != SOCKS_VERSION_5)
@@ -709,13 +707,13 @@ size_t __fastcall SOCKS_UDP_ASSOCIATE(
 				}
 
 			//Send authentication request.
-				if (send(Socket_Normal, Buffer.get(), (int)DataLength, 0) == SOCKET_ERROR)
+				if (send(Socket_Normal, (const char *)Buffer.get(), (int)DataLength, 0) == SOCKET_ERROR)
 				{
 					fwprintf_s(stderr, L"Send packet error, error code is %d.\n", (int)WSAGetLastError());
 					return EXIT_FAILURE;
 				}
 				else {
-					Result = recv(Socket_Normal, Buffer.get(), LARGE_PACKET_MAXSIZE, 0);
+					Result = recv(Socket_Normal, (char *)Buffer.get(), LARGE_PACKET_MAXSIZE, 0);
 				}
 				if (Result > 0)
 				{
@@ -765,7 +763,7 @@ size_t __fastcall SOCKS_UDP_ASSOCIATE(
 		*((uint16_t *)(Buffer.get() + DataLength)) = SOCKS_Local_Port;
 		DataLength += sizeof(uint16_t);
 	}
-	if (send(Socket_Normal, Buffer.get(), (int)DataLength, 0) == SOCKET_ERROR)
+	if (send(Socket_Normal, (const char *)Buffer.get(), (int)DataLength, 0) == SOCKET_ERROR)
 	{
 		fwprintf_s(stderr, L"Send packet error, error code is %d.\n", (int)WSAGetLastError());
 		return EXIT_FAILURE;
@@ -776,7 +774,7 @@ size_t __fastcall SOCKS_UDP_ASSOCIATE(
 	}
 
 //SOCKS server reply message
-	Result = recv(Socket_Normal, Buffer.get(), LARGE_PACKET_MAXSIZE, 0);
+	Result = recv(Socket_Normal, (char *)Buffer.get(), LARGE_PACKET_MAXSIZE, 0);
 	if (Result > 0)
 	{
 		if (((psocks5_server_command_reply)Buffer.get())->Version != SOCKS_VERSION_5 || ((psocks5_server_command_reply)Buffer.get())->Reply != SOCKS5_REPLY_SUCCESS)
@@ -821,7 +819,7 @@ size_t __fastcall SOCKS_UDP_ASSOCIATE(
 }
 
 //Print statistics to screen(and/or output result to file)
-size_t __fastcall PrintProcess(
+size_t PrintProcess(
 	const bool IsPacketStatistics, 
 	const bool IsTimeStatistics)
 {
@@ -829,31 +827,31 @@ size_t __fastcall PrintProcess(
 	if (IsPacketStatistics)
 	{
 		fwprintf_s(stderr, L"\nPacket statistics for pinging %ls:\n", ConfigurationParameter.wTargetString.c_str());
-		fwprintf_s(stderr, L"   Send: %lu\n", (ULONG)ConfigurationParameter.Statistics_RealSend);
-		fwprintf_s(stderr, L"   Receive: %lu\n", (ULONG)ConfigurationParameter.Statistics_RecvNum);
+		fwprintf_s(stderr, L"   Send: %lu\n", (unsigned long)ConfigurationParameter.Statistics_RealSend);
+		fwprintf_s(stderr, L"   Receive: %lu\n", (unsigned long)ConfigurationParameter.Statistics_RecvNum);
 
 	//Output to file.
 		if (ConfigurationParameter.OutputFile != nullptr)
 		{
 			fwprintf_s(ConfigurationParameter.OutputFile, L"\nPacket statistics for pinging %ls:\n", ConfigurationParameter.wTargetString.c_str());
-			fwprintf_s(ConfigurationParameter.OutputFile, L"   Send: %lu\n", (ULONG)ConfigurationParameter.Statistics_RealSend);
-			fwprintf_s(ConfigurationParameter.OutputFile, L"   Receive: %lu\n", (ULONG)ConfigurationParameter.Statistics_RecvNum);
+			fwprintf_s(ConfigurationParameter.OutputFile, L"   Send: %lu\n", (unsigned long)ConfigurationParameter.Statistics_RealSend);
+			fwprintf_s(ConfigurationParameter.OutputFile, L"   Receive: %lu\n", (unsigned long)ConfigurationParameter.Statistics_RecvNum);
 		}
 
 		if (ConfigurationParameter.Statistics_RealSend >= ConfigurationParameter.Statistics_RecvNum)
 		{
-			fwprintf_s(stderr, L"   Lost: %lu", (ULONG)(ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum));
+			fwprintf_s(stderr, L"   Lost: %lu", (unsigned long)(ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum));
 			if (ConfigurationParameter.Statistics_RealSend > 0)
-				fwprintf_s(stderr, L" (%lu%%)\n", (ULONG)((ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum) * 100 / ConfigurationParameter.Statistics_RealSend));
+				fwprintf_s(stderr, L" (%lu%%)\n", (unsigned long)((ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum) * 100 / ConfigurationParameter.Statistics_RealSend));
 			else  //Not any packets.
 				fwprintf_s(stderr, L"\n");
 
 		//Output to file.
 			if (ConfigurationParameter.OutputFile != nullptr)
 			{
-				fwprintf_s(ConfigurationParameter.OutputFile, L"   Lost: %lu", (ULONG)(ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum));
+				fwprintf_s(ConfigurationParameter.OutputFile, L"   Lost: %lu", (unsigned long)(ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum));
 				if (ConfigurationParameter.Statistics_RealSend > 0)
-					fwprintf_s(ConfigurationParameter.OutputFile, L" (%lu%%)\n", (ULONG)((ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum) * 100 / ConfigurationParameter.Statistics_RealSend));
+					fwprintf_s(ConfigurationParameter.OutputFile, L" (%lu%%)\n", (unsigned long)((ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum) * 100 / ConfigurationParameter.Statistics_RealSend));
 				else  //Not any packets.
 					fwprintf_s(ConfigurationParameter.OutputFile, L"\n");
 			}
@@ -908,7 +906,7 @@ size_t __fastcall PrintProcess(
 }
 
 //Print description to screen
-void __fastcall PrintDescription(
+void PrintDescription(
 	void)
 {
 	fwprintf_s(stderr, L"\n");

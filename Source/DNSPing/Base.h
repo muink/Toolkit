@@ -64,7 +64,6 @@
 	#define SD_BOTH                                                          SHUT_RDWR
 	#define SD_RECV                                                          SHUT_RD
 	#define SD_SEND                                                          SHUT_WR
-	#define __fastcall
 	#define closesocket                                                      close
 	#if defined(PLATFORM_LINUX)
 		#define _fcloseall                                                       fcloseall
@@ -146,7 +145,7 @@ public:
 #if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
 	std::string OutputFileName;
 #endif
-	std::shared_ptr<char> RawData;
+	std::shared_ptr<uint8_t> RawData;
 
 //Member functions
 	ConfigurationTable(
@@ -159,7 +158,7 @@ public:
 
 //Console.h
 #if defined(PLATFORM_WIN)
-BOOL __fastcall CtrlHandler(
+BOOL CtrlHandler(
 	const DWORD fdwCtrlType);
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
 void SIG_Handler(
@@ -167,83 +166,83 @@ void SIG_Handler(
 #endif
 
 //DNSPing.cpp
-size_t __fastcall ConfigurationInitialization(
+size_t ConfigurationInitialization(
 	void);
 #if defined(PLATFORM_WIN)
-size_t __fastcall ReadCommands(
+size_t ReadCommands(
 	int argc, 
 	wchar_t* argv[]);
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-size_t __fastcall ReadCommands(
+size_t ReadCommands(
 	int argc, 
 	char *argv[]);
 #endif
-size_t __fastcall OutputResultToFile(
+size_t OutputResultToFile(
 	void);
-void __fastcall PrintHeaderToScreen(
+void PrintHeaderToScreen(
 	const std::wstring wTargetAddressString, 
 	const std::wstring wTestDomain);
 
 //Process.h
-size_t __fastcall SendProcess(
+size_t SendProcess(
 	const sockaddr_storage &Target, 
 	const bool LastSend);
-size_t __fastcall PrintProcess(
+size_t PrintProcess(
 	const bool IsPacketStatistics, 
 	const bool IsTimeStatistics);
-void __fastcall PrintDescription(
+void PrintDescription(
 	void);
 
 //Protocol.h
-bool __fastcall CheckEmptyBuffer(
+bool CheckEmptyBuffer(
 	const void *Buffer, 
 	const size_t Length);
 #if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
 void MBSToWCSString(
 	std::wstring &Target, 
-	const char *Buffer);
+	const uint8_t *Buffer);
 #endif
-size_t __fastcall CaseConvert(
+size_t CaseConvert(
 	const bool IsLowerUpper, 
-	char *Buffer, 
+	uint8_t *Buffer, 
 	const size_t Length);
-size_t __fastcall AddressStringToBinary(
-	const char *AddrString, 
+size_t AddressStringToBinary(
+	const uint8_t *AddrString, 
 	void *pAddr, 
 	const uint16_t Protocol, 
-	SSIZE_T &ErrCode);
-uint16_t __fastcall ProtocolNameToPort(
+	ssize_t &ErrCode);
+uint16_t ProtocolNameToPort(
 	const std::wstring &Buffer);
-uint16_t __fastcall ServiceNameToPort(
+uint16_t ServiceNameToPort(
 	const std::wstring &Buffer);
-uint16_t __fastcall DNSClassesNameToBinary(
+uint16_t DNSClassesNameToBinary(
 	const std::wstring &Buffer);
-uint16_t __fastcall DNSTypeNameToBinary(
+uint16_t DNSTypeNameToBinary(
 	const std::wstring &Buffer);
-size_t __fastcall CharToDNSQuery(
-	const char *FName, 
-	char *TName);
-size_t __fastcall DNSQueryToChar(
-	const char *TName, 
-	char *FName, 
+size_t CharToDNSQuery(
+	const uint8_t *FName, 
+	uint8_t *TName);
+size_t DNSQueryToChar(
+	const uint8_t *TName, 
+	uint8_t *FName, 
 	uint16_t &Truncated);
-bool __fastcall ValidatePacket(
-	const char *Buffer, 
+bool ValidatePacket(
+	const uint8_t *Buffer, 
 	const size_t Length, 
 	const uint16_t DNS_ID);
-void __fastcall PrintSecondsInDateTime(
+void PrintSecondsInDateTime(
 	const time_t Seconds, 
 	FILE *FileHandle);
-void __fastcall PrintDateTime(
+void PrintDateTime(
 	const time_t Time, 
 	FILE *FileHandle);
 
 //Resolver.h
-void __fastcall PrintResponseHex(
-	const char *Buffer, 
+void PrintResponseHex(
+	const uint8_t *Buffer, 
 	const size_t Length, 
 	FILE *FileHandle);
-void __fastcall PrintResponse(
-	const char *Buffer, 
+void PrintResponse(
+	const uint8_t *Buffer, 
 	const size_t Length, 
 	FILE *FileHandle);

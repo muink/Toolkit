@@ -23,7 +23,7 @@
 extern ConfigurationTable ConfigurationParameter;
 
 //Functions
-size_t __fastcall SOCKS_UDP_ASSOCIATE(
+size_t SOCKS_UDP_ASSOCIATE(
 	sockaddr_storage &SockAddr_SOCKS_UDP, 
 	const uint16_t SOCKS_Local_Port, 
 	const SOCKET Socket_Normal, 

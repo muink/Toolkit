@@ -20,7 +20,7 @@
 #include "SHA-3.h"
 
 //Read commands(SHA-3)
-bool __fastcall ReadCommands_SHA3(
+bool ReadCommands_SHA3(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command)
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
@@ -128,7 +128,7 @@ bool __fastcall ReadCommands_SHA3(
 }
 
 //SHA-3 hash function
-bool __fastcall SHA3_Hash(
+bool SHA3_Hash(
 	FILE *FileHandle)
 {
 //Parameters check
@@ -139,11 +139,11 @@ bool __fastcall SHA3_Hash(
 	}
 
 //Initialization
-	std::shared_ptr<char> Buffer(new char[FILE_BUFFER_SIZE]()), StringBuffer(new char[FILE_BUFFER_SIZE]());
+	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	Keccak_HashInstance HashInstance;
-	memset(&HashInstance, 0, sizeof(Keccak_HashInstance));
+	memset(&HashInstance, 0, sizeof(HashInstance));
 	size_t ReadLength = 0;
 
 //SHA-3 initialization
@@ -181,7 +181,7 @@ bool __fastcall SHA3_Hash(
 	{
 		memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 		_set_errno(0);
-		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(char), FILE_BUFFER_SIZE, FileHandle);
+		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(uint8_t), FILE_BUFFER_SIZE, FileHandle);
 		if ((ReadLength == 0 && errno > 0) || Keccak_HashUpdate(&HashInstance, (BitSequence *)Buffer.get(), ReadLength * BYTES_TO_BITS) != SUCCESS)
 		{
 			fwprintf_s(stderr, L"Hash process error.\n");
@@ -196,7 +196,7 @@ bool __fastcall SHA3_Hash(
 	//SHA-3 224 bits
 		if (SHA3_HashFunctionID == HASH_ID_SHA3_224)
 		{
-			if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const unsigned char *)Buffer.get(), SHA3_SIZE_224 / BYTES_TO_BITS) == nullptr)
+			if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA3_SIZE_224 / BYTES_TO_BITS) == nullptr)
 			{
 				fwprintf_s(stderr, L"Convert binary to hex error.\n");
 				return false;
@@ -205,7 +205,7 @@ bool __fastcall SHA3_Hash(
 	//SHA-3 256 bits
 		else if (SHA3_HashFunctionID == HASH_ID_SHA3_256)
 		{
-			if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const unsigned char *)Buffer.get(), SHA3_SIZE_256 / BYTES_TO_BITS) == nullptr)
+			if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA3_SIZE_256 / BYTES_TO_BITS) == nullptr)
 			{
 				fwprintf_s(stderr, L"Convert binary to hex error.\n");
 				return false;
@@ -214,7 +214,7 @@ bool __fastcall SHA3_Hash(
 	//SHA-3 384 bits
 		else if (SHA3_HashFunctionID == HASH_ID_SHA3_384)
 		{
-			if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const unsigned char *)Buffer.get(), SHA3_SIZE_384 / BYTES_TO_BITS) == nullptr)
+			if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA3_SIZE_384 / BYTES_TO_BITS) == nullptr)
 			{
 				fwprintf_s(stderr, L"Convert binary to hex error.\n");
 				return false;
@@ -223,7 +223,7 @@ bool __fastcall SHA3_Hash(
 	//SHA-3 512 bits
 		else if (SHA3_HashFunctionID == HASH_ID_SHA3_512)
 		{
-			if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const unsigned char *)Buffer.get(), SHA3_SIZE_512 / BYTES_TO_BITS) == nullptr)
+			if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA3_SIZE_512 / BYTES_TO_BITS) == nullptr)
 			{
 				fwprintf_s(stderr, L"Convert binary to hex error.\n");
 				return false;
@@ -235,7 +235,7 @@ bool __fastcall SHA3_Hash(
 		//SHA-3 squeeze.
 			if (Keccak_HashSqueeze(&HashInstance, (BitSequence *)Buffer.get(), SHA3_SHAKE_Length) == SUCCESS)
 			{
-				if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const unsigned char *)Buffer.get(), SHA3_SHAKE_Length / BYTES_TO_BITS) == nullptr)
+				if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA3_SHAKE_Length / BYTES_TO_BITS) == nullptr)
 				{
 					fwprintf_s(stderr, L"Convert binary to hex error.\n");
 					return false;
@@ -252,7 +252,7 @@ bool __fastcall SHA3_Hash(
 		}
 
 	//Print to screen.
-		std::string HashResult = StringBuffer.get();
+		std::string HashResult = (const char *)StringBuffer.get();
 		CaseConvert(true, HashResult);
 		for (size_t Index = 0;Index < HashResult.length();++Index)
 			fwprintf_s(stderr, L"%c", HashResult.c_str()[Index]);

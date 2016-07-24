@@ -147,7 +147,7 @@
 #elif !defined(PLATFORM_UNIX)
 #  define PLATFORM_UNIX
 #endif
-/* Apple Mac OS X XCode support
+/* Apple Mac OS X Xcode support
 #if defined(PLATFORM_MACX)
 #  ifdef MAC_OS_X_VERSION_MIN_REQUIRED
 #    undef MAC_OS_X_VERSION_MIN_REQUIRED
@@ -300,7 +300,6 @@
 
 #if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
 //Linux and Mac OS X compatible
-	#define __fastcall
 	#define RETURN_ERROR                                                 (-1)
 	#if defined(PLATFORM_LINUX)
 		#define _fcloseall                                                       fcloseall
@@ -320,67 +319,67 @@
 // Main functions
 // 
 //Base.cpp
-bool __fastcall CheckEmptyBuffer(
+bool CheckEmptyBuffer(
 	const void *Buffer, 
 	const size_t Length);
-uint64_t __fastcall hton64(
+uint64_t hton64(
 	const uint64_t Value);
-bool __fastcall MBSToWCSString(
-	const char *Buffer, 
+bool MBSToWCSString(
+	const uint8_t *Buffer, 
 	const size_t MaxLen, 
 	std::wstring &Target);
 #if defined(PLATFORM_WIN)
-void __fastcall CaseConvert(
+void CaseConvert(
 	const bool IsLowerToUpper, 
 	std::wstring &Buffer);
 #endif
-void __fastcall CaseConvert(
+void CaseConvert(
 	const bool IsLowerToUpper, 
 	std::string &Buffer);
-char *sodium_bin2hex(
-	char *const hex, 
+uint8_t *sodium_bin2hex(
+	uint8_t *const hex, 
 	const size_t hex_maxlen, 
-	const unsigned char *const bin, 
+	const uint8_t *const bin, 
 	const size_t bin_len);
 
 //Checksum.cpp
-bool __fastcall Checksum_Hash(
+bool Checksum_Hash(
 	FILE *FileHandle);
 
 //CRC.cpp
-bool __fastcall ReadCommands_CRC(
+bool ReadCommands_CRC(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command);
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
 	std::string &Command);
 #endif
-bool __fastcall CRC_Hash(
+bool CRC_Hash(
 	FILE *FileHandle);
 
 //FileHash.cpp
-void __fastcall PrintDescription(
+void PrintDescription(
 	void);
 
 //MD2.cpp
-bool __fastcall MD2_Hash(
+bool MD2_Hash(
 	FILE *FileHandle);
 
 //MD4.cpp
-bool __fastcall MD4_Hash(
+bool MD4_Hash(
 	FILE *FileHandle);
 
 //MD5.cpp
-bool __fastcall MD5_Hash(
+bool MD5_Hash(
 	FILE *FileHandle);
 
 //SHA-1.cpp
-bool __fastcall SHA1_Hash(
+bool SHA1_Hash(
 	FILE *FileHandle);
 
 //SHA-2.cpp
-bool __fastcall SHA2_Hash(
+bool SHA2_Hash(
 	FILE *FileHandle);
-bool __fastcall ReadCommands_SHA2(
+bool ReadCommands_SHA2(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command);
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
@@ -388,9 +387,9 @@ bool __fastcall ReadCommands_SHA2(
 #endif
 
 //SHA-3.cpp
-bool __fastcall SHA3_Hash(
+bool SHA3_Hash(
 	FILE *FileHandle);
-bool __fastcall ReadCommands_SHA3(
+bool ReadCommands_SHA3(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command);
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))

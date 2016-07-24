@@ -66,23 +66,23 @@ typedef struct _md5_ctx_
 extern size_t HashFamilyID;
 
 //Functions
-void __fastcall MD5_Init(
+void MD5_Init(
 	MD5_CTX *context);
-void __fastcall MD5_Update(
+void MD5_Update(
 	MD5_CTX *context, 
 	uint8_t *input, 
 	unsigned int inputlen);
-void __fastcall MD5_Final(
+void MD5_Final(
 	MD5_CTX *context, 
 	uint8_t digest[MD5_SIZE_DIGEST]);
-void __fastcall MD5_Transform(
+void MD5_Transform(
 	unsigned int state[4U], 
 	uint8_t block[MD5_SIZE_BLOCK]);
-void __fastcall MD5_Encode(
+void MD5_Encode(
 	uint8_t *output, 
 	unsigned int *input, 
 	unsigned int len);
-void __fastcall MD5_Decode(
+void MD5_Decode(
 	unsigned int *output, 
 	uint8_t *input, 
 	unsigned int len);

@@ -202,93 +202,93 @@ extern size_t HashFamilyID;
 size_t CRC_HashFunctionID = HASH_ID_CRC_32;
 
 //Functions
-uint8_t __fastcall CRC8_Update(
+uint8_t CRC8_Update(
 	const size_t TableType, 
 	const uint8_t CRC, 
 	const uint8_t Buffer);
-uint8_t __fastcall CRC8_Init(
+uint8_t CRC8_Init(
 	const size_t TableType);
-uint8_t __fastcall CRC8_Calculate(
+uint8_t CRC8_Calculate(
 	uint8_t CRC, 
 	const size_t TableType, 
 	uint8_t *Buffer, 
 	const size_t Length);
-uint8_t __fastcall CRC8_Final(
+uint8_t CRC8_Final(
 	const uint8_t CRC, 
 	const size_t TableType);
-uint16_t __fastcall CRC16_Update_Normal(
+uint16_t CRC16_Update_Normal(
 	const uint16_t *Table, 
 	uint16_t CRC, 
 	const uint8_t Buffer);
-uint16_t __fastcall CRC16_Update_Reflected(
+uint16_t CRC16_Update_Reflected(
 	const uint16_t *Table, 
 	uint16_t CRC, 
 	const uint8_t Buffer);
-uint16_t __fastcall CRC16_Update_Reflected(
+uint16_t CRC16_Update_Reflected(
 	const uint16_t *Table, 
 	uint16_t CRC, 
 	const uint8_t Buffer);
-uint16_t __fastcall CRC16_Update_8005(
+uint16_t CRC16_Update_8005(
 	const uint16_t CRC, 
 	const uint8_t Buffer);
-uint16_t __fastcall CRC16_Update_A001(
+uint16_t CRC16_Update_A001(
 	const uint16_t CRC, 
 	const uint8_t Buffer);
-uint16_t __fastcall CRC16_Update_1021(
+uint16_t CRC16_Update_1021(
 	const uint16_t CRC, 
 	const uint8_t Buffer);
-uint16_t __fastcall CRC16_Update_8408(
+uint16_t CRC16_Update_8408(
 	const uint16_t CRC, 
 	const uint8_t Buffer);
-uint16_t __fastcall CRC16_Update_3D65(
+uint16_t CRC16_Update_3D65(
 	const uint16_t CRC, 
 	const uint8_t Buffer);
-uint16_t __fastcall CRC16_Update_DNP(
+uint16_t CRC16_Update_DNP(
 	const uint16_t CRC, 
 	const uint8_t Buffer);
-uint16_t __fastcall CRC16_Update_T10_DIF(
+uint16_t CRC16_Update_T10_DIF(
 	const uint16_t CRC, 
 	const uint8_t Buffer);
-uint16_t __fastcall CRC16_Update_0589(
+uint16_t CRC16_Update_0589(
 	const uint16_t CRC, 
 	const uint8_t Buffer);
-uint16_t __fastcall CRC16_Update_Teledisk(
+uint16_t CRC16_Update_Teledisk(
 	const uint16_t CRC, 
 	const uint8_t Buffer);
-uint16_t __fastcall CRC16_Update_Sick(
+uint16_t CRC16_Update_Sick(
 	uint16_t CRC, 
 	const uint8_t Buffer, 
 	const uint8_t PrevByte);
-uint16_t __fastcall CRC16_Init(
+uint16_t CRC16_Init(
 	const size_t TableType);
-uint16_t __fastcall CRC16_Calculate(
+uint16_t CRC16_Calculate(
 	uint16_t CRC, 
 	uint8_t *ParameterA, 
 	uint8_t *ParameterB, 
 	const size_t TableType, 
 	uint8_t *Buffer, 
 	const size_t Length);
-uint16_t __fastcall CRC16_Final(
+uint16_t CRC16_Final(
 	const uint16_t CRC, 
 	uint8_t *ParameterA, 
 	uint8_t *ParameterB, 
 	const size_t TableType);
-uint32_t __fastcall CRC24_Update(
+uint32_t CRC24_Update(
 	const size_t TableType, 
 	const uint32_t CRC, 
-	const char c);
-uint32_t __fastcall CRC24_Init(
+	const uint8_t c);
+uint32_t CRC24_Init(
 	const size_t TableType);
-uint32_t __fastcall CRC24_Calculate(
+uint32_t CRC24_Calculate(
 	uint32_t CRC, 
 	const size_t TableType, 
 	uint8_t *Buffer, 
 	const size_t Length);
-uint32_t __fastcall CRC32_Update_Normal(
+uint32_t CRC32_Update_Normal(
 	const uint32_t *Table, 
 	const uint32_t CRC, 
 	const uint8_t Buffer);
-uint32_t __fastcall CRC32_Update_Reflected(
+uint32_t CRC32_Update_Reflected(
 	const uint32_t *Table, 
 	const uint32_t CRC, 
 	const uint8_t Buffer);
@@ -313,44 +313,44 @@ uint32_t CRC32_Update_K(
 uint32_t CRC32_Update_Q(
 	const uint32_t CRC, 
 	const uint8_t Buffer);
-uint32_t __fastcall CRC32_Init(
+uint32_t CRC32_Init(
 	const size_t TableType);
-uint32_t __fastcall CRC32_Calculate(
+uint32_t CRC32_Calculate(
 	uint32_t CRC, 
 	const size_t TableType, 
 	uint8_t *Buffer, 
 	const size_t Length);
-uint32_t __fastcall CRC32_Final(
+uint32_t CRC32_Final(
 	const uint32_t CRC, 
 	const size_t TableType);
-uint64_t __fastcall CRC40_Calculate(
+uint64_t CRC40_Calculate(
 	uint64_t CRC, 
 	uint8_t *Buffer, 
 	const size_t Length);
-uint64_t __fastcall CRC64_Update_Normal(
+uint64_t CRC64_Update_Normal(
 	const uint64_t *Table, 
 	const uint64_t CRC, 
 	const uint8_t Buffer);
-uint64_t __fastcall CRC64_Update_Reflected(
+uint64_t CRC64_Update_Reflected(
 	const uint64_t *Table, 
 	const uint64_t CRC, 
 	const uint8_t Buffer);
-uint64_t __fastcall CRC64_Update(
+uint64_t CRC64_Update(
 	const uint64_t CRC, 
 	const uint8_t Buffer);
-uint64_t __fastcall CRC64_Update_1B(
+uint64_t CRC64_Update_1B(
 	const uint64_t CRC, 
 	const uint8_t Buffer);
-uint64_t __fastcall CRC64_Update_Jones(
+uint64_t CRC64_Update_Jones(
 	const uint64_t CRC, 
 	const uint8_t Buffer);
-uint64_t __fastcall CRC64_Init(
+uint64_t CRC64_Init(
 	const size_t TableType);
-uint64_t __fastcall CRC64_Calculate(
+uint64_t CRC64_Calculate(
 	uint64_t CRC, 
 	const size_t TableType, 
 	uint8_t *Buffer, 
 	const size_t Length);
-uint64_t __fastcall CRC64_Final(
+uint64_t CRC64_Final(
 	const uint64_t CRC, 
 	const size_t TableType);

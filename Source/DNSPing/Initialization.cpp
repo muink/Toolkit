@@ -24,9 +24,9 @@ ConfigurationTable::ConfigurationTable(
 	void)
 {
 #if defined(PLATFORM_WIN)
-	memset(this, 0, sizeof(ConfigurationTable) - (sizeof(std::string) * 5U + sizeof(std::wstring) * 3U + sizeof(std::shared_ptr<char>)));
+	memset(this, 0, sizeof(ConfigurationTable) - (sizeof(std::string) * 5U + sizeof(std::wstring) * 3U + sizeof(std::shared_ptr<uint8_t>)));
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-	memset(this, 0, sizeof(ConfigurationTable) - (sizeof(std::string) * 6U + sizeof(std::wstring) * 3U + sizeof(std::shared_ptr<char>)));
+	memset(this, 0, sizeof(ConfigurationTable) - (sizeof(std::string) * 6U + sizeof(std::wstring) * 3U + sizeof(std::shared_ptr<uint8_t>)));
 #endif
 
 	Statistics_Send = DEFAULT_SEND_TIMES;

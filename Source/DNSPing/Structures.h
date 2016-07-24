@@ -147,7 +147,7 @@
 #elif !defined(PLATFORM_UNIX)
 #  define PLATFORM_UNIX
 #endif
-/* XCode support
+/* Xcode support
 #if defined(PLATFORM_MACX)
 #  ifdef MAC_OS_X_VERSION_MIN_REQUIRED
 #    undef MAC_OS_X_VERSION_MIN_REQUIRED
@@ -191,6 +191,9 @@
 	#pragma comment(lib, "ws2_32.lib")                      //WinSock 2.0+
 	#define __LITTLE_ENDIAN              1U                 //Little Endian
 	#define __BYTE_ORDER                 __LITTLE_ENDIAN    //x86 and x86-64/x64
+
+//Windows compatible definitions
+	typedef SSIZE_T                   ssize_t;
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
 //Portable Operating System Interface/POSIX and Unix system header
 	#include <cerrno>                 //Error report
@@ -208,17 +211,12 @@
 	#define FALSE                    0
 	#define INVALID_SOCKET           (-1)
 	#define SOCKET_ERROR             (-1)
-	#define in_addr                  in_addr_Windows
 	#define MAX_PATH                 PATH_MAX
+	#define in_addr                  in_addr_Windows
 	typedef int                      SOCKET;
-	typedef unsigned char            UCHAR;
-	typedef unsigned int             UINT;
-	typedef unsigned long            ULONG, DWORD;
-	typedef ssize_t                  SSIZE_T;
 	typedef sockaddr                 *PSOCKADDR;
 	typedef sockaddr_in              *PSOCKADDR_IN;
 	typedef sockaddr_in6             *PSOCKADDR_IN6;
-	typedef addrinfo                 ADDRINFOA;
 
 //Internet Protocol version 4/IPv4 Address(Linux, from Microsoft Windows)
 	typedef struct _in_addr_windows_

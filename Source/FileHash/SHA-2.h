@@ -116,51 +116,51 @@ extern size_t HashFamilyID;
 size_t SHA2_HashFunctionID = DEFAULT_HASH_FUNCTION_ID;
 
 //Functions
-static void __fastcall SHA2_256_LongReverse(
+static void SHA2_256_LongReverse(
 	SHA_INT32 *buffer, 
 	int byteCount, 
 	int Endianness);
 /*
-static void __fastcall SHA2_256_Copy(
+static void SHA2_256_Copy(
 	SHA2_256_Object *src, 
 	SHA2_256_Object *dest);
 */
-static void __fastcall SHA2_256_Transform(
+static void SHA2_256_Transform(
 	SHA2_256_Object *sha_info);
-static void __fastcall SHA2_256_Init(
+static void SHA2_256_Init(
 	SHA2_256_Object *sha_info);
-static void __fastcall SHA2_224_Init(
+static void SHA2_224_Init(
 	SHA2_256_Object *sha_info);
-static void __fastcall SHA2_256_Update(
+static void SHA2_256_Update(
 	SHA2_256_Object *sha_info, 
 	SHA2_256_BYTE *buffer, 
 	int count);
-static void __fastcall SHA2_256_Final(
+static void SHA2_256_Final(
 	uint8_t digest[SHA2_256_SIZE_DIGEST], 
 	SHA2_256_Object *sha_info);
-static void __fastcall SHA2_512_LongReverse(
+static void SHA2_512_LongReverse(
 	SHA_INT64 *buffer, 
 	int byteCount, 
 	int Endianness);
 /*
-static void __fastcall SHA2_512_Copy(
+static void SHA2_512_Copy(
 	SHA2_512_Object *src, 
 	SHA2_512_Object *dest);
 */
-static void __fastcall SHA2_512_Transform(
+static void SHA2_512_Transform(
 	SHA2_512_Object *sha_info);
-static void __fastcall SHA2_512_Init(
+static void SHA2_512_Init(
 	SHA2_512_Object *sha_info);
-static void __fastcall SHA2_384_Init(
+static void SHA2_384_Init(
 	SHA2_512_Object *sha_info);
-static void __fastcall SHA2_512_256_Init(
+static void SHA2_512_256_Init(
 	SHA2_512_Object *sha_info);
-static void __fastcall SHA2_512_224_Init(
+static void SHA2_512_224_Init(
 	SHA2_512_Object *sha_info);
-static void __fastcall SHA2_512_Update(
+static void SHA2_512_Update(
 	SHA2_512_Object *sha_info, 
 	SHA2_512_BYTE *buffer, 
 	int count);
-static void __fastcall SHA2_512_Final(
+static void SHA2_512_Final(
 	uint8_t digest[SHA2_512_SIZE_DIGEST], 
 	SHA2_512_Object *sha_info);

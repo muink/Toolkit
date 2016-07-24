@@ -20,7 +20,7 @@
 #include "MD4.h"
 
 //Initialize the hash state
-void __fastcall MD4_Init(
+void MD4_Init(
 	MD4_CTX *c)
 {
 	memset(c, 0, sizeof(MD4_CTX));
@@ -33,12 +33,12 @@ void __fastcall MD4_Init(
 }
 
 //MD4 Block data order setting
-void __fastcall MD4_BlockDataOrder(
+void MD4_BlockDataOrder(
 	MD4_CTX *c, 
 	const void *data_, 
 	size_t num)
 {
-	const unsigned char *data = (const unsigned char *)data_;
+	const uint8_t *data = (const uint8_t *)data_;
 	register uint32_t A = 0, B = 0, C = 0, D = 0, l = 0;
 	uint32_t XX0 = 0, XX1 = 0, XX2 = 0, XX3 = 0, XX4 = 0, XX5 = 0, XX6 = 0, XX7 = 0, XX8 = 0, XX9 = 0, XX10 = 0, XX11 = 0, XX12 = 0, XX13 = 0, XX14 = 0, XX15 = 0;
 #define X(i)   XX ## i
@@ -115,13 +115,13 @@ void __fastcall MD4_BlockDataOrder(
 }
 
 //Update MD4 status
-void __fastcall MD4_Update(
+void MD4_Update(
 	MD4_CTX *c, 
 	const void *data_, 
 	size_t len)
 {
-	const unsigned char *data = (const unsigned char *)data_;
-	unsigned char *p = nullptr;
+	const uint8_t *data = (const uint8_t *)data_;
+	uint8_t *p = nullptr;
 	MD4_LONG l = 0;
 	size_t n = 0;
 
@@ -135,7 +135,7 @@ void __fastcall MD4_Update(
 	n = c->Num;
 	if (n != 0)
 	{
-		p = (unsigned char *)c->Data;
+		p = (uint8_t *)c->Data;
 		if (len >= MD4_SIZE_BLOCK || len + n >= MD4_SIZE_BLOCK)
 		{
 			memcpy(p + n, data, MD4_SIZE_BLOCK - n);
@@ -162,7 +162,7 @@ void __fastcall MD4_Update(
 	}
 	if (len != 0)
 	{
-		p = (unsigned char *)c->Data;
+		p = (uint8_t *)c->Data;
 		c->Num = (unsigned int)len;
 		memcpy(p, data, len);
 	}
@@ -171,11 +171,11 @@ void __fastcall MD4_Update(
 }
 
 //Finish MD4 process
-void __fastcall MD4_Final(
+void MD4_Final(
 	uint8_t *md, 
 	MD4_CTX *c)
 {
-	unsigned char *p = (unsigned char *)c->Data;
+	uint8_t *p = (uint8_t *)c->Data;
 	size_t n = c->Num;
 
 	p[n] = 0x80; //There is always room for one.
@@ -205,7 +205,7 @@ void __fastcall MD4_Final(
 }
 
 //MD4 hash function
-bool __fastcall MD4_Hash(
+bool MD4_Hash(
 	FILE *FileHandle)
 {
 //Parameters check
@@ -219,13 +219,13 @@ bool __fastcall MD4_Hash(
 	size_t ReadBlockSize = FILE_BUFFER_SIZE, ReadLength = 0, RoundCount = 0;
 	if (HashFamilyID == HASH_ID_ED2K)
 		ReadBlockSize = ED2K_SIZE_BLOCK;
-	std::shared_ptr<char> Buffer(new char[ReadBlockSize]()), StringBuffer(new char[FILE_BUFFER_SIZE]()), BufferED2K(new char[MD4_SIZE_DIGEST]());
+	std::shared_ptr<uint8_t> Buffer(new uint8_t[ReadBlockSize]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]()), BufferED2K(new uint8_t[MD4_SIZE_DIGEST]());
 	memset(Buffer.get(), 0, ReadBlockSize);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(BufferED2K.get(), 0, MD4_SIZE_DIGEST);
 	MD4_CTX HashInstance, HashInstanceED2K;
-	memset(&HashInstance, 0, sizeof(MD4_CTX));
-	memset(&HashInstanceED2K, 0, sizeof(MD4_CTX));
+	memset(&HashInstance, 0, sizeof(HashInstance));
+	memset(&HashInstanceED2K, 0, sizeof(HashInstanceED2K));
 
 //MD4 initialization
 	MD4_Init(&HashInstance);
@@ -237,7 +237,7 @@ bool __fastcall MD4_Hash(
 	{
 		memset(Buffer.get(), 0, ReadBlockSize);
 		_set_errno(0);
-		ReadLength = fread_s(Buffer.get(), ReadBlockSize, sizeof(char), ReadBlockSize, FileHandle);
+		ReadLength = fread_s(Buffer.get(), ReadBlockSize, sizeof(uint8_t), ReadBlockSize, FileHandle);
 		if (ReadLength == 0)
 		{
 			fwprintf_s(stderr, L"Hash process error");
@@ -252,7 +252,7 @@ bool __fastcall MD4_Hash(
 			MD4_Update(&HashInstance, Buffer.get(), ReadLength);
 			if (HashFamilyID == HASH_ID_ED2K)
 			{
-				MD4_Final((unsigned char *)Buffer.get(), &HashInstance);
+				MD4_Final(Buffer.get(), &HashInstance);
 				memcpy_s(BufferED2K.get(), MD4_SIZE_DIGEST, Buffer.get(), MD4_SIZE_DIGEST);
 				MD4_Update(&HashInstanceED2K, Buffer.get(), MD4_SIZE_DIGEST);
 				MD4_Init(&HashInstance);
@@ -266,26 +266,26 @@ bool __fastcall MD4_Hash(
 	memset(Buffer.get(), 0, ReadBlockSize);
 	if (HashFamilyID == HASH_ID_MD4)
 	{
-		MD4_Final((unsigned char *)Buffer.get(), &HashInstance);
+		MD4_Final(Buffer.get(), &HashInstance);
 	}
 	else if (HashFamilyID == HASH_ID_ED2K)
 	{
 		if (RoundCount > 1U)
-			MD4_Final((unsigned char *)Buffer.get(), &HashInstanceED2K);
+			MD4_Final(Buffer.get(), &HashInstanceED2K);
 		else 
 			memcpy_s(Buffer.get(), MD4_SIZE_DIGEST, BufferED2K.get(), MD4_SIZE_DIGEST);
 	}
 	else {
 		return false;
 	}
-	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const unsigned char *)Buffer.get(), MD4_SIZE_DIGEST) == nullptr)
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), MD4_SIZE_DIGEST) == nullptr)
 	{
 		fwprintf_s(stderr, L"Convert binary to hex error.\n");
 		return false;
 	}
 	else {
 	//Print to screen.
-		std::string HashResult = StringBuffer.get();
+		std::string HashResult = (const char *)StringBuffer.get();
 		CaseConvert(true, HashResult);
 		for (size_t Index = 0;Index < HashResult.length();++Index)
 			fwprintf_s(stderr, L"%c", HashResult.c_str()[Index]);

@@ -20,7 +20,7 @@
 #include "MD2.h"
 
 //Initialize the hash state
-void __fastcall MD2_Init(
+void MD2_Init(
 	MD2_CTX *md2)
 {
 	XMEMSET(md2->X, 0, MD2_X_SIZE);
@@ -32,7 +32,7 @@ void __fastcall MD2_Init(
 }
 
 //Update MD2 status
-void __fastcall MD2_Update(
+void MD2_Update(
 	MD2_CTX *md2, 
 	const uint8_t *data, 
 	uint32_t len)
@@ -104,12 +104,11 @@ void __fastcall MD2_Update(
 }
 
 //Finish hash process
-void __fastcall MD2_Final(
+void MD2_Final(
 	MD2_CTX *md2, 
 	uint8_t *hash)
 {
-	uint8_t padding[MD2_BLOCK_SIZE];
-	memset(padding, 0, MD2_BLOCK_SIZE);
+	uint8_t padding[MD2_BLOCK_SIZE] = {0};
 	uint32_t padLen = MD2_PAD_SIZE - md2->Count, i = 0;
 
 	for (i = 0;i < padLen;++i)
@@ -124,7 +123,7 @@ void __fastcall MD2_Final(
 }
 
 //MD2 hash function
-bool __fastcall MD2_Hash(
+bool MD2_Hash(
 	FILE *FileHandle)
 {
 //Parameters check
@@ -135,11 +134,11 @@ bool __fastcall MD2_Hash(
 	}
 
 //Initialization
-	std::shared_ptr<char> Buffer(new char[FILE_BUFFER_SIZE]()), StringBuffer(new char[FILE_BUFFER_SIZE]());
+	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	MD2_CTX HashInstance;
-	memset(&HashInstance, 0, sizeof(MD2_CTX));
+	memset(&HashInstance, 0, sizeof(HashInstance));
 	size_t ReadLength = 0;
 
 //MD2 initialization
@@ -150,7 +149,7 @@ bool __fastcall MD2_Hash(
 	{
 		memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 		_set_errno(0);
-		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(char), FILE_BUFFER_SIZE, FileHandle);
+		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(uint8_t), FILE_BUFFER_SIZE, FileHandle);
 		if (ReadLength == 0)
 		{
 			fwprintf_s(stderr, L"Hash process error");
@@ -162,21 +161,21 @@ bool __fastcall MD2_Hash(
 			return false;
 		}
 		else {
-			MD2_Update(&HashInstance, (uint8_t *)Buffer.get(), (uint32_t)ReadLength);
+			MD2_Update(&HashInstance, Buffer.get(), (uint32_t)ReadLength);
 		}
 	}
 
 //Binary to hex
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
-	MD2_Final(&HashInstance, (uint8_t *)Buffer.get());
-	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const unsigned char *)Buffer.get(), MD2_DIGEST_SIZE) == nullptr)
+	MD2_Final(&HashInstance, Buffer.get());
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), MD2_DIGEST_SIZE) == nullptr)
 	{
 		fwprintf_s(stderr, L"Convert binary to hex error.\n");
 		return false;
 	}
 	else {
 	//Print to screen.
-		std::string HashResult = StringBuffer.get();
+		std::string HashResult = (const char *)StringBuffer.get();
 		CaseConvert(true, HashResult);
 		for (size_t Index = 0;Index < HashResult.length();++Index)
 			fwprintf_s(stderr, L"%c", HashResult.c_str()[Index]);

@@ -68,15 +68,15 @@ typedef struct _sha1_state_
 extern size_t HashFamilyID;
 
 //Functions
-static void __fastcall SHA1_Compress(
+static void SHA1_Compress(
 	SHA1_State *sha1, 
 	uint8_t *buf);
-void __fastcall SHA1_Init(
+void SHA1_Init(
 	SHA1_State *sha1);
-void __fastcall SHA1_Process(
+void SHA1_Process(
 	SHA1_State *sha1, 
 	const uint8_t *in, 
 	unsigned long inlen);
-void __fastcall SHA1_Done(
+void SHA1_Done(
 	SHA1_State *sha1, 
 	uint8_t *out);

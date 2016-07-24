@@ -20,8 +20,8 @@
 #include "Resolver.h"
 
 //Print response hex format data
-void __fastcall PrintResponseHex(
-	const char *Buffer, 
+void PrintResponseHex(
+	const uint8_t *Buffer, 
 	const size_t Length, 
 	FILE *FileHandle)
 {
@@ -34,29 +34,29 @@ void __fastcall PrintResponseHex(
 	{
 		if (Index == 0)
 		{
-			fwprintf_s(FileHandle, L"0000  %02x ", (UCHAR)Buffer[Index]);
+			fwprintf_s(FileHandle, L"0000  %02x ", (uint8_t)Buffer[Index]);
 		}
 		else if (Index % NUM_HEX + 1U == NUM_HEX)
 		{
-			fwprintf_s(FileHandle, L"%02x   ", (UCHAR)Buffer[Index]);
+			fwprintf_s(FileHandle, L"%02x   ", (uint8_t)Buffer[Index]);
 			for (size_t InnerIndex = Index - (NUM_HEX - 1U);InnerIndex < Index + 1U;++InnerIndex)
 			{
 				if (InnerIndex != Index - (NUM_HEX - 1U) && InnerIndex % (NUM_HEX / 2U) == 0)
 					fwprintf_s(FileHandle, L" ");
-				if ((UCHAR)Buffer[InnerIndex] >= ASCII_SPACE && (UCHAR)Buffer[InnerIndex] <= ASCII_TILDE)
-					fwprintf_s(FileHandle, L"%c", (UCHAR)Buffer[InnerIndex]);
+				if (Buffer[InnerIndex] >= ASCII_SPACE && Buffer[InnerIndex] <= ASCII_TILDE)
+					fwprintf_s(FileHandle, L"%c", (uint8_t)Buffer[InnerIndex]);
 				else
 					fwprintf_s(FileHandle, L".");
 			}
 			if (Index + 1U < Length)
 			{
-				fwprintf_s(FileHandle, L"\n%04x  ", (UINT)(Index + 1U));
+				fwprintf_s(FileHandle, L"\n%04x  ", (unsigned int)(Index + 1U));
 			}
 		}
 		else {
 			if (Index % (NUM_HEX / 2U) == 0 && Index % NUM_HEX != 0)
 				fwprintf_s(FileHandle, L" ");
-			fwprintf_s(FileHandle, L"%02x ", (UCHAR)Buffer[Index]);
+			fwprintf_s(FileHandle, L"%02x ", (uint8_t)Buffer[Index]);
 		}
 	}
 
@@ -73,8 +73,8 @@ void __fastcall PrintResponseHex(
 		fwprintf_s(FileHandle, L"   ");
 		for (Index = Length - Length % NUM_HEX;Index < Length;++Index)
 		{
-			if ((UCHAR)Buffer[Index] >= ASCII_SPACE && (UCHAR)Buffer[Index] <= ASCII_TILDE)
-				fwprintf_s(FileHandle, L"%c", (UCHAR)Buffer[Index]);
+			if (Buffer[Index] >= ASCII_SPACE && Buffer[Index] <= ASCII_TILDE)
+				fwprintf_s(FileHandle, L"%c", (uint8_t)Buffer[Index]);
 			else
 				fwprintf_s(FileHandle, L".");
 		}
@@ -87,8 +87,8 @@ void __fastcall PrintResponseHex(
 }
 
 //Print response result or data to file
-void __fastcall PrintResponse(
-	const char *Buffer, 
+void PrintResponse(
+	const uint8_t *Buffer, 
 	const size_t Length, 
 	FILE *FileHandle)
 {
@@ -116,7 +116,7 @@ void __fastcall PrintResponse(
 		//Print Name.
 			PrintDomainName(Buffer, CurrentLength, FileHandle);
 			fwprintf_s(FileHandle, L"\n");
-			CurrentLength += strnlen_s(Buffer + CurrentLength, Length - CurrentLength) + 1U;
+			CurrentLength += strnlen_s((const char *)Buffer + CurrentLength, Length - CurrentLength) + 1U;
 
 		//Print Type and Classes.
 			pdns_qry = (dns_qry *)(Buffer + CurrentLength);
@@ -136,7 +136,7 @@ void __fastcall PrintResponse(
 		for (Index = 0;Index < ntohs(pdns_hdr->Answer);++Index)
 		{
 		//Print Name.
-			fwprintf_s(FileHandle, L" RR(%u)\n   Name: ", (UINT)(Index + 1U));
+			fwprintf_s(FileHandle, L" RR(%u)\n   Name: ", (unsigned int)(Index + 1U));
 			CurrentLength += PrintDomainName(Buffer, CurrentLength, FileHandle);
 			fwprintf_s(FileHandle, L"\n");
 
@@ -163,7 +163,7 @@ void __fastcall PrintResponse(
 		for (Index = 0;Index < ntohs(pdns_hdr->Authority);++Index)
 		{
 		//Print Name.
-			fwprintf_s(FileHandle, L" RR(%u)\n   Name: ", (UINT)(Index + 1U));
+			fwprintf_s(FileHandle, L" RR(%u)\n   Name: ", (unsigned int)(Index + 1U));
 			CurrentLength += PrintDomainName(Buffer, CurrentLength, FileHandle);
 			fwprintf_s(FileHandle, L"\n");
 
@@ -190,7 +190,7 @@ void __fastcall PrintResponse(
 		for (Index = 0;Index < ntohs(pdns_hdr->Additional);++Index)
 		{
 		//Print Name.
-			fwprintf_s(FileHandle, L" RR(%u)\n   Name: ", (UINT)(Index + 1U));
+			fwprintf_s(FileHandle, L" RR(%u)\n   Name: ", (unsigned int)(Index + 1U));
 			CurrentLength += PrintDomainName(Buffer, CurrentLength, FileHandle);
 			fwprintf_s(FileHandle, L"\n");
 
@@ -223,7 +223,7 @@ void __fastcall PrintResponse(
 }
 
 //Print Header Flags to file
-void __fastcall PrintFlags(
+void PrintFlags(
 	const uint16_t Flags, 
 	FILE *FileHandle)
 {
@@ -303,7 +303,7 @@ void __fastcall PrintFlags(
 }
 
 //Print Type and Classes name to file
-void __fastcall PrintTypeClassesName(
+void PrintTypeClassesName(
 	const uint16_t Type, 
 	const uint16_t Classes, 
 	FILE *FileHandle)
@@ -545,8 +545,8 @@ void __fastcall PrintTypeClassesName(
 }
 
 //Print Domain Name in response to file
-size_t __fastcall PrintDomainName(
-	const char *Buffer, 
+size_t PrintDomainName(
+	const uint8_t *Buffer, 
 	const size_t Location, 
 	FILE *FileHandle)
 {
@@ -554,11 +554,11 @@ size_t __fastcall PrintDomainName(
 	if (Buffer[Location] == 0)
 	{
 		fwprintf_s(FileHandle, L"<Root>");
-		return sizeof(char);
+		return sizeof(uint8_t);
 	}
 
 //Initialization
-	std::shared_ptr<char> BufferTemp(new char[PACKET_MAXSIZE]());
+	std::shared_ptr<uint8_t> BufferTemp(new uint8_t[PACKET_MAXSIZE]());
 	memset(BufferTemp.get(), 0, PACKET_MAXSIZE);
 	size_t Index = 0, Result = 0;
 	uint16_t Truncated = 0;
@@ -571,7 +571,7 @@ size_t __fastcall PrintDomainName(
 	//Print once when pointer is not at first.
 		if (Result > sizeof(uint16_t))
 		{
-			for (Index = 0;Index < strnlen_s(BufferTemp.get(), PACKET_MAXSIZE);++Index)
+			for (Index = 0;Index < strnlen_s((const char *)BufferTemp.get(), PACKET_MAXSIZE);++Index)
 				fwprintf_s(FileHandle, L"%c", BufferTemp.get()[Index]);
 			memset(BufferTemp.get(), 0, PACKET_MAXSIZE);
 			fwprintf_s(FileHandle, L".");
@@ -583,7 +583,7 @@ size_t __fastcall PrintDomainName(
 			if (MultiplePTR)
 				fwprintf_s(FileHandle, L".");
 			DNSQueryToChar(Buffer + Truncated, BufferTemp.get(), Truncated);
-			for (Index = 0;Index < strnlen_s(BufferTemp.get(), PACKET_MAXSIZE);++Index)
+			for (Index = 0;Index < strnlen_s((const char *)BufferTemp.get(), PACKET_MAXSIZE);++Index)
 				fwprintf_s(FileHandle, L"%c", BufferTemp.get()[Index]);
 			memset(BufferTemp.get(), 0, PACKET_MAXSIZE);
 			MultiplePTR = true;
@@ -594,14 +594,14 @@ size_t __fastcall PrintDomainName(
 	}
 
 //Print last.
-	for (Index = 0;Index < strnlen_s(BufferTemp.get(), PACKET_MAXSIZE);++Index)
+	for (Index = 0;Index < strnlen_s((const char *)BufferTemp.get(), PACKET_MAXSIZE);++Index)
 		fwprintf_s(FileHandle, L"%c", BufferTemp.get()[Index]);
 	return Result;
 }
 
 //Print Resourse data to file
-void __fastcall PrintResourseData(
-	const char *Buffer, 
+void PrintResourseData(
+	const uint8_t *Buffer, 
 	const size_t Location, 
 	const uint16_t Length, 
 	const uint16_t Type, 
@@ -679,21 +679,20 @@ void __fastcall PrintResourseData(
 	{
 		fwprintf_s(FileHandle, L"\n   Data: ");
 
-		char BufferTemp[ADDR_STRING_MAXSIZE];
-		memset(BufferTemp, 0, ADDR_STRING_MAXSIZE);
+		uint8_t BufferTemp[ADDR_STRING_MAXSIZE] = {0};
 	#if defined(PLATFORM_WIN_XP)
 		DWORD BufferLength = ADDR_STRING_MAXSIZE;
 		sockaddr_storage SockAddr;
-		memset(&SockAddr, 0, sizeof(sockaddr_storage));
+		memset(&SockAddr, 0, sizeof(SockAddr));
 		SockAddr.ss_family = AF_INET6;
 		((PSOCKADDR_IN6)&SockAddr)->sin6_addr = *(in6_addr *)(Buffer + Location);
-		WSAAddressToStringA((PSOCKADDR)&SockAddr, sizeof(sockaddr_in6), nullptr, BufferTemp, &BufferLength);
+		WSAAddressToStringA((PSOCKADDR)&SockAddr, sizeof(sockaddr_in6), nullptr, (LPSTR)BufferTemp, &BufferLength);
 	#else
-		inet_ntop(AF_INET6, (char *)(Buffer + Location), BufferTemp, ADDR_STRING_MAXSIZE);
+		inet_ntop(AF_INET6, (char *)(Buffer + Location), (char *)BufferTemp, ADDR_STRING_MAXSIZE);
 	#endif
-		CaseConvert(true, BufferTemp, strnlen_s(BufferTemp, ADDR_STRING_MAXSIZE));
+		CaseConvert(true, BufferTemp, strnlen_s((const char *)BufferTemp, ADDR_STRING_MAXSIZE));
 
-		for (Index = 0;Index < strnlen_s(BufferTemp, ADDR_STRING_MAXSIZE);++Index)
+		for (Index = 0;Index < strnlen_s((const char *)BufferTemp, ADDR_STRING_MAXSIZE);++Index)
 			fwprintf_s(FileHandle, L"%c", BufferTemp[Index]);
 	}
 //SRV Record(Server Selection)
@@ -808,7 +807,7 @@ void __fastcall PrintResourseData(
 		CurrentLength += sizeof(dns_rrsig_record);
 		fwprintf_s(FileHandle, L"\n         Signature: ");
 		for (Index = Location + CurrentLength;Index < Location + Length;++Index)
-			fwprintf_s(FileHandle, L"%02x", (UCHAR)Buffer[Index]);
+			fwprintf_s(FileHandle, L"%02x", (uint8_t)Buffer[Index]);
 	}
 //NSEC Record(Next-SECure)
 	else if (Type == htons(DNS_RECORD_NSEC))
@@ -819,7 +818,7 @@ void __fastcall PrintResourseData(
 		CurrentLength = PrintDomainName(Buffer, Location, FileHandle);
 		fwprintf_s(FileHandle, L"\n         List of Type Bit Map: ");
 		for (Index = Location + CurrentLength;Index < Location + Length;++Index)
-			fwprintf_s(FileHandle, L"%x", (UCHAR)Buffer[Index]);
+			fwprintf_s(FileHandle, L"%x", (uint8_t)Buffer[Index]);
 	}
 //CAA Record(Certification Authority Authorization)
 	else if (Type == htons(DNS_RECORD_CAA))

@@ -53,7 +53,7 @@ ENDIF(CMAKE_VERSION VERSION_LESS "3.1")
 IF(PLATFORM_OPENWRT)
 	add_definitions(-DPLATFORM_OPENWRT)
 ELSE(PLATFORM_OPENWRT)
-	add_definitions(-fpic)
+	add_definitions(-flto -fpic)
 ENDIF(PLATFORM_OPENWRT)
 
 # Executable file name

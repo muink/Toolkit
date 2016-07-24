@@ -184,7 +184,7 @@ const uint8_t CRC8_Table_Darc[] =
 };
 
 //CRC-8 update process
-uint8_t __fastcall CRC8_Update(
+uint8_t CRC8_Update(
 	const size_t TableType, 
 	const uint8_t CRC, 
 	const uint8_t Buffer)
@@ -242,7 +242,7 @@ uint8_t __fastcall CRC8_Update(
 }
 
 //CRC-8 initialization process
-uint8_t __fastcall CRC8_Init(
+uint8_t CRC8_Init(
 	const size_t TableType)
 {
 	switch (TableType)
@@ -265,7 +265,7 @@ uint8_t __fastcall CRC8_Init(
 }
 
 //CRC-8 calculate process
-uint8_t __fastcall CRC8_Calculate(
+uint8_t CRC8_Calculate(
 	uint8_t CRC, 
 	const size_t TableType, 
 	uint8_t *Buffer, 
@@ -278,7 +278,7 @@ uint8_t __fastcall CRC8_Calculate(
 }
 
 //Finish CRC-8 process
-uint8_t __fastcall CRC8_Final(
+uint8_t CRC8_Final(
 	const uint8_t CRC, 
 	const size_t TableType)
 {
@@ -636,7 +636,7 @@ const uint16_t CRC16_Table_Teledisk[] =
 };
 
 //CRC-16 common routines for calculations
-uint16_t __fastcall CRC16_Update_Normal(
+uint16_t CRC16_Update_Normal(
 	const uint16_t *Table, 
 	uint16_t CRC, 
 	const uint8_t Buffer)
@@ -648,7 +648,7 @@ uint16_t __fastcall CRC16_Update_Normal(
 	return (CRC << 8U) ^ Table[(CRC >> 8U) ^ short_c];
 }
 
-uint16_t __fastcall CRC16_Update_Reflected(
+uint16_t CRC16_Update_Reflected(
 	const uint16_t *Table, 
 	uint16_t CRC, 
 	const uint8_t Buffer)
@@ -661,70 +661,70 @@ uint16_t __fastcall CRC16_Update_Reflected(
 }
 
 //CRC-16 update process
-uint16_t __fastcall CRC16_Update_8005(
+uint16_t CRC16_Update_8005(
 	const uint16_t CRC, 
 	const uint8_t Buffer)
 {
 	return CRC16_Update_Normal(CRC16_Table_8005_Normal, CRC, Buffer);
 }
 
-uint16_t __fastcall CRC16_Update_A001(
+uint16_t CRC16_Update_A001(
 	const uint16_t CRC, 
 	const uint8_t Buffer)
 {
 	return CRC16_Update_Reflected(CRC16_Table_8005_Reflected, CRC, Buffer);
 }
 
-uint16_t __fastcall CRC16_Update_1021(
+uint16_t CRC16_Update_1021(
 	const uint16_t CRC, 
 	const uint8_t Buffer)
 {
 	return CRC16_Update_Normal(CRC16_Table_1021_Normal, CRC, Buffer);
 }
 
-uint16_t __fastcall CRC16_Update_8408(
+uint16_t CRC16_Update_8408(
 	const uint16_t CRC, 
 	const uint8_t Buffer)
 {
 	return CRC16_Update_Reflected(CRC16_Table_1021_Reflected, CRC, Buffer);
 }
 
-uint16_t __fastcall CRC16_Update_3D65(
+uint16_t CRC16_Update_3D65(
 	const uint16_t CRC, 
 	const uint8_t Buffer)
 {
 	return CRC16_Update_Normal(CRC16_Table_3D65_Normal, CRC, Buffer);
 }
 
-uint16_t __fastcall CRC16_Update_DNP(
+uint16_t CRC16_Update_DNP(
 	const uint16_t CRC, 
 	const uint8_t Buffer)
 {
 	return CRC16_Update_Reflected(CRC16_Table_3D65_Reflected, CRC, Buffer);
 }
 
-uint16_t __fastcall CRC16_Update_T10_DIF(
+uint16_t CRC16_Update_T10_DIF(
 	const uint16_t CRC, 
 	const uint8_t Buffer)
 {
 	return CRC16_Update_Normal(CRC16_Table_T10_DIF, CRC, Buffer);
 }
 
-uint16_t __fastcall CRC16_Update_0589(
+uint16_t CRC16_Update_0589(
 	const uint16_t CRC, 
 	const uint8_t Buffer)
 {
 	return CRC16_Update_Normal(CRC16_Table_DECT, CRC, Buffer);
 }
 
-uint16_t __fastcall CRC16_Update_Teledisk(
+uint16_t CRC16_Update_Teledisk(
 	const uint16_t CRC, 
 	const uint8_t Buffer)
 {
 	return CRC16_Update_Normal(CRC16_Table_Teledisk, CRC, Buffer);
 }
 
-uint16_t __fastcall CRC16_Update_Sick(
+uint16_t CRC16_Update_Sick(
 	uint16_t CRC, 
 	const uint8_t Buffer, 
 	const uint8_t PrevByte)
@@ -741,7 +741,7 @@ uint16_t __fastcall CRC16_Update_Sick(
 }
 
 //CRC-16 initialization process
-uint16_t __fastcall CRC16_Init(
+uint16_t CRC16_Init(
 	const size_t TableType)
 {
 	switch (TableType)
@@ -788,7 +788,7 @@ uint16_t __fastcall CRC16_Init(
 }
 
 //CRC-16 calculate process
-uint16_t __fastcall CRC16_Calculate(
+uint16_t CRC16_Calculate(
 	uint16_t CRC, 
 	uint8_t *ParameterA, 
 	uint8_t *ParameterB, 
@@ -853,7 +853,7 @@ uint16_t __fastcall CRC16_Calculate(
 }
 
 //Finish CRC-16 process
-uint16_t __fastcall CRC16_Final(
+uint16_t CRC16_Final(
 	const uint16_t CRC, 
 	uint8_t *ParameterA, 
 	uint8_t *ParameterB, 
@@ -986,10 +986,10 @@ const uint32_t CRC24_Table_R64[] =
 };
 
 //CRC-24 update process
-uint32_t __fastcall CRC24_Update(
+uint32_t CRC24_Update(
 	const size_t TableType, 
 	const uint32_t CRC, 
-	const char c)
+	const uint8_t c)
 {
 	uint32_t long_c = 0x000000FFL & (uint32_t)c;
 	if (TableType == HASH_ID_CRC_24_FLEXRAY_A || TableType == HASH_ID_CRC_24_FLEXRAY_B)
@@ -1001,7 +1001,7 @@ uint32_t __fastcall CRC24_Update(
 }
 
 //CRC-24 initialization process
-uint32_t __fastcall CRC24_Init(
+uint32_t CRC24_Init(
 	const size_t TableType)
 {
 	switch (TableType)
@@ -1024,7 +1024,7 @@ uint32_t __fastcall CRC24_Init(
 }
 
 //CRC-24 calculate process
-uint32_t __fastcall CRC24_Calculate(
+uint32_t CRC24_Calculate(
 	uint32_t CRC, 
 	const size_t TableType, 
 	uint8_t *Buffer, 
@@ -1303,7 +1303,7 @@ const uint32_t CRC32_Table_Q[] =
 };
 
 //CRC-32 common routines for calculations
-uint32_t __fastcall CRC32_Update_Normal(
+uint32_t CRC32_Update_Normal(
 	const uint32_t *Table, 
 	const uint32_t CRC, 
 	const uint8_t Buffer)
@@ -1312,7 +1312,7 @@ uint32_t __fastcall CRC32_Update_Normal(
 	return (CRC << 8U) ^ Table[((CRC >> 24U) ^ long_c) & 0xFF];
 }
 
-uint32_t __fastcall CRC32_Update_Reflected(
+uint32_t CRC32_Update_Reflected(
 	const uint32_t *Table, 
 	const uint32_t CRC, 
 	const uint8_t Buffer)
@@ -1371,7 +1371,7 @@ uint32_t CRC32_Update_Q(
 }
 
 //CRC-32 initialization process
-uint32_t __fastcall CRC32_Init(
+uint32_t CRC32_Init(
 	const size_t TableType)
 {
 	switch (TableType)
@@ -1406,7 +1406,7 @@ uint32_t __fastcall CRC32_Init(
 }
 
 //CRC-32 calculate process
-uint32_t __fastcall CRC32_Calculate(
+uint32_t CRC32_Calculate(
 	uint32_t CRC, 
 	const size_t TableType, 
 	uint8_t *Buffer, 
@@ -1448,7 +1448,7 @@ uint32_t __fastcall CRC32_Calculate(
 }
 
 //Finish CRC-32 process
-uint32_t __fastcall CRC32_Final(
+uint32_t CRC32_Final(
 	const uint32_t CRC, 
 	const size_t TableType)
 {
@@ -1555,7 +1555,7 @@ const uint64_t CRC40_Table_Normal[] =
 };
 
 //CRC-40 calculate process
-uint64_t __fastcall CRC40_Calculate(
+uint64_t CRC40_Calculate(
 	uint64_t CRC, 
 	uint8_t *Buffer, 
 	const size_t Length)
@@ -1788,7 +1788,7 @@ const uint64_t CRC64_Table_Jones_Reflected[] =
 };
 
 //CRC-64 common routines for calculations
-uint64_t __fastcall CRC64_Update_Normal(
+uint64_t CRC64_Update_Normal(
 	const uint64_t *Table, 
 	const uint64_t CRC, 
 	const uint8_t Buffer)
@@ -1797,7 +1797,7 @@ uint64_t __fastcall CRC64_Update_Normal(
 	return (CRC << 8U) ^ Table[((CRC >> 56U) ^ long64_c) & 0xFF];
 }
 
-uint64_t __fastcall CRC64_Update_Reflected(
+uint64_t CRC64_Update_Reflected(
 	const uint64_t *Table, 
 	const uint64_t CRC, 
 	const uint8_t Buffer)
@@ -1806,21 +1806,21 @@ uint64_t __fastcall CRC64_Update_Reflected(
 	return (CRC >> 8U) ^ Table[(CRC ^ long64_c) & 0xFF];
 }
 
-uint64_t __fastcall CRC64_Update(
+uint64_t CRC64_Update(
 	const uint64_t CRC, 
 	const uint8_t Buffer)
 {
 	return CRC64_Update_Normal(CRC64_Table_Normal, CRC, Buffer);
 }
 
-uint64_t __fastcall CRC64_Update_1B(
+uint64_t CRC64_Update_1B(
 	const uint64_t CRC, 
 	const uint8_t Buffer)
 {
 	return CRC64_Update_Reflected(CRC64_Table_1B_Reflected, CRC, Buffer);
 }
 
-uint64_t __fastcall CRC64_Update_Jones(
+uint64_t CRC64_Update_Jones(
 	const uint64_t CRC, 
 	const uint8_t Buffer)
 {
@@ -1828,7 +1828,7 @@ uint64_t __fastcall CRC64_Update_Jones(
 }
 
 //CRC-64 initialization process
-uint64_t __fastcall CRC64_Init(
+uint64_t CRC64_Init(
 	const size_t TableType)
 {
 	switch (TableType)
@@ -1847,7 +1847,7 @@ uint64_t __fastcall CRC64_Init(
 }
 
 //CRC-64 calculate process
-uint64_t __fastcall CRC64_Calculate(
+uint64_t CRC64_Calculate(
 	uint64_t CRC, 
 	const size_t TableType, 
 	uint8_t *Buffer, 
@@ -1873,7 +1873,7 @@ uint64_t __fastcall CRC64_Calculate(
 }
 
 //Finish CRC-64 process
-uint64_t __fastcall CRC64_Final(
+uint64_t CRC64_Final(
 	const uint64_t CRC, 
 	const size_t TableType)
 {
@@ -1893,7 +1893,7 @@ uint64_t __fastcall CRC64_Final(
 // Hash function
 // 
 //Read commands(CRC)
-bool __fastcall ReadCommands_CRC(
+bool ReadCommands_CRC(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command)
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
@@ -2114,7 +2114,7 @@ bool __fastcall ReadCommands_CRC(
 }
 
 //CRC hash process 
-bool __fastcall CRC_Hash(
+bool CRC_Hash(
 	FILE *FileHandle)
 {
 //Parameters check
@@ -2125,7 +2125,7 @@ bool __fastcall CRC_Hash(
 	}
 
 //Initialization
-	std::shared_ptr<char> Buffer(new char[FILE_BUFFER_SIZE]());
+	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	size_t ReadLength = 0;
 	uint8_t ResultCRC8 = 0, ParameterA = 0, ParameterB = 0;
@@ -2164,7 +2164,7 @@ bool __fastcall CRC_Hash(
 	{
 		memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 		_set_errno(0);
-		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(char), FILE_BUFFER_SIZE, FileHandle);
+		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(uint8_t), FILE_BUFFER_SIZE, FileHandle);
 		if (ReadLength == 0)
 		{
 			fwprintf_s(stderr, L"Hash process error");
@@ -2180,7 +2180,7 @@ bool __fastcall CRC_Hash(
 				CRC_HashFunctionID == HASH_ID_CRC_8_CCITT || CRC_HashFunctionID == HASH_ID_CRC_8_MAXIM || CRC_HashFunctionID == HASH_ID_CRC_8_ICODE || 
 				CRC_HashFunctionID == HASH_ID_CRC_8_J1850 || CRC_HashFunctionID == HASH_ID_CRC_8_WCDMA || CRC_HashFunctionID == HASH_ID_CRC_8_ROHC || 
 				CRC_HashFunctionID == HASH_ID_CRC_8_DARC)
-					ResultCRC8 = CRC8_Calculate(ResultCRC8, CRC_HashFunctionID, (uint8_t *)Buffer.get(), ReadLength);
+					ResultCRC8 = CRC8_Calculate(ResultCRC8, CRC_HashFunctionID, Buffer.get(), ReadLength);
 			else if (CRC_HashFunctionID == HASH_ID_CRC_16 || CRC_HashFunctionID == HASH_ID_CRC_16_BUYPASS || CRC_HashFunctionID == HASH_ID_CRC_16_DDS_110 || 
 				CRC_HashFunctionID == HASH_ID_CRC_16_EN_13757 || CRC_HashFunctionID == HASH_ID_CRC_16_TELEDISK || CRC_HashFunctionID == HASH_ID_CRC_16_MODBUS || 
 				CRC_HashFunctionID == HASH_ID_CRC_16_MAXIM || CRC_HashFunctionID == HASH_ID_CRC_16_USB || CRC_HashFunctionID == HASH_ID_CRC_16_T10_DIF || 
@@ -2189,19 +2189,19 @@ bool __fastcall CRC_Hash(
 				CRC_HashFunctionID == HASH_ID_CRC_16_CCITT_1D0F || CRC_HashFunctionID == HASH_ID_CRC_16_GENIBUS || CRC_HashFunctionID == HASH_ID_CRC_16_KERMIT || 
 				CRC_HashFunctionID == HASH_ID_CRC_16_X25 || CRC_HashFunctionID == HASH_ID_CRC_16_MCRF4XX || CRC_HashFunctionID == HASH_ID_CRC_16_RIELLO || 
 				CRC_HashFunctionID == HASH_ID_CRC_16_FLETCHER)
-					ResultCRC16 = CRC16_Calculate(ResultCRC16, &ParameterA, &ParameterB, CRC_HashFunctionID, (uint8_t *)Buffer.get(), ReadLength);
+					ResultCRC16 = CRC16_Calculate(ResultCRC16, &ParameterA, &ParameterB, CRC_HashFunctionID, Buffer.get(), ReadLength);
 			else if (CRC_HashFunctionID == HASH_ID_CRC_24_FLEXRAY_A || CRC_HashFunctionID == HASH_ID_CRC_24_FLEXRAY_B || CRC_HashFunctionID == HASH_ID_CRC_24_R64)
-				ResultCRC32 = CRC24_Calculate(ResultCRC32, CRC_HashFunctionID, (uint8_t *)Buffer.get(), ReadLength);
+				ResultCRC32 = CRC24_Calculate(ResultCRC32, CRC_HashFunctionID, Buffer.get(), ReadLength);
 			else if (CRC_HashFunctionID == HASH_ID_CRC_32 || CRC_HashFunctionID == HASH_ID_CRC_32_JAM || CRC_HashFunctionID == HASH_ID_CRC_32_C || 
 				CRC_HashFunctionID == HASH_ID_CRC_32_D || CRC_HashFunctionID == HASH_ID_CRC_32_BZIP2 || CRC_HashFunctionID == HASH_ID_CRC_32_MPEG2 || 
 				CRC_HashFunctionID == HASH_ID_CRC_32_POSIX || CRC_HashFunctionID == HASH_ID_CRC_32_K || CRC_HashFunctionID == HASH_ID_CRC_32_Q || 
 				CRC_HashFunctionID == HASH_ID_CRC_32_XFER)
-					ResultCRC32 = CRC32_Calculate(ResultCRC32, CRC_HashFunctionID, (uint8_t *)Buffer.get(), ReadLength);
+					ResultCRC32 = CRC32_Calculate(ResultCRC32, CRC_HashFunctionID, Buffer.get(), ReadLength);
 			else if (CRC_HashFunctionID == HASH_ID_CRC_40)
-				ResultCRC64 = CRC40_Calculate(ResultCRC64, (uint8_t *)Buffer.get(), ReadLength);
+				ResultCRC64 = CRC40_Calculate(ResultCRC64, Buffer.get(), ReadLength);
 			else if (CRC_HashFunctionID == HASH_ID_CRC_64 || CRC_HashFunctionID == HASH_ID_CRC_64_1B || CRC_HashFunctionID == HASH_ID_CRC_64_WE || 
 				CRC_HashFunctionID == HASH_ID_CRC_64_JONES)
-					ResultCRC64 = CRC64_Calculate(ResultCRC64, CRC_HashFunctionID, (uint8_t *)Buffer.get(), ReadLength);
+					ResultCRC64 = CRC64_Calculate(ResultCRC64, CRC_HashFunctionID, Buffer.get(), ReadLength);
 			else 
 				return false;
 		}
@@ -2270,14 +2270,14 @@ bool __fastcall CRC_Hash(
 
 //Binary to hex
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
-	if (sodium_bin2hex(Buffer.get(), FILE_BUFFER_SIZE, (const unsigned char *)Result, BlockSize) == nullptr)
+	if (sodium_bin2hex(Buffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Result, BlockSize) == nullptr)
 	{
 		fwprintf_s(stderr, L"Convert binary to hex error.\n");
 		return false;
 	}
 	else {
 	//Print to screen.
-		std::string HashResult = Buffer.get();
+		std::string HashResult = (const char *)Buffer.get();
 		CaseConvert(true, HashResult);
 		for (size_t Index = 0;Index < HashResult.length();++Index)
 			fwprintf_s(stderr, L"%c", HashResult.c_str()[Index]);

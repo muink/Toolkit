@@ -74,16 +74,16 @@ typedef struct _md4_state_st_
 extern size_t HashFamilyID;
 
 //Functions
-void __fastcall MD4_Init(
+void MD4_Init(
 	MD4_CTX *c);
-void __fastcall MD4_BlockDataOrder(
+void MD4_BlockDataOrder(
 	MD4_CTX *c, 
 	const void *data_, 
 	size_t num);
-void __fastcall MD4_Update(
+void MD4_Update(
 	MD4_CTX *c, 
 	const void *data_, 
 	size_t len);
-void __fastcall MD4_Final(
+void MD4_Final(
 	uint8_t *md, 
 	MD4_CTX *c);

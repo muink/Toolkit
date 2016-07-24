@@ -23,7 +23,7 @@
 extern size_t HashFamilyID;
 
 //Checksum update process
-uint32_t __fastcall Checksum_Update(
+uint32_t Checksum_Update(
 	uint32_t Checksum, 
 	const uint16_t *Buffer, 
 	const size_t Length)
@@ -39,7 +39,7 @@ uint32_t __fastcall Checksum_Update(
 }
 
 //Finish checksum hash process
-uint16_t __fastcall Checksum_Final(
+uint16_t Checksum_Final(
 	uint32_t Checksum, 
 	const uint16_t *Buffer, 
 	const size_t Length)
@@ -53,7 +53,7 @@ uint16_t __fastcall Checksum_Final(
 }
 
 //Internet protocol checksum hash function
-bool __fastcall Checksum_Hash(
+bool Checksum_Hash(
 	FILE *FileHandle)
 {
 //Parameters check
@@ -64,7 +64,7 @@ bool __fastcall Checksum_Hash(
 	}
 
 //Initialization
-	std::shared_ptr<char> Buffer(new char[FILE_BUFFER_SIZE]());
+	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	size_t ReadLength = 0;
 	uint16_t Checksum16 = 0;
@@ -75,7 +75,7 @@ bool __fastcall Checksum_Hash(
 	{
 		memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 		_set_errno(0);
-		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(char), FILE_BUFFER_SIZE, FileHandle);
+		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(uint8_t), FILE_BUFFER_SIZE, FileHandle);
 		if (ReadLength == 0)
 		{
 			fwprintf_s(stderr, L"Hash process error");
@@ -94,14 +94,14 @@ bool __fastcall Checksum_Hash(
 //Binary to hex
 	Checksum16 = Checksum_Final(Checksum32, (uint16_t *)(Buffer.get() + ReadLength - ReadLength % sizeof(uint16_t)), ReadLength % sizeof(uint16_t));
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
-	if (sodium_bin2hex(Buffer.get(), FILE_BUFFER_SIZE, (const unsigned char *)&Checksum16, sizeof(uint16_t)) == nullptr)
+	if (sodium_bin2hex(Buffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)&Checksum16, sizeof(uint16_t)) == nullptr)
 	{
 		fwprintf_s(stderr, L"Convert binary to hex error.\n");
 		return false;
 	}
 	else {
 	//Print to screen.
-		std::string HashResult = Buffer.get();
+		std::string HashResult = (const char *)Buffer.get();
 		CaseConvert(true, HashResult);
 		for (size_t Index = 0;Index < HashResult.length();++Index)
 			fwprintf_s(stderr, L"%c", HashResult.c_str()[Index]);

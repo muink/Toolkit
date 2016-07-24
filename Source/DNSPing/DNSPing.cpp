@@ -132,10 +132,10 @@ int main(
 		}
 		BufferTemp.reset();
 	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-		MBSToWCSString(ConfigurationParameter.wTargetString, ConfigurationParameter.TargetString_Normal.c_str());
-		MBSToWCSString(wTestDomain, ConfigurationParameter.TestDomain.c_str());
+		MBSToWCSString(ConfigurationParameter.wTargetString, (const uint8_t *)ConfigurationParameter.TargetString_Normal.c_str());
+		MBSToWCSString(wTestDomain, (const uint8_t *)ConfigurationParameter.TestDomain.c_str());
 		if (!ConfigurationParameter.TargetAddressString.empty())
-			MBSToWCSString(wTargetAddressString, ConfigurationParameter.TargetAddressString.c_str());
+			MBSToWCSString(wTargetAddressString, (const uint8_t *)ConfigurationParameter.TargetAddressString.c_str());
 	#endif
 
 	//Check DNS header.
@@ -232,7 +232,7 @@ int main(
 }
 
 //Configuration initialization process
-size_t __fastcall ConfigurationInitialization(
+size_t ConfigurationInitialization(
 	void)
 {
 #if defined(PLATFORM_WIN)
@@ -245,7 +245,7 @@ size_t __fastcall ConfigurationInitialization(
 
 //Winsock initialization
 	WSAData WSAInitialization;
-	memset(&WSAInitialization, 0, sizeof(WSAData));
+	memset(&WSAInitialization, 0, sizeof(WSAInitialization));
 	if (WSAStartup(MAKEWORD(2, 2), &WSAInitialization) != 0 || LOBYTE(WSAInitialization.wVersion) != 2 || HIBYTE(WSAInitialization.wVersion) != 2)
 	{
 		fwprintf_s(stderr, L"\nWinsock initialization error, error code is %d.\n", WSAGetLastError());
@@ -271,18 +271,18 @@ size_t __fastcall ConfigurationInitialization(
 
 //Read commands
 #if defined(PLATFORM_WIN)
-size_t __fastcall ReadCommands(
+size_t ReadCommands(
 	int argc, 
 	wchar_t* argv[])
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-size_t __fastcall ReadCommands(
+size_t ReadCommands(
 	int argc, 
 	char *argv[])
 #endif
 {
 //Initialization
 	std::wstring Parameter;
-	SSIZE_T SignedResult = 0;
+	ssize_t SignedResult = 0;
 	size_t UnsignedResult = 0;
 
 //Read parameter
@@ -291,7 +291,7 @@ size_t __fastcall ReadCommands(
 	#if defined(PLATFORM_WIN)
 		Parameter = argv[Index];
 	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-		MBSToWCSString(Parameter, argv[Index]);
+		MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 	#endif
 		SignedResult = 0;
 		UnsignedResult = 0;
@@ -320,7 +320,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 				_set_errno(0);
@@ -355,7 +355,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 				_set_errno(0);
@@ -383,7 +383,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 				_set_errno(0);
@@ -416,7 +416,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 				_set_errno(0);
@@ -449,7 +449,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 				_set_errno(0);
@@ -515,7 +515,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 				_set_errno(0);
@@ -551,7 +551,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 				_set_errno(0);
@@ -579,7 +579,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 				_set_errno(0);
@@ -607,7 +607,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 				_set_errno(0);
@@ -635,7 +635,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 				_set_errno(0);
@@ -663,7 +663,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 				_set_errno(0);
@@ -700,7 +700,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 				_set_errno(0);
@@ -736,7 +736,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 			//Type name
@@ -774,7 +774,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 			//Classes name
@@ -812,7 +812,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 			//Server name
@@ -850,18 +850,18 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 			//Initialization
-				std::shared_ptr<char> RawDataStringPTR(new char[Parameter.length() + 1U]());
+				std::shared_ptr<uint8_t> RawDataStringPTR(new uint8_t[Parameter.length() + 1U]());
 				memset(RawDataStringPTR.get(), 0, Parameter.length() + 1U);
 			#if defined(PLATFORM_WIN)
-				WideCharToMultiByte(CP_ACP, 0, Parameter.c_str(), (int)Parameter.length(), RawDataStringPTR.get(), (int)Parameter.length() + 1U, nullptr, nullptr);
+				WideCharToMultiByte(CP_ACP, 0, Parameter.c_str(), (int)Parameter.length(), (LPSTR)RawDataStringPTR.get(), (int)Parameter.length() + 1U, nullptr, nullptr);
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				wcstombs(RawDataStringPTR.get(), Parameter.c_str(), Parameter.length());
+				wcstombs((char *)RawDataStringPTR.get(), Parameter.c_str(), Parameter.length());
 			#endif
-				std::string RawDataString(RawDataStringPTR.get());
+				std::string RawDataString((const char *)RawDataStringPTR.get());
 				RawDataStringPTR.reset();
 
 				if (RawDataString.length() < PACKET_MINSIZE && RawDataString.length() > PACKET_MAXSIZE)
@@ -869,12 +869,11 @@ size_t __fastcall ReadCommands(
 					fwprintf_s(stderr, L"\nParameter [-rawdata raw_data] error.\n");
 					return EXIT_FAILURE;
 				}
-				std::shared_ptr<char> TempRawData(new char[PACKET_MAXSIZE]());
+				std::shared_ptr<uint8_t> TempRawData(new uint8_t[PACKET_MAXSIZE]());
 				memset(TempRawData.get(), 0, PACKET_MAXSIZE);
 				ConfigurationParameter.RawData.swap(TempRawData);
 				TempRawData.reset();
-				char TempString[5U];
-				memset(TempString, 0, 5U);
+				uint8_t TempString[5U] = {0};
 				TempString[0] = ASCII_ZERO;
 				TempString[1U] = 120; //"x"
 
@@ -887,10 +886,10 @@ size_t __fastcall ReadCommands(
 
 				//Read number.
 					_set_errno(0);
-					UnsignedResult = strtoul(TempString, nullptr, 0);
+					UnsignedResult = strtoul((const char *)TempString, nullptr, 0);
 					if (UnsignedResult > 0 && UnsignedResult <= UINT8_MAX)
 					{
-						ConfigurationParameter.RawData.get()[ConfigurationParameter.RawDataLen] = (char)UnsignedResult;
+						ConfigurationParameter.RawData.get()[ConfigurationParameter.RawDataLen] = (uint8_t)UnsignedResult;
 						++ConfigurationParameter.RawDataLen;
 					}
 					else {
@@ -914,7 +913,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 			//Protocol name
@@ -961,16 +960,16 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
-				std::shared_ptr<char> ParameterPTR(new char[Parameter.length() + 1U]());
+				std::shared_ptr<uint8_t> ParameterPTR(new uint8_t[Parameter.length() + 1U]());
 				memset(ParameterPTR.get(), 0, Parameter.length() + 1U);
 			#if defined(PLATFORM_WIN)
-				WideCharToMultiByte(CP_ACP, 0, Parameter.c_str(), (int)Parameter.length(), ParameterPTR.get(), (int)(Parameter.length() + 1U), nullptr, nullptr);
+				WideCharToMultiByte(CP_ACP, 0, Parameter.c_str(), (int)Parameter.length(), (LPSTR)ParameterPTR.get(), (int)(Parameter.length() + 1U), nullptr, nullptr);
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				wcstombs(ParameterPTR.get(), Parameter.c_str(), Parameter.length());
+				wcstombs((char *)ParameterPTR.get(), Parameter.c_str(), Parameter.length());
 			#endif
-				std::string ParameterString(ParameterPTR.get());
+				std::string ParameterString((const char *)ParameterPTR.get());
 				ConfigurationParameter.TargetString_SOCKS = Parameter;
 				ParameterPTR.reset();
 
@@ -1029,7 +1028,7 @@ size_t __fastcall ReadCommands(
 					}
 
 				//Mark address.
-					if (AddressStringToBinary((char *)ParameterString.c_str(), &((PSOCKADDR_IN6)&ConfigurationParameter.SockAddr_SOCKS)->sin6_addr, AF_INET6, SignedResult) == EXIT_FAILURE)
+					if (AddressStringToBinary((const uint8_t *)ParameterString.c_str(), &((PSOCKADDR_IN6)&ConfigurationParameter.SockAddr_SOCKS)->sin6_addr, AF_INET6, SignedResult) == EXIT_FAILURE)
 					{
 						fwprintf_s(stderr, L"\nParameter [-socks target] error, error code is %d.\n", (int)SignedResult);
 						return EXIT_FAILURE;
@@ -1077,8 +1076,8 @@ size_t __fastcall ReadCommands(
 							}
 							else {
 							//Get address.
-								ADDRINFOA AddrInfoHints, *AddrInfo = nullptr;
-								memset(&AddrInfoHints, 0, sizeof(ADDRINFOA));
+								addrinfo AddrInfoHints, *AddrInfo = nullptr;
+								memset(&AddrInfoHints, 0, sizeof(AddrInfoHints));
 								AddrInfoHints.ai_family = ConfigurationParameter.Protocol;
 								if (getaddrinfo(ParameterString.c_str(), nullptr, &AddrInfoHints, &AddrInfo) != 0)
 								{
@@ -1099,15 +1098,14 @@ size_t __fastcall ReadCommands(
 											((PSOCKADDR_IN6)&ConfigurationParameter.SockAddr_SOCKS)->sin6_port = htons((uint16_t)UnsignedResult);
 
 										//Get string of address.
-											char Buffer[ADDR_STRING_MAXSIZE];
-											memset(Buffer, 0, ADDR_STRING_MAXSIZE);
+											uint8_t Buffer[ADDR_STRING_MAXSIZE] = {0};
 
 										//Minimum supported system of inet_ntop and inet_pton functions is Windows Vista. [Roy Tam]
 										#if defined(PLATFORM_WIN_XP)
 											DWORD BufferLength = ADDR_STRING_MAXSIZE;
-											WSAAddressToStringA((PSOCKADDR)&ConfigurationParameter.SockAddr_SOCKS, sizeof(sockaddr_in6), nullptr, Buffer, &BufferLength);
+											WSAAddressToStringA((PSOCKADDR)&ConfigurationParameter.SockAddr_SOCKS, sizeof(sockaddr_in6), nullptr, (LPSTR)Buffer, &BufferLength);
 										#else
-											inet_ntop(AF_INET6, &((PSOCKADDR_IN6)&ConfigurationParameter.SockAddr_SOCKS)->sin6_addr, Buffer, ADDR_STRING_MAXSIZE);
+											inet_ntop(AF_INET6, &((PSOCKADDR_IN6)&ConfigurationParameter.SockAddr_SOCKS)->sin6_addr, (char *)Buffer, ADDR_STRING_MAXSIZE);
 										#endif
 
 											break;
@@ -1120,15 +1118,14 @@ size_t __fastcall ReadCommands(
 											((PSOCKADDR_IN)&ConfigurationParameter.SockAddr_SOCKS)->sin_port = htons((uint16_t)UnsignedResult);
 
 										//Get string of address.
-											char Buffer[ADDR_STRING_MAXSIZE];
-											memset(Buffer, 0, ADDR_STRING_MAXSIZE);
+											uint8_t Buffer[ADDR_STRING_MAXSIZE] = {0};
 
 										//Minimum supported system of inet_ntop and inet_pton functions is Windows Vista. [Roy Tam]
 										#if defined(PLATFORM_WIN_XP)
 											DWORD BufferLength = ADDR_STRING_MAXSIZE;
-											WSAAddressToStringA((PSOCKADDR)&ConfigurationParameter.SockAddr_SOCKS, sizeof(sockaddr_in), nullptr, Buffer, &BufferLength);
+											WSAAddressToStringA((PSOCKADDR)&ConfigurationParameter.SockAddr_SOCKS, sizeof(sockaddr_in), nullptr, (LPSTR)Buffer, &BufferLength);
 										#else
-											inet_ntop(AF_INET, &((PSOCKADDR_IN)&ConfigurationParameter.SockAddr_SOCKS)->sin_addr, Buffer, ADDR_STRING_MAXSIZE);
+											inet_ntop(AF_INET, &((PSOCKADDR_IN)&ConfigurationParameter.SockAddr_SOCKS)->sin_addr, (char *)Buffer, ADDR_STRING_MAXSIZE);
 										#endif
 
 											break;
@@ -1161,7 +1158,7 @@ size_t __fastcall ReadCommands(
 
 						//Mark address.
 							ConfigurationParameter.SockAddr_SOCKS.ss_family = AF_INET;
-							if (AddressStringToBinary((char *)ParameterString.c_str(), &((PSOCKADDR_IN)&ConfigurationParameter.SockAddr_SOCKS)->sin_addr, AF_INET, SignedResult) == EXIT_FAILURE)
+							if (AddressStringToBinary((const uint8_t *)ParameterString.c_str(), &((PSOCKADDR_IN)&ConfigurationParameter.SockAddr_SOCKS)->sin_addr, AF_INET, SignedResult) == EXIT_FAILURE)
 							{
 								fwprintf_s(stderr, L"\nParameter [-socks target] error, error code is %d.\n", (int)SignedResult);
 								return EXIT_FAILURE;
@@ -1185,16 +1182,16 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
-				std::shared_ptr<char> ParameterPTR(new char[Parameter.length() + 1U]());
+				std::shared_ptr<uint8_t> ParameterPTR(new uint8_t[Parameter.length() + 1U]());
 				memset(ParameterPTR.get(), 0, Parameter.length() + 1U);
 			#if defined(PLATFORM_WIN)
-				WideCharToMultiByte(CP_ACP, 0, Parameter.c_str(), (int)Parameter.length(), ParameterPTR.get(), (int)(Parameter.length() + 1U), nullptr, nullptr);
+				WideCharToMultiByte(CP_ACP, 0, Parameter.c_str(), (int)Parameter.length(), (LPSTR)ParameterPTR.get(), (int)(Parameter.length() + 1U), nullptr, nullptr);
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				wcstombs(ParameterPTR.get(), Parameter.c_str(), Parameter.length());
+				wcstombs((char *)ParameterPTR.get(), Parameter.c_str(), Parameter.length());
 			#endif
-				ConfigurationParameter.SOCKS_Username = ParameterPTR.get();
+				ConfigurationParameter.SOCKS_Username = (const char *)ParameterPTR.get();
 				ParameterPTR.reset();
 
 			//SOCKS username check
@@ -1219,16 +1216,16 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
-				std::shared_ptr<char> ParameterPTR(new char[Parameter.length() + 1U]());
+				std::shared_ptr<uint8_t> ParameterPTR(new uint8_t[Parameter.length() + 1U]());
 				memset(ParameterPTR.get(), 0, Parameter.length() + 1U);
 			#if defined(PLATFORM_WIN)
-				WideCharToMultiByte(CP_ACP, 0, Parameter.c_str(), (int)Parameter.length(), ParameterPTR.get(), (int)(Parameter.length() + 1U), nullptr, nullptr);
+				WideCharToMultiByte(CP_ACP, 0, Parameter.c_str(), (int)Parameter.length(), (LPSTR)ParameterPTR.get(), (int)(Parameter.length() + 1U), nullptr, nullptr);
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				wcstombs(ParameterPTR.get(), Parameter.c_str(), Parameter.length());
+				wcstombs((char *)ParameterPTR.get(), Parameter.c_str(), Parameter.length());
 			#endif
-				ConfigurationParameter.SOCKS_Password = ParameterPTR.get();
+				ConfigurationParameter.SOCKS_Password = (const char *)ParameterPTR.get();
 				ParameterPTR.reset();
 
 			//SOCKS password check
@@ -1252,7 +1249,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 				_set_errno(0);
@@ -1285,7 +1282,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 				if (Parameter == L"result")
@@ -1315,7 +1312,7 @@ size_t __fastcall ReadCommands(
 			#if defined(PLATFORM_WIN)
 				Parameter = argv[Index];
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				MBSToWCSString(Parameter, argv[Index]);
+				MBSToWCSString(Parameter, (const uint8_t *)argv[Index]);
 			#endif
 
 				if (Parameter.length() <= MAX_PATH)
@@ -1323,10 +1320,10 @@ size_t __fastcall ReadCommands(
 					ConfigurationParameter.wOutputFileName = Parameter;
 
 				#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-					std::shared_ptr<char> OutputFileNamePTR(new char[Parameter.length() + 1U]);
+					std::shared_ptr<uint8_t> OutputFileNamePTR(new uint8_t[Parameter.length() + 1U]);
 					memset(OutputFileNamePTR.get(), 0, Parameter.length() + 1U);
-					wcstombs(OutputFileNamePTR.get(), Parameter.c_str(), Parameter.length());
-					ConfigurationParameter.OutputFileName = OutputFileNamePTR.get();
+					wcstombs((char *)OutputFileNamePTR.get(), Parameter.c_str(), Parameter.length());
+					ConfigurationParameter.OutputFileName = (const char *)OutputFileNamePTR.get();
 				#endif
 				}
 				else {
@@ -1360,15 +1357,15 @@ size_t __fastcall ReadCommands(
 			}
 
 		//Initialization
-			std::shared_ptr<char> TestDomainPTR(new char[Parameter.length() + 1U]());
+			std::shared_ptr<uint8_t> TestDomainPTR(new uint8_t[Parameter.length() + 1U]());
 			memset(TestDomainPTR.get(), 0, Parameter.length() + 1U);
 		#if defined(PLATFORM_WIN)
-			WideCharToMultiByte(CP_ACP, 0, Parameter.c_str(), (int)Parameter.length(), TestDomainPTR.get(), (int)(Parameter.length() + 1U), nullptr, nullptr);
+			WideCharToMultiByte(CP_ACP, 0, Parameter.c_str(), (int)Parameter.length(), (LPSTR)TestDomainPTR.get(), (int)(Parameter.length() + 1U), nullptr, nullptr);
 		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-			wcstombs(TestDomainPTR.get(), Parameter.c_str(), Parameter.length());
+			wcstombs((char *)TestDomainPTR.get(), Parameter.c_str(), Parameter.length());
 		#endif
 
-			ConfigurationParameter.TestDomain = TestDomainPTR.get();
+			ConfigurationParameter.TestDomain = (const char *)TestDomainPTR.get();
 		}
 	//Specifie target.
 		else if (Index == (size_t)(argc - 1))
@@ -1381,14 +1378,14 @@ size_t __fastcall ReadCommands(
 			}
 
 		//Initialization
-			std::shared_ptr<char> ParameterPTR(new char[Parameter.length() + 1U]());
+			std::shared_ptr<uint8_t> ParameterPTR(new uint8_t[Parameter.length() + 1U]());
 			memset(ParameterPTR.get(), 0, Parameter.length() + 1U);
 		#if defined(PLATFORM_WIN)
-			WideCharToMultiByte(CP_ACP, 0, Parameter.c_str(), (int)Parameter.length(), ParameterPTR.get(), (int)(Parameter.length() + 1U), nullptr, nullptr);
+			WideCharToMultiByte(CP_ACP, 0, Parameter.c_str(), (int)Parameter.length(), (LPSTR)ParameterPTR.get(), (int)(Parameter.length() + 1U), nullptr, nullptr);
 		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-			wcstombs(ParameterPTR.get(), Parameter.c_str(), Parameter.length());
+			wcstombs((char *)ParameterPTR.get(), Parameter.c_str(), Parameter.length());
 		#endif
-			std::string ParameterString(ParameterPTR.get());
+			std::string ParameterString((const char *)ParameterPTR.get());
 			ParameterPTR.reset();
 
 		//IPv6
@@ -1409,7 +1406,7 @@ size_t __fastcall ReadCommands(
 			//Mark address.
 				ConfigurationParameter.Protocol = AF_INET6;
 				ConfigurationParameter.SockAddr_Normal.ss_family = AF_INET6;
-				if (AddressStringToBinary((char *)ParameterString.c_str(), &((PSOCKADDR_IN6)&ConfigurationParameter.SockAddr_Normal)->sin6_addr, AF_INET6, SignedResult) == EXIT_FAILURE)
+				if (AddressStringToBinary((const uint8_t *)ParameterString.c_str(), &((PSOCKADDR_IN6)&ConfigurationParameter.SockAddr_Normal)->sin6_addr, AF_INET6, SignedResult) == EXIT_FAILURE)
 				{
 					fwprintf_s(stderr, L"\nTarget format error, error code is %d.\n", (int)SignedResult);
 					return EXIT_FAILURE;
@@ -1440,8 +1437,8 @@ size_t __fastcall ReadCommands(
 					//Normal mode
 						else {
 						//Get address.
-							ADDRINFOA AddrInfoHints, *AddrInfo = nullptr;
-							memset(&AddrInfoHints, 0, sizeof(ADDRINFOA));
+							addrinfo AddrInfoHints, *AddrInfo = nullptr;
+							memset(&AddrInfoHints, 0, sizeof(AddrInfoHints));
 							AddrInfoHints.ai_family = ConfigurationParameter.Protocol;
 							if (getaddrinfo(ParameterString.c_str(), nullptr, &AddrInfoHints, &AddrInfo) != 0)
 							{
@@ -1463,20 +1460,19 @@ size_t __fastcall ReadCommands(
 
 									//Get string of address.
 										ConfigurationParameter.TargetAddressString = ParameterString;
-										char Buffer[ADDR_STRING_MAXSIZE];
-										memset(Buffer, 0, ADDR_STRING_MAXSIZE);
+										uint8_t Buffer[ADDR_STRING_MAXSIZE] = {0};
 
 									//Minimum supported system of inet_ntop and inet_pton functions is Windows Vista. [Roy Tam]
 									#if defined(PLATFORM_WIN_XP)
 										DWORD BufferLength = ADDR_STRING_MAXSIZE;
-										WSAAddressToStringA((PSOCKADDR)&ConfigurationParameter.SockAddr_Normal, sizeof(sockaddr_in6), nullptr, Buffer, &BufferLength);
+										WSAAddressToStringA((PSOCKADDR)&ConfigurationParameter.SockAddr_Normal, sizeof(sockaddr_in6), nullptr, (LPSTR)Buffer, &BufferLength);
 									#else
-										inet_ntop(AF_INET6, &((PSOCKADDR_IN6)&ConfigurationParameter.SockAddr_Normal)->sin6_addr, Buffer, ADDR_STRING_MAXSIZE);
+										inet_ntop(AF_INET6, &((PSOCKADDR_IN6)&ConfigurationParameter.SockAddr_Normal)->sin6_addr, (char *)Buffer, ADDR_STRING_MAXSIZE);
 									#endif
-										CaseConvert(true, Buffer, strlen(Buffer));
+										CaseConvert(true, Buffer, strnlen_s((const char *)Buffer, ADDR_STRING_MAXSIZE));
 
 										ConfigurationParameter.TargetString_Normal.append("[");
-										ConfigurationParameter.TargetString_Normal.append(Buffer);
+										ConfigurationParameter.TargetString_Normal.append((const char *)Buffer);
 										ConfigurationParameter.TargetString_Normal.append("]");
 										break;
 									}
@@ -1489,18 +1485,17 @@ size_t __fastcall ReadCommands(
 
 									//Get string of address.
 										ConfigurationParameter.TargetAddressString = ParameterString;
-										char Buffer[ADDR_STRING_MAXSIZE];
-										memset(Buffer, 0, ADDR_STRING_MAXSIZE);
+										uint8_t Buffer[ADDR_STRING_MAXSIZE] = {0};
 
 									//Minimum supported system of inet_ntop and inet_pton functions is Windows Vista. [Roy Tam]
 									#if defined(PLATFORM_WIN_XP)
 										DWORD BufferLength = ADDR_STRING_MAXSIZE;
-										WSAAddressToStringA((PSOCKADDR)&ConfigurationParameter.SockAddr_Normal, sizeof(sockaddr_in), nullptr, Buffer, &BufferLength);
+										WSAAddressToStringA((PSOCKADDR)&ConfigurationParameter.SockAddr_Normal, sizeof(sockaddr_in), nullptr, (LPSTR)Buffer, &BufferLength);
 									#else
-										inet_ntop(AF_INET, &((PSOCKADDR_IN)&ConfigurationParameter.SockAddr_Normal)->sin_addr, Buffer, ADDR_STRING_MAXSIZE);
+										inet_ntop(AF_INET, &((PSOCKADDR_IN)&ConfigurationParameter.SockAddr_Normal)->sin_addr, (char *)Buffer, ADDR_STRING_MAXSIZE);
 									#endif
 
-										ConfigurationParameter.TargetString_Normal = Buffer;
+										ConfigurationParameter.TargetString_Normal = (const char *)Buffer;
 										break;
 									}
 								}
@@ -1534,7 +1529,7 @@ size_t __fastcall ReadCommands(
 					//Mark address.
 						ConfigurationParameter.Protocol = AF_INET;
 						ConfigurationParameter.SockAddr_Normal.ss_family = AF_INET;
-						if (AddressStringToBinary((char *)ParameterString.c_str(), &((PSOCKADDR_IN)&ConfigurationParameter.SockAddr_Normal)->sin_addr, AF_INET, SignedResult) == EXIT_FAILURE)
+						if (AddressStringToBinary((const uint8_t *)ParameterString.c_str(), &((PSOCKADDR_IN)&ConfigurationParameter.SockAddr_Normal)->sin_addr, AF_INET, SignedResult) == EXIT_FAILURE)
 						{
 							fwprintf_s(stderr, L"\nTarget format error, error code is %d.\n", (int)SignedResult);
 							return EXIT_FAILURE;
@@ -1551,10 +1546,10 @@ size_t __fastcall ReadCommands(
 }
 
 //Output result to file
-size_t __fastcall OutputResultToFile(
+size_t OutputResultToFile(
 	void)
 {
-	SSIZE_T SignedResult = 0;
+	ssize_t SignedResult = 0;
 
 #if defined(PLATFORM_WIN)
 	SignedResult = _wfopen_s(&ConfigurationParameter.OutputFile, ConfigurationParameter.wOutputFileName.c_str(), L"a,ccs=UTF-8");
@@ -1568,11 +1563,12 @@ size_t __fastcall OutputResultToFile(
 	}
 	else {
 		tm TimeStructure;
-		memset(&TimeStructure, 0, sizeof(tm));
 		time_t TimeValues = 0;
+		memset(&TimeStructure, 0, sizeof(TimeStructure));
+		
+	//Get current time.
 		time(&TimeValues);
 		localtime_s(&TimeStructure, &TimeValues);
-
 		fwprintf_s(ConfigurationParameter.OutputFile, L"------------------------------ %d-%02d-%02d %02d:%02d:%02d ------------------------------\n", TimeStructure.tm_year + 1900, TimeStructure.tm_mon + 1, TimeStructure.tm_mday, TimeStructure.tm_hour, TimeStructure.tm_min, TimeStructure.tm_sec);
 	}
 
@@ -1580,7 +1576,7 @@ size_t __fastcall OutputResultToFile(
 }
 
 //Print header to screen. 
-void __fastcall PrintHeaderToScreen(
+void PrintHeaderToScreen(
 	const std::wstring wTargetAddressString, 
 	const std::wstring wTestDomain)
 {
@@ -1591,9 +1587,8 @@ void __fastcall PrintHeaderToScreen(
 	{
 		if (wTargetAddressString.empty())
 		{
-			char FQDN[NI_MAXHOST + 1U];
-			memset(FQDN, 0, NI_MAXHOST + 1U);
-			if (getnameinfo((PSOCKADDR)&ConfigurationParameter.SockAddr_Normal, sizeof(sockaddr_in), FQDN, NI_MAXHOST, nullptr, 0, NI_NUMERICSERV) != 0)
+			uint8_t FQDN[NI_MAXHOST + 1U] = {0};
+			if (getnameinfo((PSOCKADDR)&ConfigurationParameter.SockAddr_Normal, sizeof(sockaddr_in), (char *)FQDN, NI_MAXHOST, nullptr, 0, NI_NUMERICSERV) != 0)
 			{
 				fwprintf_s(stderr, L"Resolve addresses to host names error, error code is %d.\n", WSAGetLastError());
 				fwprintf_s(stderr, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), wTestDomain.c_str());
@@ -1601,20 +1596,20 @@ void __fastcall PrintHeaderToScreen(
 					fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), wTestDomain.c_str());
 			}
 			else {
-				if (ConfigurationParameter.TargetString_Normal == FQDN)
+				if (ConfigurationParameter.TargetString_Normal == (const char *)FQDN)
 				{
 					fwprintf_s(stderr, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), wTestDomain.c_str());
 					if (ConfigurationParameter.OutputFile != nullptr)
 						fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), wTestDomain.c_str());
 				}
 				else {
-					std::shared_ptr<wchar_t> wFQDN(new wchar_t[strnlen(FQDN, NI_MAXHOST) + 1U]());
-					wmemset(wFQDN.get(), 0, strnlen(FQDN, NI_MAXHOST) + 1U);
+					std::shared_ptr<wchar_t> wFQDN(new wchar_t[strnlen_s((const char *)FQDN, NI_MAXHOST) + 1U]());
+					wmemset(wFQDN.get(), 0, strnlen_s((const char *)FQDN, NI_MAXHOST) + 1U);
 
 				#if defined(PLATFORM_WIN)
-					MultiByteToWideChar(CP_ACP, 0, FQDN, MBSTOWCS_NULLTERMINATE, wFQDN.get(), (int)strlen(FQDN));
+					MultiByteToWideChar(CP_ACP, 0, (const char *)FQDN, MBSTOWCS_NULLTERMINATE, wFQDN.get(), (int)strnlen_s((const char *)FQDN, NI_MAXHOST));
 				#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-					mbstowcs(wFQDN.get(), FQDN, strlen(FQDN));
+					mbstowcs(wFQDN.get(), (const char *)FQDN, strnlen((const char *)FQDN, NI_MAXHOST));
 				#endif
 
 					fwprintf_s(stderr, L"DNSPing %ls:%u [%ls] with %ls:\n", wFQDN.get(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.wTargetString.c_str(), wTestDomain.c_str());

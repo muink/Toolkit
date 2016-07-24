@@ -29,7 +29,9 @@ int wmain(
 	wchar_t* argv[])
 {
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-int main(int argc, char *argv[])
+int main(
+	int argc, 
+	char *argv[])
 {
 #endif
 
@@ -186,7 +188,7 @@ int main(int argc, char *argv[])
 }
 
 //Print description to screen
-void __fastcall PrintDescription(
+void PrintDescription(
 	void)
 {
 	fwprintf_s(stderr, L"\n");

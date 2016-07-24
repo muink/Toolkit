@@ -20,7 +20,7 @@
 #include "Base.h"
 
 //Check empty buffer
-bool __fastcall CheckEmptyBuffer(
+bool CheckEmptyBuffer(
 	const void *Buffer, 
 	const size_t Length)
 {
@@ -39,7 +39,7 @@ bool __fastcall CheckEmptyBuffer(
 }
 
 //Convert host values to network byte order with 64 bits
-uint64_t __fastcall hton64(
+uint64_t hton64(
 	const uint64_t Value)
 {
 #if BYTE_ORDER == LITTLE_ENDIAN
@@ -51,7 +51,7 @@ uint64_t __fastcall hton64(
 
 /* Redirect to hton64.
 //Convert network byte order to host values with 64 bits
-uint64_t __fastcall ntoh64(const uint64_t Value)
+uint64_t ntoh64(const uint64_t Value)
 {
 #if BYTE_ORDER == LITTLE_ENDIAN
 	return (((uint64_t)ntohl((int32_t)((Value << (sizeof(uint32_t) * BYTES_TO_BITS)) >> (sizeof(uint32_t) * BYTES_TO_BITS)))) << (sizeof(uint32_t) * BYTES_TO_BITS)) | (uint32_t)ntohl((int32_t)(Value >> (sizeof(uint32_t) * BYTES_TO_BITS)));
@@ -62,8 +62,8 @@ uint64_t __fastcall ntoh64(const uint64_t Value)
 */
 
 //Convert multiple bytes to wide char string
-bool __fastcall MBSToWCSString(
-	const char *Buffer, 
+bool MBSToWCSString(
+	const uint8_t *Buffer, 
 	const size_t MaxLen, 
 	std::wstring &Target)
 {
@@ -71,7 +71,7 @@ bool __fastcall MBSToWCSString(
 	Target.clear();
 	if (Buffer == nullptr || MaxLen == 0)
 		return false;
-	size_t Length = strnlen_s(Buffer, MaxLen);
+	size_t Length = strnlen_s((const char *)Buffer, MaxLen);
 	if (Length == 0 || CheckEmptyBuffer(Buffer, Length))
 		return false;
 
@@ -79,9 +79,9 @@ bool __fastcall MBSToWCSString(
 	std::shared_ptr<wchar_t> TargetPTR(new wchar_t[Length + 1U]());
 	wmemset(TargetPTR.get(), 0, Length + 1U);
 #if defined(PLATFORM_WIN)
-	if (MultiByteToWideChar(CP_ACP, 0, Buffer, MBSTOWCS_NULLTERMINATE, TargetPTR.get(), (int)(Length + 1U)) == 0)
+	if (MultiByteToWideChar(CP_ACP, 0, (LPCCH)Buffer, MBSTOWCS_NULLTERMINATE, TargetPTR.get(), (int)(Length + 1U)) == 0)
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-	if (mbstowcs(TargetPTR.get(), Buffer, Length + 1U) == (size_t)RETURN_ERROR)
+	if (mbstowcs(TargetPTR.get(), (const char *)Buffer, Length + 1U) == (size_t)RETURN_ERROR)
 #endif
 	{
 		return false;
@@ -97,7 +97,7 @@ bool __fastcall MBSToWCSString(
 
 #if defined(PLATFORM_WIN)
 //Convert lowercase/uppercase words to uppercase/lowercase words(C++ wide string version)
-void __fastcall CaseConvert(
+void CaseConvert(
 	const bool IsLowerToUpper, 
 	std::wstring &Buffer)
 {
@@ -105,10 +105,10 @@ void __fastcall CaseConvert(
 	{
 	//Lowercase to uppercase
 		if (IsLowerToUpper)
-			StringIter = (char)toupper(StringIter);
+			StringIter = (uint8_t)toupper(StringIter);
 	//Uppercase to lowercase
 		else 
-			StringIter = (char)tolower(StringIter);
+			StringIter = (uint8_t)tolower(StringIter);
 	}
 
 	return;
@@ -116,7 +116,7 @@ void __fastcall CaseConvert(
 #endif
 
 //Convert lowercase/uppercase words to uppercase/lowercase words(C++ string version)
-void __fastcall CaseConvert(
+void CaseConvert(
 	const bool IsLowerToUpper, 
 	std::string &Buffer)
 {
@@ -124,20 +124,20 @@ void __fastcall CaseConvert(
 	{
 	//Lowercase to uppercase
 		if (IsLowerToUpper)
-			StringIter = (char)toupper(StringIter);
+			StringIter = (uint8_t)toupper(StringIter);
 	//Uppercase to lowercase
 		else 
-			StringIter = (char)tolower(StringIter);
+			StringIter = (uint8_t)tolower(StringIter);
 	}
 
 	return;
 }
 
 //Derived from original code by CodesInChaos(LibSodium)
-char *sodium_bin2hex(
-	char *const hex, 
+uint8_t *sodium_bin2hex(
+	uint8_t *const hex, 
 	const size_t hex_maxlen, 
-	const unsigned char *const bin, 
+	const uint8_t *const bin, 
 	const size_t bin_len)
 {
     size_t       i = (size_t) 0U;
@@ -151,8 +151,8 @@ char *sodium_bin2hex(
     while (i < bin_len) {
         c = bin[i] & 0xf;
         b = bin[i] >> 4;
-        x = (unsigned char) (87U + c + (((c - 10U) >> 8) & ~38U)) << 8 | 
-            (unsigned char) (87U + b + (((b - 10U) >> 8) & ~38U));
+        x = (uint8_t) (87U + c + (((c - 10U) >> 8) & ~38U)) << 8 | 
+            (uint8_t) (87U + b + (((b - 10U) >> 8) & ~38U));
         hex[i * 2U] = (char) x;
         x >>= 8;
         hex[i * 2U + 1U] = (char) x;

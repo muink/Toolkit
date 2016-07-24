@@ -45,12 +45,12 @@ typedef struct _md2_info_
 extern size_t HashFamilyID;
 
 //Functions
-void __fastcall MD2_Init(
+void MD2_Init(
 	MD2_CTX *md2);
-void __fastcall MD2_Update(
+void MD2_Update(
 	MD2_CTX *md2, 
 	const uint8_t *data, 
 	uint32_t len);
-void __fastcall MD2_Final(
+void MD2_Final(
 	MD2_CTX *md2, 
 	uint8_t *hash);

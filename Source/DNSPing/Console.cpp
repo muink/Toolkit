@@ -21,7 +21,7 @@
 
 #if defined(PLATFORM_WIN)
 //Catch Control-C exception from keyboard.
-BOOL __fastcall CtrlHandler(
+BOOL CtrlHandler(
 	const DWORD fdwCtrlType)
 {
 //Handle the CTRL-C signal.
