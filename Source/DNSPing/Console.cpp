@@ -24,26 +24,30 @@
 BOOL CtrlHandler(
 	const DWORD fdwCtrlType)
 {
-//Handle the CTRL-C signal.
-	if (fdwCtrlType == CTRL_C_EVENT)
+	switch (fdwCtrlType)
 	{
-		fwprintf_s(stderr, L"Get Control-C.\n");
-	}
-//Handle the CTRL-Break signal.
-	else if (fdwCtrlType == CTRL_BREAK_EVENT)
-	{
-		fwprintf_s(stderr, L"Get Control-Break.\n");
-		PrintProcess(true, true);
-		
-		return TRUE;
-	}
-//Handle other signals.
-	else {
-		fwprintf_s(stderr, L"Get closing signal.\n");
+	//Handle the CTRL-C signal.
+		case CTRL_C_EVENT:
+		{
+			fwprintf_s(stderr, L"[Notice] Get Control-C.\n");
+			PrintProcess(true, true);
+		}break;
+	//Handle the CTRL-Break signal.
+		case CTRL_BREAK_EVENT:
+		{
+			fwprintf_s(stderr, L"[Notice] Get Control-Break.\n");
+			PrintProcess(true, true);
+
+			return TRUE;
+		}break;
+	//Handle other signals.
+		default:
+		{
+			fwprintf_s(stderr, L"[Notice] Get closing signal.\n");
+			PrintProcess(true, true);
+		}
 	}
 
-//Print statistics.
-	PrintProcess(true, true);
 	return FALSE;
 }
 #endif

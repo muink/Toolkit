@@ -20,6 +20,11 @@
 
 
 # Create a release directory.
+if (uname -s | grep -iq "Darwin"); then
+	ThreadNum=`sysctl -n hw.ncpu`
+else
+	ThreadNum=`grep "processor" /proc/cpuinfo | sort -u | wc -l`
+fi
 rm -Rrf Object
 mkdir Release
 
@@ -27,7 +32,7 @@ mkdir Release
 mkdir Object
 cd Object
 cmake ../DNSPing
-make
+make -j${ThreadNum}
 cd ..
 mv -f Object/DNSPing Release
 rm -Rrf Object
@@ -36,7 +41,7 @@ rm -Rrf Object
 mkdir Object
 cd Object
 cmake ../FileHash
-make
+make -j${ThreadNum}
 cd ..
 mv -f Object/FileHash Release
 rm -Rrf Object

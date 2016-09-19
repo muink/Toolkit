@@ -23,36 +23,65 @@
 ConfigurationTable::ConfigurationTable(
 	void)
 {
+//Global status
+	OutputFile = nullptr;
 #if defined(PLATFORM_WIN)
-	memset(this, 0, sizeof(ConfigurationTable) - (sizeof(std::string) * 5U + sizeof(std::wstring) * 3U + sizeof(std::shared_ptr<uint8_t>)));
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-	memset(this, 0, sizeof(ConfigurationTable) - (sizeof(std::string) * 6U + sizeof(std::wstring) * 3U + sizeof(std::shared_ptr<uint8_t>)));
+	IsWinSockInitialized = false;
 #endif
 
-	Statistics_Send = DEFAULT_SEND_TIMES;
+//C-Syle type parameter block
+	TransmissionInterval = 0;
 	BufferSize = PACKET_MAXSIZE;
-	Validate = true;
+	RawDataLen = 0;
+	EDNSPayloadSize = 0;
+	Protocol = 0;
+	ServiceType = 0;
+	IsReverseLookup = false;
+	IsRawSocket = false;
+	IsEDNS = false;
+	IsDNSSEC = false;
+	IsValidate = true;
+	IsShowResponse = false;
+	IsShowHexResponse = false;
+#if (defined(PLATFORM_WIN) || defined(PLATFORM_LINUX))
+	IsDoNotFragment = false;
+#endif
 #if defined(PLATFORM_WIN)
+	PacketHopLimits = 0;
 	SocketTimeout = DEFAULT_TIME_OUT;
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+	PacketHopLimits = 0;
 	SocketTimeout.tv_sec = DEFAULT_TIME_OUT;
 #endif
+	memset(&SockAddr_Normal, 0, sizeof(SockAddr_Normal));
+	memset(&SockAddr_SOCKS, 0, sizeof(SockAddr_SOCKS));
+	memset(&Parameter_Header, 0, sizeof(Parameter_Header));
+	memset(&Parameter_Query, 0, sizeof(Parameter_Query));
+	memset(&Parameter_EDNS, 0, sizeof(Parameter_EDNS));
+
+//C-Syle type result block
+	Statistics_Send = DEFAULT_SEND_TIMES;
+	Statistics_RealSend = 0;
+	Statistics_RecvNum = 0;
+	Statistics_TotalTime = 0;
+	Statistics_MaxTime = 0;
+	Statistics_MinTime = 0;
 
 	return;
 }
 
-#if (defined(PLATFORM_WIN) || (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT)))
 //GlobalStatus class destructor
 ConfigurationTable::~ConfigurationTable(
 	void)
 {
-//Close all file and network handles and WinSock cleanup.
-	_fcloseall();
+//Close all file handles and WinSock cleanup.
 #if defined(PLATFORM_WIN)
-	if (Initialization_WinSock)
+	_fcloseall();
+	if (IsWinSockInitialized)
 		WSACleanup();
+#elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
+	fcloseall();
 #endif
 
 	return;
 }
-#endif

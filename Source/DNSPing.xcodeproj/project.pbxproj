@@ -14,6 +14,7 @@
 		D942EC761D12F2E200F7C65A /* Protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942EC6C1D12F2E200F7C65A /* Protocol.cpp */; };
 		D942EC771D12F2E200F7C65A /* Resolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942EC6E1D12F2E200F7C65A /* Resolver.cpp */; };
 		D942EC781D12F2E200F7C65A /* Terminal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942EC711D12F2E200F7C65A /* Terminal.cpp */; };
+		D9AC805D1D903736007FD633 /* ReadCommands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9AC805C1D903736007FD633 /* ReadCommands.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -42,6 +43,7 @@
 		D942EC711D12F2E200F7C65A /* Terminal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Terminal.cpp; path = DNSPing/Terminal.cpp; sourceTree = "<group>"; };
 		D942EC791D12F2ED00F7C65A /* Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Base.h; path = DNSPing/Base.h; sourceTree = "<group>"; };
 		D99427BC1D12F0FE00280D91 /* DNSPing */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = DNSPing; sourceTree = BUILT_PRODUCTS_DIR; };
+		D9AC805C1D903736007FD633 /* ReadCommands.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ReadCommands.cpp; path = DNSPing/ReadCommands.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +81,7 @@
 				D942EC691D12F2E200F7C65A /* Initialization.cpp */,
 				D942EC6A1D12F2E200F7C65A /* Process.cpp */,
 				D942EC6C1D12F2E200F7C65A /* Protocol.cpp */,
+				D9AC805C1D903736007FD633 /* ReadCommands.cpp */,
 				D942EC6E1D12F2E200F7C65A /* Resolver.cpp */,
 				D942EC711D12F2E200F7C65A /* Terminal.cpp */,
 				D942EC791D12F2ED00F7C65A /* Base.h */,
@@ -153,6 +156,7 @@
 				D942EC731D12F2E200F7C65A /* DNSPing.cpp in Sources */,
 				D942EC761D12F2E200F7C65A /* Protocol.cpp in Sources */,
 				D942EC751D12F2E200F7C65A /* Process.cpp in Sources */,
+				D9AC805D1D903736007FD633 /* ReadCommands.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

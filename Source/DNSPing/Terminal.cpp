@@ -27,13 +27,13 @@ extern ConfigurationTable ConfigurationParameter;
 void SIG_Handler(
 	const int Signal)
 {
-	fwprintf(stderr, L"Get closing signal.\n");
+	fwprintf(stderr, L"[Notice] Get closing signal.\n");
 	PrintProcess(true, true);
 
 //Close file handle.
 	if (ConfigurationParameter.OutputFile != nullptr)
 		fclose(ConfigurationParameter.OutputFile);
-	
+
 	exit(EXIT_SUCCESS);
 	return;
 }

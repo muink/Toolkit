@@ -29,3 +29,6 @@ size_t SOCKS_UDP_ASSOCIATE(
 	const SOCKET Socket_Normal, 
 	const PSOCKADDR SockAddr, 
 	const socklen_t AddrLen);
+void ErrorCodeToMessage(
+	const ssize_t ErrorCode, 
+	std::wstring &Message);

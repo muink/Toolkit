@@ -22,7 +22,7 @@
 //////////////////////////////////////////////////
 // Main header
 // 
-#define ADDR_STRING_MAXSIZE          64U         //Maximum size of addresses(IPv4/IPv6) words
+#define ADDRESS_STRING_MAXSIZE       64U         //Maximum size of addresses(IPv4/IPv6) words
 #define BYTES_TO_BITS                8U
 #if defined(PLATFORM_WIN)
 	#define DEFAULT_TIME_OUT             2000U       //Default timeout, 2000 ms(2 seconds)
@@ -36,6 +36,7 @@
 #define DEFAULT_SEND_TIMES           4U          //Default send times
 #define DOMAIN_MAXSIZE               256U        //Maximum size of whole level domain is 256 bytes(Section 2.3.1 in RFC 1035).
 #define DOMAIN_MINSIZE               2U          //Minimum size of whole level domain is 3 bytes(Section 2.3.1 in RFC 1035).
+#define FILE_BUFFER_SIZE             4096U       //Maximum size of file buffer(4KB/4096 bytes)
 #define HIGHEST_BIT_U16              0x7FFF      //Get highest bit in uint16_t/16 bits data
 #define HIGHEST_MOVE_BIT_U16         15U         //Move 15 bits to get highest bit in uint16_t/16 bits data.
 #define LARGE_PACKET_MAXSIZE         4096U       //Maximum size of packets(4KB/4096 bytes) of TCP protocol
@@ -43,6 +44,7 @@
 #define NUM_HEX                      16
 #define PACKET_MAXSIZE               1500U       //Maximum size of packets, Standard MTU of Ethernet II network
 #define PACKET_MINSIZE               64U         //Minimum size of packets in Ethernet network.
+#define PADDING_RESERVED_BYTES       2U          //Padding reserved bytes(2 bytes)
 #define SECONDS_IN_DAY               86400U      //86400 seconds in a day
 #define SECONDS_IN_HOUR              3600U       //3600 seconds in an hour
 #define SECONDS_IN_MINUTE            60U         //60 seconds in a minute
@@ -54,7 +56,7 @@
 #define DNS_PACKET_MINSIZE           (sizeof(dns_hdr) + 4U + sizeof(dns_qry))   //Minimum DNS packet size(DNS Header + Minimum Domain + DNS Query)
 
 //Version definitions
-#define FULL_VERSION                                  L"0.3.1.0"
+#define FULL_VERSION                                  L"0.3.2.0"
 #define COPYRIGHT_MESSAGE                             L"Copyright (C) 2014-2016 Chengr28"
 
 
@@ -65,16 +67,12 @@
 	#define SD_RECV                                                          SHUT_RD
 	#define SD_SEND                                                          SHUT_WR
 	#define closesocket                                                      close
-	#if defined(PLATFORM_LINUX)
-		#define _fcloseall                                                       fcloseall
-	#endif
 	#define fwprintf_s                                                       fwprintf
-	#define GetCurrentProcessId                                              pthread_self
 	#define GetLastError()                                                   errno
 	#define _set_errno(Value)                                                errno = Value
 	#define strnlen_s                                                        strnlen
 	#define wcsnlen_s                                                        wcsnlen
-	#define WSAGetLastError                                                  GetLastError
+	#define WSAGetLastError()                                                errno
 	#define localtime_s(TimeStructure, TimeValue)                            localtime_r(TimeValue, TimeStructure)
 	#define memcpy_s(Dst, DstSize, Src, Size)                                memcpy(Dst, Src, Size)
 	#define memmove_s(Dst, DstSize, Src, Size)                               memmove(Dst, Src, Size)
@@ -93,7 +91,7 @@ public:
 //Global status
 	FILE *OutputFile;
 #if defined(PLATFORM_WIN)
-	bool Initialization_WinSock;
+	bool IsWinSockInitialized;
 #endif
 
 //C-Syle type parameter block
@@ -103,21 +101,22 @@ public:
 	size_t EDNSPayloadSize;
 	uint16_t Protocol;
 	uint16_t ServiceType;
-	bool ReverseLookup;
-	bool RawSocket;
-	bool EDNS;
-	bool DNSSEC;
-	bool Validate;
-	bool ShowResponse;
-	bool ShowResponseHex;
-	int IP_HopLimits;
-#if defined(PLATFORM_WIN)
-	int SocketTimeout;
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-	timeval SocketTimeout;
-#endif
+	bool IsReverseLookup;
+	bool IsRawSocket;
+	bool IsEDNS;
+	bool IsDNSSEC;
+	bool IsValidate;
+	bool IsShowResponse;
+	bool IsShowHexResponse;
 #if (defined(PLATFORM_WIN) || defined(PLATFORM_LINUX))
-	bool IPv4_DF;
+	bool IsDoNotFragment;
+#endif
+#if defined(PLATFORM_WIN)
+	DWORD PacketHopLimits;
+	DWORD SocketTimeout;
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+	int PacketHopLimits;
+	timeval SocketTimeout;
 #endif
 	sockaddr_storage SockAddr_Normal;
 	sockaddr_storage SockAddr_SOCKS;
@@ -150,10 +149,8 @@ public:
 //Member functions
 	ConfigurationTable(
 		void);
-#if (defined(PLATFORM_WIN) || (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT)))
 	~ConfigurationTable(
 		void);
-#endif
 };
 
 //Console.h
@@ -166,30 +163,24 @@ void SIG_Handler(
 #endif
 
 //DNSPing.cpp
-size_t ConfigurationInitialization(
+bool ConfigurationInitialization(
 	void);
-#if defined(PLATFORM_WIN)
-size_t ReadCommands(
-	int argc, 
-	wchar_t* argv[]);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-size_t ReadCommands(
-	int argc, 
-	char *argv[]);
-#endif
-size_t OutputResultToFile(
+
+//Process.h
+bool SendProcess(
+	const sockaddr_storage &Target, 
+	const bool LastSend);
+void PrintProcess(
+	const bool IsPacketStatistics, 
+	const bool IsTimeStatistics);
+bool OutputResultToFile(
 	void);
 void PrintHeaderToScreen(
 	const std::wstring wTargetAddressString, 
 	const std::wstring wTestDomain);
-
-//Process.h
-size_t SendProcess(
-	const sockaddr_storage &Target, 
-	const bool LastSend);
-size_t PrintProcess(
-	const bool IsPacketStatistics, 
-	const bool IsTimeStatistics);
+void PrintErrorToScreen(
+	const wchar_t *Message, 
+	const ssize_t ErrorCode);
 void PrintDescription(
 	void);
 
@@ -197,23 +188,35 @@ void PrintDescription(
 bool CheckEmptyBuffer(
 	const void *Buffer, 
 	const size_t Length);
-#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-void MBSToWCSString(
-	std::wstring &Target, 
-	const uint8_t *Buffer);
-#endif
-size_t CaseConvert(
+bool MBSToWCSString(
+	const uint8_t *Buffer, 
+	const size_t MaxLen, 
+	std::wstring &Target);
+bool WCSToMBSString(
+	const wchar_t *Buffer, 
+	const size_t MaxLen, 
+	std::string &Target);
+void CaseConvert(
 	const bool IsLowerUpper, 
 	uint8_t *Buffer, 
 	const size_t Length);
-size_t AddressStringToBinary(
-	const uint8_t *AddrString, 
-	void *pAddr, 
+void CaseConvert(
+	std::wstring &Buffer, 
+	const bool IsLowerToUpper);
+bool AddressStringToBinary(
 	const uint16_t Protocol, 
-	ssize_t &ErrCode);
-uint16_t ProtocolNameToPort(
+	const uint8_t *AddrString, 
+	void *OriginalAddr, 
+	ssize_t &ErrorCode);
+bool BinaryToAddressString(
+	const uint16_t Protocol, 
+	const void *OriginalAddr, 
+	void *AddressString, 
+	const size_t StringSize, 
+	ssize_t *ErrorCode);
+uint16_t ProtocolNameToBinary(
 	const std::wstring &Buffer);
-uint16_t ServiceNameToPort(
+uint16_t ServiceNameToBinary(
 	const std::wstring &Buffer);
 uint16_t DNSClassesNameToBinary(
 	const std::wstring &Buffer);
@@ -231,18 +234,29 @@ bool ValidatePacket(
 	const size_t Length, 
 	const uint16_t DNS_ID);
 void PrintSecondsInDateTime(
-	const time_t Seconds, 
-	FILE *FileHandle);
+	FILE *FileHandle, 
+	const time_t Seconds);
 void PrintDateTime(
-	const time_t Time, 
-	FILE *FileHandle);
+	FILE *FileHandle, 
+	const time_t Time);
+
+//ReadCommands.cpp
+#if defined(PLATFORM_WIN)
+bool ReadCommands(
+	int argc, 
+	wchar_t *argv[]);
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+bool ReadCommands(
+	int argc, 
+	char *argv[]);
+#endif
 
 //Resolver.h
-void PrintResponseHex(
+void PrintHexResponse(
+	FILE *FileHandle, 
 	const uint8_t *Buffer, 
-	const size_t Length, 
-	FILE *FileHandle);
+	const size_t Length);
 void PrintResponse(
+	FILE *FileHandle, 
 	const uint8_t *Buffer, 
-	const size_t Length, 
-	FILE *FileHandle);
+	const size_t Length);

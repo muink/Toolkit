@@ -85,7 +85,7 @@ bool ReadCommands_SHA3(
 		#endif
 			if (Result >= FILE_BUFFER_SIZE)
 			{
-				fwprintf_s(stderr, L"Commands error.\n");
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
 				return false;
 			}
 			else {
@@ -106,7 +106,7 @@ bool ReadCommands_SHA3(
 		#endif
 			if (Result >= FILE_BUFFER_SIZE)
 			{
-				fwprintf_s(stderr, L"Commands error.\n");
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
 				return false;
 			}
 			else {
@@ -115,12 +115,12 @@ bool ReadCommands_SHA3(
 		}
 	//Commands error
 		else {
-			fwprintf_s(stderr, L"Commands error.\n");
+			fwprintf_s(stderr, L"[Error] Commands error.\n");
 			return false;
 		}
 	}
 	else { //Commands error
-		fwprintf_s(stderr, L"Commands error.\n");
+		fwprintf_s(stderr, L"[Error] Commands error.\n");
 		return false;
 	}
 
@@ -134,7 +134,7 @@ bool SHA3_Hash(
 //Parameters check
 	if (HashFamilyID != HASH_ID_SHA3 || FileHandle == nullptr)
 	{
-		fwprintf_s(stderr, L"Parameters error.\n");
+		fwprintf_s(stderr, L"[Error] Parameters error.\n");
 		return false;
 	}
 
@@ -172,7 +172,7 @@ bool SHA3_Hash(
 		Keccak_HashInitialize_SHAKE256(&HashInstance);
 	}
 	else {
-		fwprintf_s(stderr, L"SHA-3 function ID error.\n");
+		fwprintf_s(stderr, L"[Error] Parameters error.\n");
 		return false;
 	}
 
@@ -182,9 +182,20 @@ bool SHA3_Hash(
 		memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 		_set_errno(0);
 		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(uint8_t), FILE_BUFFER_SIZE, FileHandle);
-		if ((ReadLength == 0 && errno > 0) || Keccak_HashUpdate(&HashInstance, (BitSequence *)Buffer.get(), ReadLength * BYTES_TO_BITS) != SUCCESS)
+		if (ReadLength == 0 && errno != 0)
 		{
-			fwprintf_s(stderr, L"Hash process error.\n");
+			std::wstring Message(L"[Error] Read file error");
+			ErrorCodeToMessage(errno, Message);
+			if (errno == 0)
+				fwprintf_s(stderr, Message.c_str());
+			else
+				fwprintf_s(stderr, Message.c_str(), errno);
+
+			return false;
+		}
+		else if (Keccak_HashUpdate(&HashInstance, (BitSequence *)Buffer.get(), ReadLength * BYTES_TO_BITS) != SUCCESS)
+		{
+			fwprintf_s(stderr, L"[Error] Hash process error");
 			return false;
 		}
 	}
@@ -198,7 +209,7 @@ bool SHA3_Hash(
 		{
 			if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA3_SIZE_224 / BYTES_TO_BITS) == nullptr)
 			{
-				fwprintf_s(stderr, L"Convert binary to hex error.\n");
+				fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 				return false;
 			}
 		}
@@ -207,7 +218,7 @@ bool SHA3_Hash(
 		{
 			if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA3_SIZE_256 / BYTES_TO_BITS) == nullptr)
 			{
-				fwprintf_s(stderr, L"Convert binary to hex error.\n");
+				fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 				return false;
 			}
 		}
@@ -216,7 +227,7 @@ bool SHA3_Hash(
 		{
 			if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA3_SIZE_384 / BYTES_TO_BITS) == nullptr)
 			{
-				fwprintf_s(stderr, L"Convert binary to hex error.\n");
+				fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 				return false;
 			}
 		}
@@ -225,7 +236,7 @@ bool SHA3_Hash(
 		{
 			if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA3_SIZE_512 / BYTES_TO_BITS) == nullptr)
 			{
-				fwprintf_s(stderr, L"Convert binary to hex error.\n");
+				fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 				return false;
 			}
 		}
@@ -237,29 +248,25 @@ bool SHA3_Hash(
 			{
 				if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA3_SHAKE_Length / BYTES_TO_BITS) == nullptr)
 				{
-					fwprintf_s(stderr, L"Convert binary to hex error.\n");
+					fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 					return false;
 				}
 			}
 			else {
-				fwprintf_s(stderr, L"Hash squeeze error.\n");
+				fwprintf_s(stderr, L"[Error] Hash squeeze error.\n");
 				return false;
 			}
 		}
 		else {
-			fwprintf_s(stderr, L"SHA-3 function ID error.\n");
+			fwprintf_s(stderr, L"[Error] Parameters error.\n");
 			return false;
 		}
 
 	//Print to screen.
-		std::string HashResult = (const char *)StringBuffer.get();
-		CaseConvert(true, HashResult);
-		for (size_t Index = 0;Index < HashResult.length();++Index)
-			fwprintf_s(stderr, L"%c", HashResult.c_str()[Index]);
-		fwprintf_s(stderr, L"\n");
+		PrintToScreen(StringBuffer.get());
 	}
 	else {
-		fwprintf_s(stderr, L"Hash final error.\n");
+		fwprintf_s(stderr, L"[Error] Hash final error.\n");
 		return false;
 	}
 

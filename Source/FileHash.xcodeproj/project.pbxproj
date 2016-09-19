@@ -39,7 +39,6 @@
 		D942EC7A1D12F30D00F7C65A /* CRC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CRC.cpp; sourceTree = "<group>"; };
 		D942EC7B1D12F30D00F7C65A /* CRC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CRC.h; sourceTree = "<group>"; };
 		D942EC7C1D12F30D00F7C65A /* FileHash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileHash.cpp; sourceTree = "<group>"; };
-		D942EC7D1D12F30D00F7C65A /* FileHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileHash.h; sourceTree = "<group>"; };
 		D942EC7E1D12F30D00F7C65A /* MD2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MD2.cpp; sourceTree = "<group>"; };
 		D942EC7F1D12F30D00F7C65A /* MD2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MD2.h; sourceTree = "<group>"; };
 		D942EC801D12F30D00F7C65A /* MD4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MD4.cpp; sourceTree = "<group>"; };
@@ -67,6 +66,7 @@
 		D942ECB51D12F73800F7C65A /* SnP-Relaned.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SnP-Relaned.h"; path = "FileHash/SHA3/SnP-Relaned.h"; sourceTree = "<group>"; };
 		D942ECB61D12F73800F7C65A /* SnP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SnP.h; path = FileHash/SHA3/SnP.h; sourceTree = "<group>"; };
 		D99427D51D12F15900280D91 /* FileHash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FileHash; sourceTree = BUILT_PRODUCTS_DIR; };
+		D9AC805E1D903757007FD633 /* Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,8 +129,8 @@
 				D942EC841D12F30D00F7C65A /* SHA-1.cpp */,
 				D942EC861D12F30D00F7C65A /* SHA-2.cpp */,
 				D942EC881D12F30D00F7C65A /* SHA-3.cpp */,
+				D9AC805E1D903757007FD633 /* Base.h */,
 				D942EC7B1D12F30D00F7C65A /* CRC.h */,
-				D942EC7D1D12F30D00F7C65A /* FileHash.h */,
 				D942EC7F1D12F30D00F7C65A /* MD2.h */,
 				D942EC811D12F30D00F7C65A /* MD4.h */,
 				D942EC831D12F30D00F7C65A /* MD5.h */,

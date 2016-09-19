@@ -39,6 +39,7 @@ set(MAIN_SRC_FILES
 		"DNSPing.cpp"
 		"Process.cpp"
 		"Protocol.cpp"
+		"ReadCommands.cpp"
 		"Resolver.cpp"
 		"Terminal.cpp")
 

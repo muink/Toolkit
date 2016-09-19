@@ -22,8 +22,8 @@
 //The SHA-1 block size, message digest size in bytes and some useful types.
 #define SHA1_SIZE_BLOCK         64U
 #define SHA1_SIZE_DIGEST        20U
-typedef int32_t            SHA1_INT32;
-typedef int64_t            SHA1_INT64;
+typedef int32_t                 SHA1_INT32;
+typedef int64_t                 SHA1_INT64;
 
 //The structure for storing SHA1 info
 typedef struct _sha1_state_

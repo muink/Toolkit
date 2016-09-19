@@ -20,7 +20,7 @@
 #include "Process.h"
 
 //Send DNS request process
-size_t SendProcess(
+bool SendProcess(
 	const sockaddr_storage &Target, 
 	const bool LastSend)
 {
@@ -35,7 +35,7 @@ size_t SendProcess(
 	{
 	//Socket initialization
 		AddrLen_Normal = sizeof(sockaddr_in6);
-		if (ConfigurationParameter.SockAddr_SOCKS.ss_family == 0 && ConfigurationParameter.RawSocket && ConfigurationParameter.RawData)
+		if (ConfigurationParameter.SockAddr_SOCKS.ss_family == 0 && ConfigurationParameter.IsRawSocket && ConfigurationParameter.RawData)
 		{
 			Socket_Normal = socket(AF_INET6, SOCK_RAW, ConfigurationParameter.ServiceType);
 			Socket_Exchange = &Socket_Normal;
@@ -56,15 +56,15 @@ size_t SendProcess(
 	//Socket check
 		if (Socket_Normal == INVALID_SOCKET || (ConfigurationParameter.SockAddr_SOCKS.ss_family > 0 && Socket_SOCKS == INVALID_SOCKET))
 		{
-			fwprintf_s(stderr, L"Socket initialization error, error code is %d.\n", WSAGetLastError());
-			return EXIT_FAILURE;
+			PrintErrorToScreen(L"[Error] Socket initialization error", WSAGetLastError());
+			return false;
 		}
 	}
 //IPv4
 	else {
 	//Socket initialization
 		AddrLen_Normal = sizeof(sockaddr_in);
-		if (ConfigurationParameter.SockAddr_SOCKS.ss_family == 0 && ConfigurationParameter.RawSocket && ConfigurationParameter.RawData)
+		if (ConfigurationParameter.SockAddr_SOCKS.ss_family == 0 && ConfigurationParameter.IsRawSocket && ConfigurationParameter.RawData)
 		{
 			Socket_Normal = socket(AF_INET, SOCK_RAW, ConfigurationParameter.ServiceType);
 			Socket_Exchange = &Socket_Normal;
@@ -85,80 +85,86 @@ size_t SendProcess(
 	//Socket check
 		if (Socket_Normal == INVALID_SOCKET || (ConfigurationParameter.SockAddr_SOCKS.ss_family > 0 && Socket_SOCKS == INVALID_SOCKET))
 		{
-			fwprintf_s(stderr, L"Socket initialization error, error code is %d.\n", WSAGetLastError());
-			return EXIT_FAILURE;
+			PrintErrorToScreen(L"[Error] Socket initialization error", WSAGetLastError());
+			return false;
 		}
 	}
 
 //Set socket timeout.
 #if defined(PLATFORM_WIN)
-	if (setsockopt(*Socket_Exchange, SOL_SOCKET, SO_SNDTIMEO, (char *)&ConfigurationParameter.SocketTimeout, sizeof(int)) == SOCKET_ERROR || 
-		setsockopt(*Socket_Exchange, SOL_SOCKET, SO_RCVTIMEO, (char *)&ConfigurationParameter.SocketTimeout, sizeof(int)) == SOCKET_ERROR)
+	if (setsockopt(*Socket_Exchange, SOL_SOCKET, SO_SNDTIMEO, (const char *)&ConfigurationParameter.SocketTimeout, sizeof(ConfigurationParameter.SocketTimeout)) == SOCKET_ERROR || 
+		setsockopt(*Socket_Exchange, SOL_SOCKET, SO_RCVTIMEO, (const char *)&ConfigurationParameter.SocketTimeout, sizeof(ConfigurationParameter.SocketTimeout)) == SOCKET_ERROR)
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-	if (setsockopt(*Socket_Exchange, SOL_SOCKET, SO_SNDTIMEO, &ConfigurationParameter.SocketTimeout, sizeof(timeval)) == SOCKET_ERROR || 
-		setsockopt(*Socket_Exchange, SOL_SOCKET, SO_RCVTIMEO, &ConfigurationParameter.SocketTimeout, sizeof(timeval)) == SOCKET_ERROR)
+	if (setsockopt(*Socket_Exchange, SOL_SOCKET, SO_SNDTIMEO, &ConfigurationParameter.SocketTimeout, sizeof(ConfigurationParameter.SocketTimeout)) == SOCKET_ERROR || 
+		setsockopt(*Socket_Exchange, SOL_SOCKET, SO_RCVTIMEO, &ConfigurationParameter.SocketTimeout, sizeof(ConfigurationParameter.SocketTimeout)) == SOCKET_ERROR)
 #endif
 	{
-		fwprintf_s(stderr, L"Set UDP socket timeout error, error code is %d.\n", WSAGetLastError());
+		PrintErrorToScreen(L"[Error] Set UDP socket timeout error", WSAGetLastError());
 
 		shutdown(Socket_Normal, SD_BOTH);
 		shutdown(Socket_SOCKS, SD_BOTH);
 		closesocket(Socket_Normal);
 		closesocket(Socket_SOCKS);
-		return EXIT_FAILURE;
+		return false;
 	}
 
-//Set IP options.
-	if (ConfigurationParameter.Protocol == AF_INET6) //IPv6
+//Set Internet Protocol header options.
+	if (ConfigurationParameter.Protocol == AF_INET6)
 	{
 	#if defined(PLATFORM_WIN)
-		if (ConfigurationParameter.IP_HopLimits != 0 && setsockopt(*Socket_Exchange, IPPROTO_IP, IPV6_UNICAST_HOPS, (char *)&ConfigurationParameter.IP_HopLimits, sizeof(int)) == SOCKET_ERROR)
+		if (ConfigurationParameter.PacketHopLimits != 0 && 
+			setsockopt(*Socket_Exchange, IPPROTO_IPV6, IPV6_UNICAST_HOPS, (const char *)&ConfigurationParameter.PacketHopLimits, sizeof(ConfigurationParameter.PacketHopLimits)) == SOCKET_ERROR)
 	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-		if (ConfigurationParameter.IP_HopLimits != 0 && setsockopt(*Socket_Exchange, IPPROTO_IP, IPV6_UNICAST_HOPS, &ConfigurationParameter.IP_HopLimits, sizeof(int)) == SOCKET_ERROR)
+		if (ConfigurationParameter.PacketHopLimits != 0 && 
+			setsockopt(*Socket_Exchange, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &ConfigurationParameter.PacketHopLimits, sizeof(ConfigurationParameter.PacketHopLimits)) == SOCKET_ERROR)
 	#endif
 		{
-			fwprintf_s(stderr, L"Set HopLimit or TTL flag error, error code is %d.\n", WSAGetLastError());
+			PrintErrorToScreen(L"[Error] Set HopLimit flag error", WSAGetLastError());
 
 			shutdown(Socket_Normal, SD_BOTH);
 			shutdown(Socket_SOCKS, SD_BOTH);
 			closesocket(Socket_Normal);
 			closesocket(Socket_SOCKS);
-			return EXIT_FAILURE;
+			return false;
 		}
 	}
 	else { //IPv4
 	#if defined(PLATFORM_WIN)
-		if (ConfigurationParameter.IP_HopLimits != 0 && setsockopt(*Socket_Exchange, IPPROTO_IP, IP_TTL, (char *)&ConfigurationParameter.IP_HopLimits, sizeof(int)) == SOCKET_ERROR)
+		if (ConfigurationParameter.PacketHopLimits != 0 && 
+			setsockopt(*Socket_Exchange, IPPROTO_IP, IP_TTL, (const char *)&ConfigurationParameter.PacketHopLimits, sizeof(ConfigurationParameter.PacketHopLimits)) == SOCKET_ERROR)
 	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-		if (ConfigurationParameter.IP_HopLimits != 0 && setsockopt(*Socket_Exchange, IPPROTO_IP, IP_TTL, &ConfigurationParameter.IP_HopLimits, sizeof(int)) == SOCKET_ERROR)
+		if (ConfigurationParameter.PacketHopLimits != 0 && 
+			setsockopt(*Socket_Exchange, IPPROTO_IP, IP_TTL, &ConfigurationParameter.PacketHopLimits, sizeof(ConfigurationParameter.PacketHopLimits)) == SOCKET_ERROR)
 	#endif
 		{
-			fwprintf_s(stderr, L"Set HopLimit or TTL flag error, error code is %d.\n", WSAGetLastError());
+			PrintErrorToScreen(L"[Error] Set TTL flag error", WSAGetLastError());
 
 			shutdown(Socket_Normal, SD_BOTH);
 			shutdown(Socket_SOCKS, SD_BOTH);
 			closesocket(Socket_Normal);
 			closesocket(Socket_SOCKS);
-			return EXIT_FAILURE;
+			return false;
 		}
 
-	//Set "Do Not Fragment" flag.
+	//Set Do Not Fragment flag.
 	#if (defined(PLATFORM_WIN) || defined(PLATFORM_LINUX))
 		#if defined(PLATFORM_WIN)
-			int DoNotFragment = 1;
-			if (ConfigurationParameter.IPv4_DF && setsockopt(*Socket_Exchange, IPPROTO_IP, IP_DONTFRAGMENT, (char *)&DoNotFragment, sizeof(int)) == SOCKET_ERROR)
+			BOOL DoNotFragment = TRUE;
+			if (ConfigurationParameter.IsDoNotFragment && 
+				setsockopt(*Socket_Exchange, IPPROTO_IP, IP_DONTFRAGMENT, (const char *)&DoNotFragment, sizeof(DoNotFragment)) == SOCKET_ERROR)
 		#elif defined(PLATFORM_LINUX)
 			int DoNotFragment = IP_PMTUDISC_DO;
-			if (ConfigurationParameter.IPv4_DF && setsockopt(*Socket_Exchange, IPPROTO_IP, IP_MTU_DISCOVER, &DoNotFragment, sizeof(int)) == SOCKET_ERROR)
+			if (ConfigurationParameter.IsDoNotFragment && 
+				setsockopt(*Socket_Exchange, IPPROTO_IP, IP_MTU_DISCOVER, &DoNotFragment, sizeof(DoNotFragment)) == SOCKET_ERROR)
 		#endif
 		{
-			fwprintf_s(stderr, L"Set \"Do Not Fragment\" flag error, error code is %d.\n", WSAGetLastError());
+			PrintErrorToScreen(L"[Error] Set Do Not Fragment flag error", WSAGetLastError());
 
 			shutdown(Socket_Normal, SD_BOTH);
 			shutdown(Socket_SOCKS, SD_BOTH);
 			closesocket(Socket_Normal);
 			closesocket(Socket_SOCKS);
-			return EXIT_FAILURE;
+			return false;
 		}
 	#endif
 	}
@@ -167,7 +173,6 @@ size_t SendProcess(
 	std::shared_ptr<uint8_t> Buffer(new uint8_t[ConfigurationParameter.BufferSize]()), RecvBuffer(new uint8_t[ConfigurationParameter.BufferSize]());
 	memset(Buffer.get(), 0, ConfigurationParameter.BufferSize);
 	memset(RecvBuffer.get(), 0, ConfigurationParameter.BufferSize);
-	ssize_t DataLength = 0;
 #if defined(PLATFORM_WIN)
 	LARGE_INTEGER CPUFrequency, BeforeTime, AfterTime;
 	memset(&CPUFrequency, 0, sizeof(CPUFrequency));
@@ -176,6 +181,7 @@ size_t SendProcess(
 #endif
 	memset(&BeforeTime, 0, sizeof(BeforeTime));
 	memset(&AfterTime, 0, sizeof(AfterTime));
+	ssize_t DataLength = 0;
 
 //Make standard packet.
 	dns_hdr *pdns_hdr = nullptr;
@@ -193,23 +199,25 @@ size_t SendProcess(
 	}
 	else {
 	//DNS request
-		memcpy_s(Buffer.get() + DataLength, ConfigurationParameter.BufferSize - DataLength, &ConfigurationParameter.Parameter_Header, sizeof(dns_hdr));
+		memcpy_s(Buffer.get() + DataLength, ConfigurationParameter.BufferSize - DataLength, &ConfigurationParameter.Parameter_Header, sizeof(ConfigurationParameter.Parameter_Header));
 		if (ConfigurationParameter.Parameter_Header.ID == 0)
 		{
 			pdns_hdr = (dns_hdr *)(Buffer.get() + DataLength);
-		#if defined(PLATFORM_MACX)
-			pdns_hdr->ID = htons(*(uint16_t *)pthread_self());
-		#else
+		#if defined(PLATFORM_WIN)
 			pdns_hdr->ID = htons((uint16_t)GetCurrentProcessId());
+		#elif defined(PLATFORM_LINUX)
+			pdns_hdr->ID = htons((uint16_t)pthread_self());
+		#elif defined(PLATFORM_MACX)
+			pdns_hdr->ID = htons(*(uint16_t *)pthread_self());
 		#endif
 		}
 		DataLength += sizeof(dns_hdr);
 		DataLength += CharToDNSQuery((const uint8_t *)ConfigurationParameter.TestDomain.c_str(), Buffer.get() + DataLength);
-		memcpy_s(Buffer.get() + DataLength, ConfigurationParameter.BufferSize - DataLength, &ConfigurationParameter.Parameter_Query, sizeof(dns_qry));
+		memcpy_s(Buffer.get() + DataLength, ConfigurationParameter.BufferSize - DataLength, &ConfigurationParameter.Parameter_Query, sizeof(ConfigurationParameter.Parameter_Query));
 		DataLength += sizeof(dns_qry);
-		if (ConfigurationParameter.EDNS)
+		if (ConfigurationParameter.IsEDNS)
 		{
-			memcpy_s(Buffer.get() + DataLength, ConfigurationParameter.BufferSize - DataLength, &ConfigurationParameter.Parameter_EDNS, sizeof(dns_opt_record));
+			memcpy_s(Buffer.get() + DataLength, ConfigurationParameter.BufferSize - DataLength, &ConfigurationParameter.Parameter_EDNS, sizeof(ConfigurationParameter.Parameter_EDNS));
 			DataLength += sizeof(dns_opt_record);
 		}
 	}
@@ -242,13 +250,13 @@ size_t SendProcess(
 		if (connect(Socket_SOCKS, (PSOCKADDR)&SockAddr_SOCKS_UDP, AddrLen_SOCKS) == SOCKET_ERROR || 
 			getsockname(Socket_SOCKS, (PSOCKADDR)&SockAddr_SOCKS_Local, &AddrLen_SOCKS) == SOCKET_ERROR)
 		{
-			fwprintf_s(stderr, L"Connecting error, error code is %d.\n", WSAGetLastError());
+			PrintErrorToScreen(L"[Error] Connecting error", WSAGetLastError());
 
 			shutdown(Socket_Normal, SD_BOTH);
 			shutdown(Socket_SOCKS, SD_BOTH);
 			closesocket(Socket_Normal);
 			closesocket(Socket_SOCKS);
-			return EXIT_FAILURE;
+			return false;
 		}
 		else {
 			if (SockAddr_SOCKS_UDP.ss_family == AF_INET6)
@@ -265,17 +273,17 @@ size_t SendProcess(
 			closesocket(Socket_Normal);
 			closesocket(Socket_SOCKS);
 
-			return EXIT_FAILURE;
+			return false;
 		}
 		else if (connect(Socket_SOCKS, (PSOCKADDR)&SockAddr_SOCKS_UDP, AddrLen_SOCKS) == SOCKET_ERROR)
 		{
-			fwprintf_s(stderr, L"Connecting error, error code is %d.\n", WSAGetLastError());
+			PrintErrorToScreen(L"[Error] Connecting error", WSAGetLastError());
 
 			shutdown(Socket_Normal, SD_BOTH);
 			shutdown(Socket_SOCKS, SD_BOTH);
 			closesocket(Socket_Normal);
 			closesocket(Socket_SOCKS);
-			return EXIT_FAILURE;
+			return false;
 		}
 
 	//Make SOCKS packet header.
@@ -284,7 +292,7 @@ size_t SendProcess(
 			memmove_s(Buffer.get() + sizeof(socks_udp_relay_request) + sizeof(in6_addr) + sizeof(uint16_t), ConfigurationParameter.BufferSize - (sizeof(socks_udp_relay_request) + sizeof(in6_addr) + sizeof(uint16_t)), Buffer.get(), DataLength);
 			memset(Buffer.get(), 0, sizeof(socks_udp_relay_request) + sizeof(in6_addr) + sizeof(uint16_t));
 			((psocks_udp_relay_request)Buffer.get())->Address_Type = SOCKS5_ADDRESS_IPV6;
-			memcpy_s(Buffer.get() + sizeof(socks_udp_relay_request), ConfigurationParameter.BufferSize - sizeof(socks_udp_relay_request), &((PSOCKADDR_IN6)&Target)->sin6_addr, sizeof(in6_addr));
+			memcpy_s(Buffer.get() + sizeof(socks_udp_relay_request), ConfigurationParameter.BufferSize - sizeof(socks_udp_relay_request), &((PSOCKADDR_IN6)&Target)->sin6_addr, sizeof(((PSOCKADDR_IN6)&Target)->sin6_addr));
 			*(uint16_t *)(Buffer.get() + sizeof(socks_udp_relay_request) + sizeof(in6_addr)) = ((PSOCKADDR_IN6)&Target)->sin6_port;
 			DataLength += sizeof(socks_udp_relay_request) + sizeof(in6_addr) + sizeof(uint16_t);
 		}
@@ -293,7 +301,7 @@ size_t SendProcess(
 			memmove_s(Buffer.get() + sizeof(socks_udp_relay_request) + sizeof(in_addr) + sizeof(uint16_t), ConfigurationParameter.BufferSize - (sizeof(socks_udp_relay_request) + sizeof(in_addr) + sizeof(uint16_t)), Buffer.get(), DataLength);
 			memset(Buffer.get(), 0, sizeof(socks_udp_relay_request) + sizeof(in_addr) + sizeof(uint16_t));
 			((psocks_udp_relay_request)Buffer.get())->Address_Type = SOCKS5_ADDRESS_IPV4;
-			memcpy_s(Buffer.get() + sizeof(socks_udp_relay_request), ConfigurationParameter.BufferSize - sizeof(socks_udp_relay_request), &((PSOCKADDR_IN)&Target)->sin_addr, sizeof(in_addr));
+			memcpy_s(Buffer.get() + sizeof(socks_udp_relay_request), ConfigurationParameter.BufferSize - sizeof(socks_udp_relay_request), &((PSOCKADDR_IN)&Target)->sin_addr, sizeof(((PSOCKADDR_IN)&Target)->sin_addr));
 			*(uint16_t *)(Buffer.get() + sizeof(socks_udp_relay_request) + sizeof(in_addr)) = ((PSOCKADDR_IN)&Target)->sin_port;
 			DataLength += sizeof(socks_udp_relay_request) + sizeof(in_addr) + sizeof(uint16_t);
 		}
@@ -308,63 +316,67 @@ size_t SendProcess(
 			DataLength += sizeof(socks_udp_relay_request) + sizeof(uint8_t) + ConfigurationParameter.TargetString_Normal.length() + sizeof(uint16_t);
 		}
 		else {
-			fwprintf_s(stderr, L"Make SOCKS packet header error.\n");
+			PrintErrorToScreen(L"[Error] Make SOCKS packet header error", 0);
 
 			shutdown(Socket_Normal, SD_BOTH);
 			shutdown(Socket_SOCKS, SD_BOTH);
 			closesocket(Socket_Normal);
 			closesocket(Socket_SOCKS);
-			return EXIT_FAILURE;
+			return false;
 		}
 	}
 //Normal mode
 	else {
 		if (connect(*Socket_Exchange, (PSOCKADDR)&Target, AddrLen_Normal) == SOCKET_ERROR)
 		{
-			fwprintf_s(stderr, L"Connecting error, error code is %d.\n", WSAGetLastError());
+			PrintErrorToScreen(L"[Error] Connecting error", WSAGetLastError());
 
 			shutdown(Socket_Normal, SD_BOTH);
 			shutdown(Socket_SOCKS, SD_BOTH);
 			closesocket(Socket_Normal);
 			closesocket(Socket_SOCKS);
-			return EXIT_FAILURE;
+			return false;
 		}
 	}
 
 //Send request.
 #if defined(PLATFORM_WIN)
-	if (QueryPerformanceFrequency(&CPUFrequency) == 0 || QueryPerformanceCounter(&BeforeTime) == 0)
+	if (QueryPerformanceFrequency(
+			&CPUFrequency) == 0 || 
+		QueryPerformanceCounter(
+			&BeforeTime) == 0)
 	{
-		fwprintf_s(stderr, L"Get current time from High Precision Event Timer/HPET error, error code is %d.\n", (int)GetLastError());
+		PrintErrorToScreen(L"[Error] Get current time from High Precision Event Timer/HPET error", GetLastError());
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
 	if (gettimeofday(&BeforeTime, NULL) != 0)
 	{
-		fwprintf(stderr, L"Get current time error, error code is %d.\n", errno);
+		PrintErrorToScreen(L"[Error] Get current time error", errno);
 #endif
 
 		shutdown(Socket_Normal, SD_BOTH);
 		shutdown(Socket_SOCKS, SD_BOTH);
 		closesocket(Socket_Normal);
 		closesocket(Socket_SOCKS);
-		return EXIT_FAILURE;
+		return false;
 	}
 	else if (send(*Socket_Exchange, (const char *)Buffer.get(), (int)DataLength, 0) == SOCKET_ERROR)
 	{
-		fwprintf_s(stderr, L"Send packet error, error code is %d.\n", (int)WSAGetLastError());
+		PrintErrorToScreen(L"[Error] Send packet error", WSAGetLastError());
 
 		shutdown(Socket_Normal, SD_BOTH);
 		shutdown(Socket_SOCKS, SD_BOTH);
 		closesocket(Socket_Normal);
 		closesocket(Socket_SOCKS);
-		return EXIT_FAILURE;
+		return false;
 	}
 
 //Receive response.
 #if defined(PLATFORM_WIN)
 	DataLength = recv(*Socket_Exchange, (char *)RecvBuffer.get(), (int)ConfigurationParameter.BufferSize, 0);
-	if (QueryPerformanceCounter(&AfterTime) == 0)
+	if (QueryPerformanceCounter(
+			&AfterTime) == 0)
 	{
-		fwprintf_s(stderr, L"Get current time from High Precision Event Timer/HPET error, error code is %d.\n", (int)GetLastError());
+		PrintErrorToScreen(L"[Error] Get current time from High Precision Event Timer/HPET error", GetLastError());
 
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
 	#if defined(PLATFORM_LINUX)
@@ -374,14 +386,14 @@ size_t SendProcess(
 	#endif
 	if (gettimeofday(&AfterTime, NULL) != 0)
 	{
-		fwprintf(stderr, L"Get current time error, error code is %d.\n", errno);
+		PrintErrorToScreen(L"[Error] Get current time error", errno);
 #endif
 
 		shutdown(Socket_Normal, SD_BOTH);
 		shutdown(Socket_SOCKS, SD_BOTH);
 		closesocket(Socket_Normal);
 		closesocket(Socket_SOCKS);
-		return EXIT_FAILURE;
+		return false;
 	}
 
 //Get waiting time.
@@ -405,13 +417,13 @@ size_t SendProcess(
 			if (((psocks_udp_relay_request)RecvBuffer.get())->Reserved > 0 || ((psocks_udp_relay_request)RecvBuffer.get())->FragmentNumber > 0 || 
 				DataLength < (ssize_t)sizeof(socks_udp_relay_request))
 			{
-				fwprintf_s(stderr, L"SOCKS receive data format error.\n");
+				PrintErrorToScreen(L"[Error] SOCKS receive data format error", 0);
 
 				shutdown(Socket_Normal, SD_BOTH);
 				shutdown(Socket_SOCKS, SD_BOTH);
 				closesocket(Socket_Normal);
 				closesocket(Socket_SOCKS);
-				return EXIT_FAILURE;
+				return false;
 			}
 			else {
 			//IPv6
@@ -425,40 +437,40 @@ size_t SendProcess(
 					memmove_s(RecvBuffer.get(), ConfigurationParameter.BufferSize, RecvBuffer.get() + sizeof(socks_udp_relay_request) + sizeof(in_addr) + sizeof(uint16_t), DataLength - (sizeof(socks_udp_relay_request) + sizeof(in_addr) + sizeof(uint16_t)));
 				}
 				else {
-					fwprintf_s(stderr, L"SOCKS receive data format error.\n");
+					PrintErrorToScreen(L"[Error] SOCKS receive data format error", 0);
 
 					shutdown(Socket_Normal, SD_BOTH);
 					shutdown(Socket_SOCKS, SD_BOTH);
 					closesocket(Socket_Normal);
 					closesocket(Socket_SOCKS);
-					return EXIT_FAILURE;
+					return false;
 				}
 			}
 
 		//Print receive message to screen.
+			std::wstring Message(L"Receive from %ls[%ls:%u] -> %d bytes, waiting ");
 		#if defined(PLATFORM_WIN)
-			fwprintf_s(stderr, L"Receive from %ls[%ls:%u] -> %d bytes, waiting %lf ms.\n", ConfigurationParameter.TargetString_SOCKS.c_str(), ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
-			if (ConfigurationParameter.OutputFile != nullptr)
-				fwprintf_s(ConfigurationParameter.OutputFile, L"Receive from %ls[%ls:%u] -> %d bytes, waiting %lf ms.\n", ConfigurationParameter.TargetString_SOCKS.c_str(), ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
+			Message.append(L"%lf ms.\n");
 		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-			fwprintf(stderr, L"Receive from %ls[%ls:%u] -> %d bytes, waiting %Lf ms.\n", ConfigurationParameter.TargetString_SOCKS.c_str(), ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
-			if (ConfigurationParameter.OutputFile != nullptr)
-				fwprintf(ConfigurationParameter.OutputFile, L"Receive from %ls[%ls:%u] -> %d bytes, waiting %Lf ms.\n", ConfigurationParameter.TargetString_SOCKS.c_str(), ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
+			Message.append(L"%Lf ms.\n");
 		#endif
+			fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.TargetString_SOCKS.c_str(), ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
+			if (ConfigurationParameter.OutputFile != nullptr)
+				fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.TargetString_SOCKS.c_str(), ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
 		}
 		else {
 		//Validate packet.
-			if (ConfigurationParameter.Validate && pdns_hdr != nullptr && !ValidatePacket(RecvBuffer.get(), DataLength, pdns_hdr->ID))
+			if (ConfigurationParameter.IsValidate && pdns_hdr != nullptr && !ValidatePacket(RecvBuffer.get(), DataLength, pdns_hdr->ID))
 			{
+				std::wstring Message(L"Receive from %ls:%u -> %d bytes but validate error, waiting ");
 			#if defined(PLATFORM_WIN)
-				fwprintf_s(stderr, L"Receive from %ls:%u -> %d bytes but validate error, waiting %lf ms.\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
-				if (ConfigurationParameter.OutputFile != nullptr)
-					fwprintf_s(ConfigurationParameter.OutputFile, L"Receive from %ls:%u -> %d bytes but validate error, waiting %lf ms.\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
+				Message.append(L"%lf ms.\n");
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				fwprintf(stderr, L"Receive from %ls:%u -> %d bytes but validate error, waiting %Lf ms.\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
-				if (ConfigurationParameter.OutputFile != nullptr)
-					fwprintf(ConfigurationParameter.OutputFile, L"Receive from %ls:%u -> %d bytes but validate error, waiting %Lf ms.\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
+				Message.append(L"%Lf ms.\n");
 			#endif
+				fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
+				if (ConfigurationParameter.OutputFile != nullptr)
+					fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
 
 			//Try to waiting correct packet.
 				for (;;)
@@ -476,15 +488,16 @@ size_t SendProcess(
 					memset(RecvBuffer.get(), 0, ConfigurationParameter.BufferSize);
 				#if defined(PLATFORM_WIN)
 					DataLength = recv(*Socket_Exchange, (char *)RecvBuffer.get(), (int)ConfigurationParameter.BufferSize, 0);
-					if (QueryPerformanceCounter(&AfterTime) == 0)
+					if (QueryPerformanceCounter(
+							&AfterTime) == 0)
 					{
-						fwprintf_s(stderr, L"Get current time from High Precision Event Timer/HPET error, error code is %d.\n", (int)GetLastError());
+						PrintErrorToScreen(L"[Error] Get current time from High Precision Event Timer/HPET error", GetLastError());
 
 						shutdown(Socket_Normal, SD_BOTH);
 						shutdown(Socket_SOCKS, SD_BOTH);
 						closesocket(Socket_Normal);
 						closesocket(Socket_SOCKS);
-						return EXIT_FAILURE;
+						return false;
 					}
 
 				//Get waiting time.
@@ -497,11 +510,11 @@ size_t SendProcess(
 				//Get waiting time.
 					if (gettimeofday(&AfterTime, NULL) != 0)
 					{
-						fwprintf(stderr, L"Get current time error, error code is %d.\n", errno);
+						PrintErrorToScreen(L"[Error] Get current time error", errno);
 
 						close(Socket_Normal);
 						close(Socket_SOCKS);
-						return EXIT_FAILURE;
+						return false;
 					}
 					Result = (long double)(AfterTime.tv_sec - BeforeTime.tv_sec) * (long double)SECOND_TO_MILLISECOND;
 					if (AfterTime.tv_sec >= BeforeTime.tv_sec)
@@ -517,15 +530,15 @@ size_t SendProcess(
 				//Validate packet.
 					if (!ValidatePacket(RecvBuffer.get(), DataLength, pdns_hdr->ID))
 					{
+						Message = (L"Receive from %ls:%u -> %d bytes but validate error, waiting ");
 					#if defined(PLATFORM_WIN)
-						fwprintf_s(stderr, L"Receive from %ls:%u -> %d bytes but validate error, waiting %lf ms.\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
-						if (ConfigurationParameter.OutputFile != nullptr)
-							fwprintf_s(ConfigurationParameter.OutputFile, L"Receive from %ls:%u -> %d bytes but validate error, waiting %lf ms.\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
+						Message.append(L"%lf ms.\n");
 					#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-						fwprintf(stderr, L"Receive from %ls:%u -> %d bytes but validate error, waiting %Lf ms.\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
-						if (ConfigurationParameter.OutputFile != nullptr)
-							fwprintf(ConfigurationParameter.OutputFile, L"Receive from %ls:%u -> %d bytes but validate error, waiting %Lf ms.\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
+						Message.append(L"%Lf ms.\n");
 					#endif
+						fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
+						if (ConfigurationParameter.OutputFile != nullptr)
+							fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
 					}
 					else {
 						break;
@@ -534,61 +547,59 @@ size_t SendProcess(
 
 				if (DataLength <= 0)
 				{
+					Message = (L"Receive error: %d(%d), waiting correct answers timeout(");
 				#if defined(PLATFORM_WIN)
-					fwprintf_s(stderr, L"Receive error: %d(%d), waiting correct answers timeout(%lf ms).\n", (int)DataLength, WSAGetLastError(), Result);
-					if (ConfigurationParameter.OutputFile != nullptr)
-						fwprintf_s(ConfigurationParameter.OutputFile, L"Receive error: %d(%d), waiting correct answers timeout(%lf ms).\n", (int)DataLength, WSAGetLastError(), Result);
+					Message.append(L"%lf ms).\n");
 				#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-					fwprintf(stderr, L"Receive error: %d(%d), waiting correct answers timeout(%Lf ms).\n", (int)DataLength, errno, Result);
-					if (ConfigurationParameter.OutputFile != nullptr)
-						fwprintf(ConfigurationParameter.OutputFile, L"Receive error: %d(%d), waiting correct answers timeout(%Lf ms).\n", (int)DataLength, errno, Result);
+					Message.append(L"%Lf ms).\n");
 				#endif
+					fwprintf_s(stderr, Message.c_str(), (int)DataLength, WSAGetLastError(), Result);
+					if (ConfigurationParameter.OutputFile != nullptr)
+						fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), (int)DataLength, WSAGetLastError(), Result);
 
 					shutdown(Socket_Normal, SD_BOTH);
 					shutdown(Socket_SOCKS, SD_BOTH);
 					closesocket(Socket_Normal);
 					closesocket(Socket_SOCKS);
-					return EXIT_SUCCESS;
+					return true;
 				}
 				else {
-				//Print receive message to screen.
+					Message = (L"Receive from %ls:%u -> %d bytes, waiting ");
 				#if defined(PLATFORM_WIN)
-					fwprintf_s(stderr, L"Receive from %ls:%u -> %d bytes, waiting %lf ms.\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
-					if (ConfigurationParameter.OutputFile != nullptr)
-						fwprintf_s(ConfigurationParameter.OutputFile, L"Receive from %ls:%u -> %d bytes, waiting %lf ms.\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
+					Message.append(L"%lf ms.\n");
 				#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-					fwprintf(stderr, L"Receive from %ls:%u -> %d bytes, waiting %Lf ms.\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
-					if (ConfigurationParameter.OutputFile != nullptr)
-						fwprintf(ConfigurationParameter.OutputFile, L"Receive from %ls:%u -> %d bytes, waiting %Lf ms.\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
+					Message.append(L"%Lf ms.\n");
 				#endif
+					fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
+					if (ConfigurationParameter.OutputFile != nullptr)
+						fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
 				}
 			}
 			else {
-			//Print receive message to screen.
+				std::wstring Message(L"Receive from %ls:%u -> %d bytes, waiting ");
 			#if defined(PLATFORM_WIN)
-				fwprintf_s(stderr, L"Receive from %ls:%u -> %d bytes, waiting %lf ms.\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
-				if (ConfigurationParameter.OutputFile != nullptr)
-					fwprintf_s(ConfigurationParameter.OutputFile, L"Receive from %ls:%u -> %d bytes, waiting %lf ms.\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
+				Message.append(L"%lf ms.\n");
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-				fwprintf(stderr, L"Receive from %ls:%u -> %d bytes, waiting %Lf ms.\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
-				if (ConfigurationParameter.OutputFile != nullptr)
-					fwprintf(ConfigurationParameter.OutputFile, L"Receive from %ls:%u -> %d bytes, waiting %Lf ms.\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
+				Message.append(L"%Lf ms.\n");
 			#endif
+				fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
+				if (ConfigurationParameter.OutputFile != nullptr)
+					fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), (int)DataLength, Result);
 			}
 		}
 
 	//Print response result or data.
-		if (ConfigurationParameter.ShowResponse)
+		if (ConfigurationParameter.IsShowResponse)
 		{
-			PrintResponse(RecvBuffer.get(), DataLength, stderr);
+			PrintResponse(stderr, RecvBuffer.get(), DataLength);
 			if (ConfigurationParameter.OutputFile != nullptr)
-				PrintResponse(RecvBuffer.get(), DataLength, ConfigurationParameter.OutputFile);
+				PrintResponse(ConfigurationParameter.OutputFile, RecvBuffer.get(), DataLength);
 		}
-		if (ConfigurationParameter.ShowResponseHex)
+		if (ConfigurationParameter.IsShowHexResponse)
 		{
-			PrintResponseHex(RecvBuffer.get(), DataLength, stderr);
+			PrintHexResponse(stderr, RecvBuffer.get(), DataLength);
 			if (ConfigurationParameter.OutputFile != nullptr)
-				PrintResponseHex(RecvBuffer.get(), DataLength, ConfigurationParameter.OutputFile);
+				PrintHexResponse(ConfigurationParameter.OutputFile, RecvBuffer.get(), DataLength);
 		}
 
 	//Calculate time.
@@ -611,15 +622,15 @@ size_t SendProcess(
 		}
 	}
 	else { //SOCKET_ERROR
+		std::wstring Message(L"Receive error: %d(%d), waiting ");
 	#if defined(PLATFORM_WIN)
-		fwprintf_s(stderr, L"Receive error: %d(%d), waiting %lf ms.\n", (int)DataLength, WSAGetLastError(), Result);
-		if (ConfigurationParameter.OutputFile != nullptr)
-			fwprintf_s(ConfigurationParameter.OutputFile, L"Receive error: %d(%d), waiting %lf ms.\n", (int)DataLength, WSAGetLastError(), Result);
+		Message.append(L"%lf ms.\n");
 	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-		fwprintf(stderr, L"Receive error: %d(%d), waiting %Lf ms.\n", (int)DataLength, errno, Result);
-		if (ConfigurationParameter.OutputFile != nullptr)
-			fwprintf(ConfigurationParameter.OutputFile, L"Receive error: %d(%d), waiting %Lf ms.\n", (int)DataLength, errno, Result);
+		Message.append(L"%Lf ms.\n");
 	#endif
+		fwprintf_s(stderr, Message.c_str(), (int)DataLength, WSAGetLastError(), Result);
+		if (ConfigurationParameter.OutputFile != nullptr)
+			fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), (int)DataLength, WSAGetLastError(), Result);
 	}
 
 //Transmission interval
@@ -642,7 +653,7 @@ size_t SendProcess(
 	shutdown(Socket_SOCKS, SD_BOTH);
 	closesocket(Socket_Normal);
 	closesocket(Socket_SOCKS);
-	return EXIT_SUCCESS;
+	return true;
 }
 
 //SOCKS UDP-ASSOCIATE process
@@ -656,7 +667,7 @@ size_t SOCKS_UDP_ASSOCIATE(
 //Connect to SOCKS server.
 	if (connect(Socket_Normal, SockAddr, AddrLen) == SOCKET_ERROR)
 	{
-		fwprintf_s(stderr, L"SOCKS server connecting error, error code is %d.\n", WSAGetLastError());
+		PrintErrorToScreen(L"[Error] SOCKS server connecting error", WSAGetLastError());
 		return EXIT_FAILURE;
 	}
 
@@ -669,7 +680,7 @@ size_t SOCKS_UDP_ASSOCIATE(
 	((psocks_client_selection)Buffer.get())->Methods_B = SOCKS_METHOD_USERNAME_PASSWORD;
 	if (send(Socket_Normal, (const char *)Buffer.get(), sizeof(socks_client_selection), 0) == SOCKET_ERROR)
 	{
-		fwprintf_s(stderr, L"Send packet error, error code is %d.\n", (int)WSAGetLastError());
+		PrintErrorToScreen(L"[Error] Send packet error", WSAGetLastError());
 		return EXIT_FAILURE;
 	}
 	else {
@@ -683,7 +694,7 @@ size_t SOCKS_UDP_ASSOCIATE(
 	{
 		if (((psocks_server_selection)Buffer.get())->Version != SOCKS_VERSION_5)
 		{
-			fwprintf_s(stderr, L"SOCKS server selection error.\n");
+			PrintErrorToScreen(L"[Error] SOCKS server selection error", 0);
 			return EXIT_FAILURE;
 		}
 		else if (((psocks_server_selection)Buffer.get())->Method != SOCKS_METHOD_NO_AUTHENTICATION_REQUIRED)
@@ -709,7 +720,7 @@ size_t SOCKS_UDP_ASSOCIATE(
 			//Send authentication request.
 				if (send(Socket_Normal, (const char *)Buffer.get(), (int)DataLength, 0) == SOCKET_ERROR)
 				{
-					fwprintf_s(stderr, L"Send packet error, error code is %d.\n", (int)WSAGetLastError());
+					PrintErrorToScreen(L"[Error] Send packet error", WSAGetLastError());
 					return EXIT_FAILURE;
 				}
 				else {
@@ -720,17 +731,17 @@ size_t SOCKS_UDP_ASSOCIATE(
 					if (((psocks_server_user_authentication)Buffer.get())->Version != SOCKS_USERNAME_PASSWORD_VERSION || 
 						((psocks_server_user_authentication)Buffer.get())->Status != SOCKS_USERNAME_PASSWORD_SUCCESS)
 					{
-						fwprintf_s(stderr, L"SOCKS server authentication error, error code is %u.\n", ((psocks_server_user_authentication)Buffer.get())->Status);
+						PrintErrorToScreen(L"[Error] SOCKS server authentication error", ((psocks_server_user_authentication)Buffer.get())->Status);
 						return EXIT_FAILURE;
 					}
 				}
 				else {
-					fwprintf_s(stderr, L"SOCKS server receive error, error code is %d.\n", WSAGetLastError());
+					PrintErrorToScreen(L"[Error] SOCKS server receive error", WSAGetLastError());
 					return EXIT_FAILURE;
 				}
 			}
 			else {
-				fwprintf_s(stderr, L"SOCKS server require a not support authentication.\n");
+				PrintErrorToScreen(L"[Error] SOCKS server require a not support authentication", 0);
 				return EXIT_FAILURE;
 			}
 		}
@@ -738,7 +749,7 @@ size_t SOCKS_UDP_ASSOCIATE(
 		memset(Buffer.get(), 0, LARGE_PACKET_MAXSIZE);
 	}
 	else {
-		fwprintf_s(stderr, L"SOCKS server receive error, error code is %d.\n", WSAGetLastError());
+		PrintErrorToScreen(L"[Error] SOCKS server receive error", WSAGetLastError());
 		return EXIT_FAILURE;
 	}
 
@@ -750,7 +761,7 @@ size_t SOCKS_UDP_ASSOCIATE(
 	{
 		((psocks5_client_command_request)Buffer.get())->Address_Type = SOCKS5_ADDRESS_IPV6;
 	//Local listening address in UDP ASSOCIATE command request is not necessary.
-//		memcpy_s(Buffer.get() + DataLength, LARGE_PACKET_MAXSIZE - DataLength, &((PSOCKADDR_IN6)&ConfigurationParameter.SockAddr_Normal)->sin6_addr, sizeof(in6_addr));
+//		memcpy_s(Buffer.get() + DataLength, LARGE_PACKET_MAXSIZE - DataLength, &((PSOCKADDR_IN6)&ConfigurationParameter.SockAddr_Normal)->sin6_addr, sizeof(((PSOCKADDR_IN6)&ConfigurationParameter.SockAddr_Normal)->sin6_addr));
 		DataLength += sizeof(in6_addr);
 		*((uint16_t *)(Buffer.get() + DataLength)) = SOCKS_Local_Port;
 		DataLength += sizeof(uint16_t);
@@ -758,14 +769,14 @@ size_t SOCKS_UDP_ASSOCIATE(
 	else { //IPv4 and domain
 		((psocks5_client_command_request)Buffer.get())->Address_Type = SOCKS5_ADDRESS_IPV4;
 	//Local listening address in UDP ASSOCIATE command request is not necessary.
-//		memcpy_s(Buffer.get() + DataLength, LARGE_PACKET_MAXSIZE - DataLength, &((PSOCKADDR_IN)&ConfigurationParameter.SockAddr_Normal)->sin_addr, sizeof(in_addr));
+//		memcpy_s(Buffer.get() + DataLength, LARGE_PACKET_MAXSIZE - DataLength, &((PSOCKADDR_IN)&ConfigurationParameter.SockAddr_Normal)->sin_addr, sizeof(((PSOCKADDR_IN)&ConfigurationParameter.SockAddr_Normal)->sin_addr));
 		DataLength += sizeof(in_addr);
 		*((uint16_t *)(Buffer.get() + DataLength)) = SOCKS_Local_Port;
 		DataLength += sizeof(uint16_t);
 	}
 	if (send(Socket_Normal, (const char *)Buffer.get(), (int)DataLength, 0) == SOCKET_ERROR)
 	{
-		fwprintf_s(stderr, L"Send packet error, error code is %d.\n", (int)WSAGetLastError());
+		PrintErrorToScreen(L"[Error] Send packet error", WSAGetLastError());
 		return EXIT_FAILURE;
 	}
 	else {
@@ -779,7 +790,7 @@ size_t SOCKS_UDP_ASSOCIATE(
 	{
 		if (((psocks5_server_command_reply)Buffer.get())->Version != SOCKS_VERSION_5 || ((psocks5_server_command_reply)Buffer.get())->Reply != SOCKS5_REPLY_SUCCESS)
 		{
-			fwprintf_s(stderr, L"SOCKS server reply message error.\n");
+			PrintErrorToScreen(L"[Error] SOCKS server reply message error", 0);
 			return EXIT_FAILURE;
 		}
 		else {
@@ -788,7 +799,7 @@ size_t SOCKS_UDP_ASSOCIATE(
 			{
 //				auto Addr = *(in6_addr *)(Buffer.get() + sizeof(socks5_server_command_reply));
 				auto Port = *(uint16_t *)(Buffer.get() + sizeof(socks5_server_command_reply) + sizeof(in6_addr));
-//				if (!CheckEmptyBuffer(&Addr, sizeof(in6_addr)))
+//				if (!CheckEmptyBuffer(&Addr, sizeof(Addr)))
 //					((PSOCKADDR_IN6)&SockAddr_SOCKS_UDP)->sin6_addr = Addr;
 				((PSOCKADDR_IN6)&SockAddr_SOCKS_UDP)->sin6_addr = ((PSOCKADDR_IN6)SockAddr)->sin6_addr;
 				if (Port > 0)
@@ -805,13 +816,13 @@ size_t SOCKS_UDP_ASSOCIATE(
 					((PSOCKADDR_IN)&SockAddr_SOCKS_UDP)->sin_port = Port;
 			}
 			else {
-				fwprintf_s(stderr, L"SOCKS server reply message error.\n");
+				PrintErrorToScreen(L"[Error] SOCKS server reply message error", 0);
 				return EXIT_FAILURE;
 			}
 		}
 	}
 	else {
-		fwprintf_s(stderr, L"SOCKS server receive error, error code is %d.\n", WSAGetLastError());
+		PrintErrorToScreen(L"[Error] SOCKS server receive error", WSAGetLastError());
 		return EXIT_FAILURE;
 	}
 
@@ -819,7 +830,7 @@ size_t SOCKS_UDP_ASSOCIATE(
 }
 
 //Print statistics to screen(and/or output result to file)
-size_t PrintProcess(
+void PrintProcess(
 	const bool IsPacketStatistics, 
 	const bool IsTimeStatistics)
 {
@@ -827,31 +838,31 @@ size_t PrintProcess(
 	if (IsPacketStatistics)
 	{
 		fwprintf_s(stderr, L"\nPacket statistics for pinging %ls:\n", ConfigurationParameter.wTargetString.c_str());
-		fwprintf_s(stderr, L"   Send: %lu\n", (unsigned long)ConfigurationParameter.Statistics_RealSend);
-		fwprintf_s(stderr, L"   Receive: %lu\n", (unsigned long)ConfigurationParameter.Statistics_RecvNum);
+		fwprintf_s(stderr, L"   Send: %u\n", (unsigned int)ConfigurationParameter.Statistics_RealSend);
+		fwprintf_s(stderr, L"   Receive: %u\n", (unsigned int)ConfigurationParameter.Statistics_RecvNum);
 
 	//Output to file.
 		if (ConfigurationParameter.OutputFile != nullptr)
 		{
 			fwprintf_s(ConfigurationParameter.OutputFile, L"\nPacket statistics for pinging %ls:\n", ConfigurationParameter.wTargetString.c_str());
-			fwprintf_s(ConfigurationParameter.OutputFile, L"   Send: %lu\n", (unsigned long)ConfigurationParameter.Statistics_RealSend);
-			fwprintf_s(ConfigurationParameter.OutputFile, L"   Receive: %lu\n", (unsigned long)ConfigurationParameter.Statistics_RecvNum);
+			fwprintf_s(ConfigurationParameter.OutputFile, L"   Send: %u\n", (unsigned int)ConfigurationParameter.Statistics_RealSend);
+			fwprintf_s(ConfigurationParameter.OutputFile, L"   Receive: %u\n", (unsigned int)ConfigurationParameter.Statistics_RecvNum);
 		}
 
 		if (ConfigurationParameter.Statistics_RealSend >= ConfigurationParameter.Statistics_RecvNum)
 		{
-			fwprintf_s(stderr, L"   Lost: %lu", (unsigned long)(ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum));
+			fwprintf_s(stderr, L"   Lost: %u", (unsigned int)(ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum));
 			if (ConfigurationParameter.Statistics_RealSend > 0)
-				fwprintf_s(stderr, L" (%lu%%)\n", (unsigned long)((ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum) * 100 / ConfigurationParameter.Statistics_RealSend));
+				fwprintf_s(stderr, L" (%u%%)\n", (unsigned int)((ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum) * 100 / ConfigurationParameter.Statistics_RealSend));
 			else  //Not any packets.
 				fwprintf_s(stderr, L"\n");
 
 		//Output to file.
 			if (ConfigurationParameter.OutputFile != nullptr)
 			{
-				fwprintf_s(ConfigurationParameter.OutputFile, L"   Lost: %lu", (unsigned long)(ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum));
+				fwprintf_s(ConfigurationParameter.OutputFile, L"   Lost: %u", (unsigned int)(ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum));
 				if (ConfigurationParameter.Statistics_RealSend > 0)
-					fwprintf_s(ConfigurationParameter.OutputFile, L" (%lu%%)\n", (unsigned long)((ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum) * 100 / ConfigurationParameter.Statistics_RealSend));
+					fwprintf_s(ConfigurationParameter.OutputFile, L" (%u%%)\n", (unsigned int)((ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum) * 100 / ConfigurationParameter.Statistics_RealSend));
 				else  //Not any packets.
 					fwprintf_s(ConfigurationParameter.OutputFile, L"\n");
 			}
@@ -869,31 +880,28 @@ size_t PrintProcess(
 	if (IsTimeStatistics && 
 		ConfigurationParameter.Statistics_RecvNum > 0 && ConfigurationParameter.Statistics_MaxTime > 0 && ConfigurationParameter.Statistics_MinTime > 0)
 	{
-		fwprintf_s(stderr, L"\nTime statistics for pinging %ls:\n", ConfigurationParameter.wTargetString.c_str());
-
+		std::wstring Message(L"\nTime statistics for pinging %ls:\n");
+		Message.append(L"   Minimum time: ");
 	#if defined(PLATFORM_WIN)
-		fwprintf_s(stderr, L"   Minimum time: %lf ms.\n", ConfigurationParameter.Statistics_MinTime);
-		fwprintf_s(stderr, L"   Maximum time: %lf ms.\n", ConfigurationParameter.Statistics_MaxTime);
-		fwprintf_s(stderr, L"   Average time: %lf ms.\n", ConfigurationParameter.Statistics_TotalTime / (long double)ConfigurationParameter.Statistics_RecvNum);
-		if (ConfigurationParameter.OutputFile != nullptr)
-		{
-			fwprintf_s(ConfigurationParameter.OutputFile, L"\nTime statistics for pinging %ls:\n", ConfigurationParameter.wTargetString.c_str());
-			fwprintf_s(ConfigurationParameter.OutputFile, L"   Minimum time: %lf ms.\n", ConfigurationParameter.Statistics_MinTime);
-			fwprintf_s(ConfigurationParameter.OutputFile, L"   Maximum time: %lf ms.\n", ConfigurationParameter.Statistics_MaxTime);
-			fwprintf_s(ConfigurationParameter.OutputFile, L"   Average time: %lf ms.\n", ConfigurationParameter.Statistics_TotalTime / (long double)ConfigurationParameter.Statistics_RecvNum);
-		}
+		Message.append(L"%lf ms.\n");
 	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-		fwprintf(stderr, L"   Minimum time: %Lf ms.\n", ConfigurationParameter.Statistics_MinTime);
-		fwprintf(stderr, L"   Maximum time: %Lf ms.\n", ConfigurationParameter.Statistics_MaxTime);
-		fwprintf(stderr, L"   Average time: %Lf ms.\n", ConfigurationParameter.Statistics_TotalTime / (long double)ConfigurationParameter.Statistics_RecvNum);
-		if (ConfigurationParameter.OutputFile != nullptr)
-		{
-			fwprintf(ConfigurationParameter.OutputFile, L"\nTime statistics for pinging %ls:\n", ConfigurationParameter.wTargetString.c_str());
-			fwprintf(ConfigurationParameter.OutputFile, L"   Minimum time: %Lf ms.\n", ConfigurationParameter.Statistics_MinTime);
-			fwprintf(ConfigurationParameter.OutputFile, L"   Maximum time: %Lf ms.\n", ConfigurationParameter.Statistics_MaxTime);
-			fwprintf(ConfigurationParameter.OutputFile, L"   Average time: %Lf ms.\n", ConfigurationParameter.Statistics_TotalTime / (long double)ConfigurationParameter.Statistics_RecvNum);
-		}
+		Message.append(L"%Lf ms.\n");
 	#endif
+		Message.append(L"   Maximum time: ");
+	#if defined(PLATFORM_WIN)
+		Message.append(L"%lf ms.\n");
+	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+		Message.append(L"%Lf ms.\n");
+	#endif
+		Message.append(L"   Average time: ");
+	#if defined(PLATFORM_WIN)
+		Message.append(L"%lf ms.\n");
+	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+		Message.append(L"%Lf ms.\n");
+	#endif
+		fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.wTargetString.c_str(), ConfigurationParameter.Statistics_MinTime, ConfigurationParameter.Statistics_MaxTime, ConfigurationParameter.Statistics_TotalTime / (long double)ConfigurationParameter.Statistics_RecvNum);
+		if (ConfigurationParameter.OutputFile != nullptr)
+			fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.wTargetString.c_str(), ConfigurationParameter.Statistics_MinTime, ConfigurationParameter.Statistics_MaxTime, ConfigurationParameter.Statistics_TotalTime / (long double)ConfigurationParameter.Statistics_RecvNum);
 	}
 
 #if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
@@ -902,17 +910,196 @@ size_t PrintProcess(
 		fwprintf_s(ConfigurationParameter.OutputFile, L"\n");
 #endif
 
-	return EXIT_SUCCESS;
+	return;
+}
+
+//Output result to file
+bool OutputResultToFile(
+	void)
+{
+	ssize_t SignedResult = 0;
+
+#if defined(PLATFORM_WIN)
+	SignedResult = _wfopen_s(&ConfigurationParameter.OutputFile, ConfigurationParameter.wOutputFileName.c_str(), L"a,ccs=UTF-8");
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+	errno = 0;
+	ConfigurationParameter.OutputFile = fopen(ConfigurationParameter.OutputFileName.c_str(), ("a"));
+#endif
+	if (ConfigurationParameter.OutputFile == nullptr)
+	{
+	#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+		SignedResult = errno;
+	#endif
+		std::wstring Message(L"[Error] Create output result file ");
+		Message.append(ConfigurationParameter.wOutputFileName);
+		Message.append(L" error");
+		PrintErrorToScreen(Message.c_str(), SignedResult);
+
+		return false;
+	}
+	else {
+		tm TimeStructure;
+		time_t TimeValues = 0;
+		memset(&TimeStructure, 0, sizeof(TimeStructure));
+
+	//Get current time.
+		time(&TimeValues);
+		localtime_s(&TimeStructure, &TimeValues);
+		fwprintf_s(
+			ConfigurationParameter.OutputFile, 
+			L"------------------------------ %d-%02d-%02d %02d:%02d:%02d ------------------------------\n", 
+			TimeStructure.tm_year + 1900, 
+			TimeStructure.tm_mon + 1, 
+			TimeStructure.tm_mday, 
+			TimeStructure.tm_hour, 
+			TimeStructure.tm_min, 
+			TimeStructure.tm_sec);
+	}
+
+	return true;
+}
+
+//Print header to screen. 
+void PrintHeaderToScreen(
+	const std::wstring wTargetAddressString, 
+	const std::wstring wTestDomain)
+{
+	fwprintf_s(stderr, L"\n");
+
+//Reverse lookup
+	if (ConfigurationParameter.IsReverseLookup && ConfigurationParameter.SockAddr_SOCKS.ss_family == 0)
+	{
+		if (wTargetAddressString.empty())
+		{
+			uint8_t FQDN[NI_MAXHOST + 1U] = {0};
+			if (getnameinfo((PSOCKADDR)&ConfigurationParameter.SockAddr_Normal, sizeof(sockaddr_in), (char *)FQDN, NI_MAXHOST, nullptr, 0, NI_NUMERICSERV) != 0)
+			{
+				PrintErrorToScreen(L"[Error] Resolve addresses to host names error", WSAGetLastError());
+				fwprintf_s(stderr, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), wTestDomain.c_str());
+				if (ConfigurationParameter.OutputFile != nullptr)
+					fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), wTestDomain.c_str());
+			}
+			else {
+				if (ConfigurationParameter.TargetString_Normal == (const char *)FQDN)
+				{
+					fwprintf_s(stderr, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), wTestDomain.c_str());
+					if (ConfigurationParameter.OutputFile != nullptr)
+						fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), wTestDomain.c_str());
+				}
+				else {
+					std::wstring wFQDN;
+					if (!MBSToWCSString(FQDN, strnlen((const char *)FQDN, NI_MAXHOST), wFQDN))
+					{
+						PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", GetLastError());
+						return;
+					}
+
+					fwprintf_s(stderr, L"DNSPing %ls:%u [%ls] with %ls:\n", wFQDN.c_str(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.wTargetString.c_str(), wTestDomain.c_str());
+					if (ConfigurationParameter.OutputFile != nullptr)
+						fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u [%ls] with %ls:\n", wFQDN.c_str(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.wTargetString.c_str(), wTestDomain.c_str());
+				}
+			}
+		}
+		else {
+			fwprintf_s(stderr, L"DNSPing %ls:%u [%ls] with %ls:\n", wTargetAddressString.c_str(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.wTargetString.c_str(), wTestDomain.c_str());
+			if (ConfigurationParameter.OutputFile != nullptr)
+				fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u [%ls] with %ls:\n", wTargetAddressString.c_str(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.wTargetString.c_str(), wTestDomain.c_str());
+		}
+	}
+//Normal mode
+	else {
+		if (!ConfigurationParameter.TargetAddressString.empty())
+		{
+			fwprintf_s(stderr, L"DNSPing %ls:%u [%ls] with %ls:\n", wTargetAddressString.c_str(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.wTargetString.c_str(), wTestDomain.c_str());
+			if (ConfigurationParameter.OutputFile != nullptr)
+				fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u [%ls] with %ls:\n", wTargetAddressString.c_str(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.wTargetString.c_str(), wTestDomain.c_str());
+		}
+		else {
+			fwprintf_s(stderr, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), wTestDomain.c_str());
+			if (ConfigurationParameter.OutputFile != nullptr)
+				fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.wTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), wTestDomain.c_str());
+		}
+	}
+
+	return;
+}
+
+//Print more details about error code
+void ErrorCodeToMessage(
+	const ssize_t ErrorCode, 
+	std::wstring &Message)
+{
+//Finish the message when there are no error codes.
+	if (ErrorCode == 0)
+	{
+		Message.append(L".\n");
+		return;
+	}
+
+//Convert error code to error message.
+#if defined(PLATFORM_WIN)
+	wchar_t *InnerMessage = nullptr;
+	if (FormatMessageW(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS|FORMAT_MESSAGE_MAX_WIDTH_MASK, 
+		nullptr, 
+		(DWORD)ErrorCode, 
+		MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), 
+		(LPWSTR)&InnerMessage, 
+		0, 
+		nullptr) == 0)
+	{
+		Message.append(L", error code is %d");
+	}
+	else {
+		Message.append(L": ");
+		Message.append(InnerMessage);
+		Message.pop_back(); //Delete space.
+		Message.pop_back(); //Delete period.
+		Message.append(L"[%d]");
+	}
+
+//Free pointer.
+	if (InnerMessage != nullptr)
+		LocalFree(InnerMessage);
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+	std::wstring InnerMessage;
+	auto ErrorMessage = strerror((int)ErrorCode);
+	if (ErrorMessage == nullptr || !MBSToWCSString((const uint8_t *)ErrorMessage, strnlen(ErrorMessage, FILE_BUFFER_SIZE), InnerMessage))
+	{
+		Message.append(L", error code is %d");
+	}
+	else {
+		Message.append(L": ");
+		Message.append(InnerMessage);
+		Message.append(L"[%d]");
+	}
+#endif
+
+	Message.append(L".\n");
+	return;
+}
+
+//Print errors to screen
+void PrintErrorToScreen(
+	const wchar_t *Message, 
+	const ssize_t ErrorCode)
+{
+	std::wstring InnerMessage(Message);
+	ErrorCodeToMessage(ErrorCode, InnerMessage);
+	if (ErrorCode == 0)
+		fwprintf_s(stderr, InnerMessage.c_str());
+	else
+		fwprintf_s(stderr, InnerMessage.c_str(), (int)ErrorCode);
+
+	return;
 }
 
 //Print description to screen
 void PrintDescription(
 	void)
 {
-	fwprintf_s(stderr, L"\n");
-
 //Description
-	fwprintf_s(stderr, L"--------------------------------------------------\n");
+	fwprintf_s(stderr, L"\n--------------------------------------------------\n");
 	fwprintf_s(stderr, L"DNSPing ");
 	fwprintf_s(stderr, FULL_VERSION);
 #if defined(PLATFORM_WIN)
@@ -926,10 +1113,10 @@ void PrintDescription(
 #endif
 	fwprintf_s(stderr, L"A useful and powerful toolkit(DNSPing)\n");
 	fwprintf_s(stderr, COPYRIGHT_MESSAGE);
-	fwprintf_s(stderr, L"--------------------------------------------------\n");
+	fwprintf_s(stderr, L"\n--------------------------------------------------\n");
 
 //Usage
-	fwprintf_s(stderr, L"\n     DNSPing [-options] domain target\n");
+	fwprintf_s(stderr, L"       DNSPing [-options] domain target\n");
 	fwprintf_s(stderr, L"  e.g. DNSPing -a -qt AAAA -n 5 -w 500 -edns www.google.com 8.8.4.4\n");
 
 //Supported options:

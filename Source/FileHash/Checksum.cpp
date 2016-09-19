@@ -34,7 +34,7 @@ uint32_t Checksum_Update(
 		Checksum += *Buffer++;
 		InnerLength -= sizeof(uint16_t);
 	}
-	
+
 	return Checksum;
 }
 
@@ -59,7 +59,7 @@ bool Checksum_Hash(
 //Parameters check
 	if (HashFamilyID != HASH_ID_CHECKSUM || FileHandle == nullptr)
 	{
-		fwprintf_s(stderr, L"Parameters error.\n");
+		fwprintf_s(stderr, L"[Error] Parameters error.\n");
 		return false;
 	}
 
@@ -76,13 +76,14 @@ bool Checksum_Hash(
 		memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 		_set_errno(0);
 		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(uint8_t), FILE_BUFFER_SIZE, FileHandle);
-		if (ReadLength == 0)
+		if (ReadLength == 0 && errno != 0)
 		{
-			fwprintf_s(stderr, L"Hash process error");
-			if (errno > 0)
-				fwprintf_s(stderr, L", error code is %d.\n", errno);
+			std::wstring Message(L"[Error] Read file error");
+			ErrorCodeToMessage(errno, Message);
+			if (errno == 0)
+				fwprintf_s(stderr, Message.c_str());
 			else 
-				fwprintf_s(stderr, L".\n");
+				fwprintf_s(stderr, Message.c_str(), errno);
 
 			return false;
 		}
@@ -96,16 +97,11 @@ bool Checksum_Hash(
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	if (sodium_bin2hex(Buffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)&Checksum16, sizeof(uint16_t)) == nullptr)
 	{
-		fwprintf_s(stderr, L"Convert binary to hex error.\n");
+		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;
 	}
 	else {
-	//Print to screen.
-		std::string HashResult = (const char *)Buffer.get();
-		CaseConvert(true, HashResult);
-		for (size_t Index = 0;Index < HashResult.length();++Index)
-			fwprintf_s(stderr, L"%c", HashResult.c_str()[Index]);
-		fwprintf_s(stderr, L"\n");
+		PrintToScreen(Buffer.get());
 	}
 
 	return true;

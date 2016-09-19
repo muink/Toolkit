@@ -71,16 +71,16 @@
 #define HASH_ID_CRC_64_1B             48U
 #define HASH_ID_CRC_64_WE             49U
 #define HASH_ID_CRC_64_JONES          50U
-#define DEFAULT_HASH_FUNCTION_ID   HASH_ID_CRC_32
+#define DEFAULT_HASH_FUNCTION_ID      HASH_ID_CRC_32
 
 //Size definitions
-#define CRC_TABLE_SIZE             256U
-#define CRC8_SIZE_BLOCK            sizeof(uint8_t)
-#define CRC16_SIZE_BLOCK           sizeof(uint16_t)
-#define CRC24_SIZE_BLOCK           (sizeof(uint32_t) - sizeof(uint8_t))
-#define CRC32_SIZE_BLOCK           sizeof(uint32_t)
-#define CRC40_SIZE_BLOCK           (sizeof(uint32_t) + sizeof(uint8_t))
-#define CRC64_SIZE_BLOCK           sizeof(uint64_t)
+#define CRC_TABLE_SIZE                256U
+#define CRC8_SIZE_BLOCK               sizeof(uint8_t)
+#define CRC16_SIZE_BLOCK              sizeof(uint16_t)
+#define CRC24_SIZE_BLOCK              (sizeof(uint32_t) - sizeof(uint8_t))
+#define CRC32_SIZE_BLOCK              sizeof(uint32_t)
+#define CRC40_SIZE_BLOCK              (sizeof(uint32_t) + sizeof(uint8_t))
+#define CRC64_SIZE_BLOCK              sizeof(uint64_t)
 
 //Commands definitions
 #if defined(PLATFORM_WIN)

@@ -84,10 +84,10 @@
 #define SHA2_512_SIZE_DIGEST       64U
 #define SHA2_512_256_SIZE_DIGEST   SHA2_256_SIZE_DIGEST
 #define SHA2_512_224_SIZE_DIGEST   SHA2_224_SIZE_DIGEST
-typedef uint8_t                SHA2_256_BYTE;
-typedef uint8_t                SHA2_512_BYTE;
-typedef uint32_t               SHA_INT32;
-typedef uint64_t               SHA_INT64;
+typedef uint8_t                    SHA2_256_BYTE;
+typedef uint8_t                    SHA2_512_BYTE;
+typedef uint32_t                   SHA_INT32;
+typedef uint64_t                   SHA_INT64;
 
 //The structure for storing SHA info
 typedef struct _sha2_256_object_

@@ -181,16 +181,22 @@
 	#include <tchar.h>                 //Unicode(UTF-8/UTF-16)/Wide-Character Support
 	#include <winsock2.h>              //WinSock 2.0+(MUST be including before windows.h)
 	#include <ws2tcpip.h>              //WinSock 2.0+ Extension for TCP/IP protocols
-//Minimum supported system of Windows Version Helpers is Windows Vista.
 //	#include <windows.h>               //Master include file
+//Minimum supported system of Windows Version Helpers is Windows Vista.
 	#if !defined(PLATFORM_WIN_XP)
 		#include <VersionHelpers.h>        //Windows Version Helpers
 	#endif
 
 //Static libraries
 	#pragma comment(lib, "ws2_32.lib")                      //WinSock 2.0+
-	#define __LITTLE_ENDIAN              1U                 //Little Endian
-	#define __BYTE_ORDER                 __LITTLE_ENDIAN    //x86 and x86-64/x64
+
+//Endian definitions
+	#define __LITTLE_ENDIAN            1234                         //Little Endian
+	#define __BIG_ENDIAN               4321                         //Big Endian
+	#define __BYTE_ORDER               __LITTLE_ENDIAN              //x86 and x86-64/x64 is Little Endian in Windows.
+	#define LITTLE_ENDIAN              __LITTLE_ENDIAN
+	#define BIG_ENDIAN                 __BIG_ENDIAN
+	#define BYTE_ORDER                 __BYTE_ORDER
 
 //Windows compatible definitions
 	typedef SSIZE_T                   ssize_t;
@@ -204,13 +210,14 @@
 	#include <pthread.h>              //Threads
 	#include <signal.h>               //Signals
 	#include <unistd.h>               //Standard library API
-	#include <sys/time.h>             //Date and time
 	#include <arpa/inet.h>            //Internet operations
+	#include <sys/time.h>             //Date and time
 
 //Windows compatible
 	#define FALSE                    0
 	#define INVALID_SOCKET           (-1)
 	#define SOCKET_ERROR             (-1)
+	#define RETURN_ERROR             (-1)
 	#define MAX_PATH                 PATH_MAX
 	#define in_addr                  in_addr_Windows
 	typedef int                      SOCKET;
@@ -262,10 +269,9 @@
 #define ASCII_ACCENT              96                   //"`"
 #define ASCII_LOWERCASE_A         97                   //"a"
 #define ASCII_LOWERCASE_F         102                  //"f"
+#define ASCII_LOWERCASE_X         120                  //"x"
 #define ASCII_BRACES_LEAD         123                  //"{"
 #define ASCII_TILDE               126                  //"~"
-#define ASCII_UPPER_TO_LOWER      32U                  //Uppercase to lowercase
-#define ASCII_LOWER_TO_UPPER      32U                  //Lowercase to uppercase
 
 
 //////////////////////////////////////////////////
@@ -515,7 +521,7 @@ typedef struct _dns_hdr_
 	union {
 		uint16_t          Flags;
 		struct {
-		#if __BYTE_ORDER == __LITTLE_ENDIAN
+		#if BYTE_ORDER == LITTLE_ENDIAN
 			uint8_t       RD:1;
 			uint8_t       TC:1;
 			uint8_t       AA:1;
@@ -733,7 +739,7 @@ typedef struct _dns_opt_
 	union {
 		uint16_t          Z_Field;
 		struct {
-		#if __BYTE_ORDER == __LITTLE_ENDIAN
+		#if BYTE_ORDER == LITTLE_ENDIAN
 			uint8_t       Reserved_First:7;
 			uint8_t       DO:1;              //DO bit
 		#else //BIG_ENDIAN

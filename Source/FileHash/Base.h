@@ -196,6 +196,9 @@
 	#define LITTLE_ENDIAN              __LITTLE_ENDIAN
 	#define BIG_ENDIAN                 __BIG_ENDIAN
 	#define BYTE_ORDER                 __BYTE_ORDER
+
+//Windows compatible definitions
+	typedef SSIZE_T                    ssize_t;
 #elif defined(PLATFORM_LINUX)
 	#include <endian.h>                //Endian
 	#include <arpa/inet.h>             //Internet operations
@@ -222,14 +225,20 @@
 // Base definitions
 // 
 #pragma pack(1)                                 //Memory alignment: 1 bytes/8 bits
+
+
+//////////////////////////////////////////////////
+// Main header
+// 
 #define BYTES_TO_BITS            8U
 #define FILE_BUFFER_SIZE         4096U
 #if defined(PLATFORM_WIN)
 	#define MBSTOWCS_NULLTERMINATE   (-1)            //MultiByteToWideChar function find null-terminate.
 #endif
+#define PADDING_RESERVED_BYTES   2U              //Padding reserved bytes(2 bytes)
 
 //Version definitions
-#define FULL_VERSION                 L"0.3.1.0"
+#define FULL_VERSION                 L"0.3.2.0"
 #define COPYRIGHT_MESSAGE            L"Copyright (C) 2012-2016 Chengr28"
 
 //Command definitions
@@ -301,17 +310,20 @@
 #if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
 //Linux and Mac OS X compatible
 	#define RETURN_ERROR                                                 (-1)
-	#if defined(PLATFORM_LINUX)
-		#define _fcloseall                                                       fcloseall
-	#endif
 	#define fwprintf_s                                                   fwprintf
 	#define strnlen_s                                                    strnlen
+	#define wcsnlen_s                                                    wcsnlen
 	#define _set_errno(Value)                                            errno = Value
 	#define fread_s(Dst, DstSize, ElementSize, Count, File)              fread(Dst, ElementSize, Count, File)
 	#define memcpy_s(Dst, DstSize, Src, Size)                            memcpy(Dst, Src, Size)
 #endif
 
 //Function definitions
+#if BYTE_ORDER == LITTLE_ENDIAN
+	#define hton64(Value)         ((uint64_t)((((uint64_t)htonl((uint32_t)((Value << (sizeof(uint32_t) * BYTES_TO_BITS)) >> (sizeof(uint32_t) * BYTES_TO_BITS)))) << (sizeof(uint32_t) * BYTES_TO_BITS)) | (uint32_t)htonl((uint32_t)(Value >> (sizeof(uint32_t) * BYTES_TO_BITS)))))
+#else //BIG_ENDIAN
+	#define hton64(Value)         Value
+#endif
 #define ntoh64                hton64
 
 
@@ -322,25 +334,28 @@
 bool CheckEmptyBuffer(
 	const void *Buffer, 
 	const size_t Length);
-uint64_t hton64(
-	const uint64_t Value);
 bool MBSToWCSString(
 	const uint8_t *Buffer, 
 	const size_t MaxLen, 
 	std::wstring &Target);
-#if defined(PLATFORM_WIN)
 void CaseConvert(
-	const bool IsLowerToUpper, 
-	std::wstring &Buffer);
-#endif
+	std::string &Buffer, 
+	const bool IsLowerToUpper);
 void CaseConvert(
-	const bool IsLowerToUpper, 
-	std::string &Buffer);
+	std::wstring &Buffer, 
+	const bool IsLowerToUpper);
 uint8_t *sodium_bin2hex(
 	uint8_t *const hex, 
 	const size_t hex_maxlen, 
 	const uint8_t *const bin, 
 	const size_t bin_len);
+void ErrorCodeToMessage(
+	const ssize_t ErrorCode, 
+	std::wstring &Message);
+void PrintToScreen(
+	const uint8_t *Message);
+void PrintDescription(
+	void);
 
 //Checksum.cpp
 bool Checksum_Hash(
@@ -357,8 +372,15 @@ bool CRC_Hash(
 	FILE *FileHandle);
 
 //FileHash.cpp
-void PrintDescription(
-	void);
+bool ReadCommands(
+#if defined(PLATFORM_WIN)
+	const wchar_t *Command, 
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+	const char *Command, 
+#endif
+	const bool IsFileNameOnly);
+bool MainHashProcess(
+	FILE *FileHandle);
 
 //MD2.cpp
 bool MD2_Hash(
