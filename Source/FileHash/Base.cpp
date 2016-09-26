@@ -247,6 +247,24 @@ void PrintDescription(
 
 //Supported hash algorithm list
 	fwprintf_s(stderr, L"\nSupported hash algorithms:\n");
+
+	fwprintf_s(stderr, L"   * BLAKE family:   -BLAKE                      = -BLAKE_256\n");
+	fwprintf_s(stderr, L"                     -BLAKE_224                  BLAKE 224 bits\n");
+	fwprintf_s(stderr, L"                     -BLAKE_256                  BLAKE 256 bits\n");
+	fwprintf_s(stderr, L"                     -BLAKE_384                  BLAKE 384 bits\n");
+	fwprintf_s(stderr, L"                     -BLAKE_512                  BLAKE 512 bits\n");
+	fwprintf_s(stderr, L"   * BLAKE2 family:  -BLAKE2                     = -BLAKE2B_256\n");
+	fwprintf_s(stderr, L"                     -BLAKE2_128                 = -BLAKE2S_128\n");
+	fwprintf_s(stderr, L"                     -BLAKE2_224                 = -BLAKE2S_224\n");
+	fwprintf_s(stderr, L"                     -BLAKE2_384                 = -BLAKE2B_384\n");
+	fwprintf_s(stderr, L"                     -BLAKE2_512                 = -BLAKE2B_512\n");
+	fwprintf_s(stderr, L"                     -BLAKE2B_256                BLAKE2B 256 bits\n");
+	fwprintf_s(stderr, L"                     -BLAKE2B_384                BLAKE2B 384 bits\n");
+	fwprintf_s(stderr, L"                     -BLAKE2B_512                BLAKE2B 512 bits\n");
+	fwprintf_s(stderr, L"                     -BLAKE2S_128                BLAKE2S 128 bits\n");
+	fwprintf_s(stderr, L"                     -BLAKE2S_160                BLAKE2S 160 bits\n");
+	fwprintf_s(stderr, L"                     -BLAKE2S_224                BLAKE2S 224 bits\n");
+	fwprintf_s(stderr, L"                     -BLAKE2S_256                BLAKE2S 256 bits\n");
 	fwprintf_s(stderr, L"   * CRC family:     -CRC                        = -CRC32\n");
 	fwprintf_s(stderr, L"                     -CRC8                       CRC 8 bits\n");
 	fwprintf_s(stderr, L"                     -CRC8_ITU                   CRC 8 bits ITU\n");
@@ -303,6 +321,11 @@ void PrintDescription(
 	fwprintf_s(stderr, L"   * MD4 family:     -MD4\n");
 	fwprintf_s(stderr, L"                     -ED2K                       eDonkey/eMule hash algorithm\n");
 	fwprintf_s(stderr, L"   * MD5:            -MD5\n");
+	fwprintf_s(stderr, L"   * RIPEMD family:  -RIPEMD                     = -RIPEMD_160\n");
+	fwprintf_s(stderr, L"                     -RIPEMD_128                 RIPEMD 128 bits\n");
+	fwprintf_s(stderr, L"                     -RIPEMD_160                 RIPEMD 160 bits\n");
+	fwprintf_s(stderr, L"                     -RIPEMD_256                 RIPEMD 256 bits\n");
+	fwprintf_s(stderr, L"                     -RIPEMD_320                 RIPEMD 320 bits\n");
 	fwprintf_s(stderr, L"   * SHA-1:          -SHA1\n");
 	fwprintf_s(stderr, L"   * SHA-2 family:   -SHA2                       = -SHA2_256\n");
 	fwprintf_s(stderr, L"                     -SHA224/-SHA2_224           SHA-2 224 bits\n");

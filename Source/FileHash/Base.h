@@ -183,9 +183,6 @@
 #if defined(PLATFORM_WIN)
 	#include <windows.h>               //Master include file in Windows
 
-//SHA-3 header
-	#include "SHA3\\KeccakHash.h"
-
 //Static libraries
 	#pragma comment(lib, "ws2_32.lib")            //Windows WinSock 2.0+ support
 
@@ -202,13 +199,7 @@
 #elif defined(PLATFORM_LINUX)
 	#include <endian.h>                //Endian
 	#include <arpa/inet.h>             //Internet operations
-
-//SHA-3 header
-	#include "SHA3/KeccakHash.h"
 #elif defined(PLATFORM_MACX)
-//SHA-3 header
-	#include "SHA3/KeccakHash.h"
-
 //Endian definitions
 	#define __LITTLE_ENDIAN            1234                      //Little Endian
 	#define __BIG_ENDIAN               4321                      //Big Endian
@@ -238,7 +229,7 @@
 #define PADDING_RESERVED_BYTES   2U              //Padding reserved bytes(2 bytes)
 
 //Version definitions
-#define FULL_VERSION                 L"0.3.2.0"
+#define FULL_VERSION                 L"0.3.3.0"
 #define COPYRIGHT_MESSAGE            L"Copyright (C) 2012-2016 Chengr28"
 
 //Command definitions
@@ -257,19 +248,24 @@
 #endif
 
 //Hash definitions
-#define HASH_ID_CRC              1U
-#define HASH_ID_CHECKSUM         2U
-#define HASH_ID_MD2              3U
-#define HASH_ID_MD4              4U
-#define HASH_ID_ED2K             5U
-#define HASH_ID_MD5              6U
+#define HASH_ID_BLAKE            1U
+#define HASH_ID_BLAKE2           2U
+#define HASH_ID_CRC              3U
+#define HASH_ID_CHECKSUM         4U
+#define HASH_ID_MD2              5U
+#define HASH_ID_MD4              6U
+#define HASH_ID_ED2K             7U
+#define HASH_ID_MD5              8U
 #define HASH_ID_MD               HASH_ID_MD5
-#define HASH_ID_SHA1             7U
-#define HASH_ID_SHA2             8U
-#define HASH_ID_SHA3             9U
+#define HASH_ID_RIPEMD           9U
+#define HASH_ID_SHA1             10U
+#define HASH_ID_SHA2             11U
+#define HASH_ID_SHA3             12U
 #define HASH_ID_SHA              HASH_ID_SHA3
 #define DEFAULT_HASH_ID          HASH_ID_SHA3
 #if defined(PLATFORM_WIN)
+	#define HASH_COMMAND_BLAKE                      L"-BLAKE"
+	#define HASH_COMMAND_BLAKE2                     L"-BLAKE2"
 	#define HASH_COMMAND_CRC                        L"-CRC"
 	#define HASH_COMMAND_CHECKSUM                   L"-CHECKSUM"
 	#define HASH_COMMAND_MD                         L"-MD"
@@ -277,6 +273,7 @@
 	#define HASH_COMMAND_MD4                        L"-MD4"
 	#define HASH_COMMAND_ED2K                       L"-ED2K"
 	#define HASH_COMMAND_MD5                        L"-MD5"
+	#define HASH_COMMAND_RIPEMD                     L"-RIPEMD"
 	#define HASH_COMMAND_SHA                        L"-SHA"
 	#define HASH_COMMAND_SHA1                       L"-SHA1"
 	#define HASH_COMMAND_SHA1_UNDERLINE             L"-SHA_1"
@@ -288,6 +285,8 @@
 	#define HASH_COMMAND_SHA3                       L"-SHA3"
 	#define HASH_COMMAND_SHA3_UNDERLINE             L"-SHA_3"
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+	#define HASH_COMMAND_BLAKE                      ("-BLAKE")
+	#define HASH_COMMAND_BLAKE2                     ("-BLAKE2")
 	#define HASH_COMMAND_CRC                        ("-CRC")
 	#define HASH_COMMAND_CHECKSUM                   ("-CHECKSUM")
 	#define HASH_COMMAND_MD                         ("-MD")
@@ -295,6 +294,7 @@
 	#define HASH_COMMAND_MD4                        ("-MD4")
 	#define HASH_COMMAND_ED2K                       ("-ED2K")
 	#define HASH_COMMAND_MD5                        ("-MD5")
+	#define HASH_COMMAND_RIPEMD                     ("-RIPEMD")
 	#define HASH_COMMAND_SHA                        ("-SHA")
 	#define HASH_COMMAND_SHA1                       ("-SHA1")
 	#define HASH_COMMAND_SHA1_UNDERLINE             ("-SHA_1")
@@ -357,6 +357,26 @@ void PrintToScreen(
 void PrintDescription(
 	void);
 
+//BLAKE.cpp
+bool ReadCommands_BLAKE(
+#if defined(PLATFORM_WIN)
+	std::wstring &Command);
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+	std::string &Command);
+#endif
+bool BLAKE_Hash(
+	FILE *FileHandle);
+
+//BLAKE2.cpp
+bool ReadCommands_BLAKE2(
+#if defined(PLATFORM_WIN)
+	std::wstring &Command);
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+	std::string &Command);
+#endif
+bool BLAKE2_Hash(
+	FILE *FileHandle);
+
 //Checksum.cpp
 bool Checksum_Hash(
 	FILE *FileHandle);
@@ -392,6 +412,16 @@ bool MD4_Hash(
 
 //MD5.cpp
 bool MD5_Hash(
+	FILE *FileHandle);
+
+//RIPEMD.cpp
+bool ReadCommands_RIPEMD(
+#if defined(PLATFORM_WIN)
+	std::wstring &Command);
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+	std::string &Command);
+#endif
+bool RIPEMD_Hash(
 	FILE *FileHandle);
 
 //SHA-1.cpp

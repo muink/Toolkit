@@ -39,7 +39,7 @@ void MD4_BlockDataOrder(
 	size_t num)
 {
 	const uint8_t *data = (const uint8_t *)data_;
-	register uint32_t A = 0, B = 0, C = 0, D = 0, l = 0;
+	uint32_t A = 0, B = 0, C = 0, D = 0, l = 0;
 	uint32_t XX0 = 0, XX1 = 0, XX2 = 0, XX3 = 0, XX4 = 0, XX5 = 0, XX6 = 0, XX7 = 0, XX8 = 0, XX9 = 0, XX10 = 0, XX11 = 0, XX12 = 0, XX13 = 0, XX14 = 0, XX15 = 0;
 #define X(i)   XX ## i
 
@@ -70,6 +70,7 @@ void MD4_BlockDataOrder(
 		R0(D, A, B, C, X(13), 7, 0); (void)HOST_c2l(data, l); X(15) = l;
 		R0(C, D, A, B, X(14), 11, 0);
 		R0(B, C, D, A, X(15), 19, 0);
+
 	//Round 1
 		R1(A, B, C, D, X(0), 3, 0x5A827999L);
 		R1(D, A, B, C, X(4), 5, 0x5A827999L);
@@ -87,6 +88,7 @@ void MD4_BlockDataOrder(
 		R1(D, A, B, C, X(7), 5, 0x5A827999L);
 		R1(C, D, A, B, X(11), 9, 0x5A827999L);
 		R1(B, C, D, A, X(15), 13, 0x5A827999L);
+
 	//Round 2
 		R2(A, B, C, D, X(0), 3, 0x6ED9EBA1L);
 		R2(D, A, B, C, X(8), 9, 0x6ED9EBA1L);
@@ -136,15 +138,15 @@ void MD4_Update(
 	if (n != 0)
 	{
 		p = (uint8_t *)c->Data;
-		if (len >= MD4_SIZE_BLOCK || len + n >= MD4_SIZE_BLOCK)
+		if (len >= MD4_BLOCK_SIZE || len + n >= MD4_BLOCK_SIZE)
 		{
-			memcpy(p + n, data, MD4_SIZE_BLOCK - n);
+			memcpy(p + n, data, MD4_BLOCK_SIZE - n);
 			MD4_BlockDataOrder(c, p, 1);
-			n = MD4_SIZE_BLOCK - n;
+			n = MD4_BLOCK_SIZE - n;
 			data += n;
 			len -= n;
 			c->Num = 0;
-			memset(p, 0, MD4_SIZE_BLOCK); //Keep it zeroed.
+			memset(p, 0, MD4_BLOCK_SIZE); //Keep it zeroed.
 		}
 		else {
 			memcpy(p + n, data, len);
@@ -152,11 +154,11 @@ void MD4_Update(
 			return;
 		}
 	}
-	n = len / MD4_SIZE_BLOCK;
+	n = len / MD4_BLOCK_SIZE;
 	if (n > 0)
 	{
 		MD4_BlockDataOrder(c, data, n);
-		n *= MD4_SIZE_BLOCK;
+		n *= MD4_BLOCK_SIZE;
 		data += n;
 		len -= n;
 	}
@@ -180,14 +182,14 @@ void MD4_Final(
 
 	p[n] = 0x80; //There is always room for one.
 	n++;
-	if (n > (MD4_SIZE_BLOCK - 8U))
+	if (n > (MD4_BLOCK_SIZE - 8U))
 	{
-		memset(p + n, 0, MD4_SIZE_BLOCK - n);
+		memset(p + n, 0, MD4_BLOCK_SIZE - n);
 		n = 0;
 		MD4_BlockDataOrder(c, p, 1);
 	}
-	memset(p + n, 0, MD4_SIZE_BLOCK - 8U - n);
-	p += MD4_SIZE_BLOCK - 8U;
+	memset(p + n, 0, MD4_BLOCK_SIZE - 8U - n);
+	p += MD4_BLOCK_SIZE - 8U;
 #if BYTE_ORDER == LITTLE_ENDIAN
 	(void)HOST_l2c(c->Nl, p);
 	(void)HOST_l2c(c->Nh, p);
@@ -195,15 +197,18 @@ void MD4_Final(
 	(void)HOST_l2c(c->Nh, p);
 	(void)HOST_l2c(c->Nl, p);
 #endif
-	p -= MD4_SIZE_BLOCK;
+	p -= MD4_BLOCK_SIZE;
 	MD4_BlockDataOrder(c, p, 1U);
 	c->Num = 0;
-	memset(p, 0, MD4_SIZE_BLOCK);
+	memset(p, 0, MD4_BLOCK_SIZE);
 	HASH_MAKE_STRING(c, md);
 
 	return;
 }
 
+//////////////////////////////////////////////////
+// Hash function
+// 
 //MD4 hash function
 bool MD4_Hash(
 	FILE *FileHandle)
@@ -219,15 +224,15 @@ bool MD4_Hash(
 	size_t ReadBlockSize = FILE_BUFFER_SIZE, ReadLength = 0, RoundCount = 0;
 	if (HashFamilyID == HASH_ID_ED2K)
 		ReadBlockSize = ED2K_SIZE_BLOCK;
-	std::shared_ptr<uint8_t> Buffer(new uint8_t[ReadBlockSize]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]()), BufferED2K(new uint8_t[MD4_SIZE_DIGEST]());
+	std::shared_ptr<uint8_t> Buffer(new uint8_t[ReadBlockSize]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]()), BufferED2K(new uint8_t[MD4_DIGEST_SIZE]());
 	memset(Buffer.get(), 0, ReadBlockSize);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
-	memset(BufferED2K.get(), 0, MD4_SIZE_DIGEST);
+	memset(BufferED2K.get(), 0, MD4_DIGEST_SIZE);
+
+//MD4 initialization
 	MD4_CTX HashInstance, HashInstanceED2K;
 	memset(&HashInstance, 0, sizeof(HashInstance));
 	memset(&HashInstanceED2K, 0, sizeof(HashInstanceED2K));
-
-//MD4 initialization
 	MD4_Init(&HashInstance);
 	if (HashFamilyID == HASH_ID_ED2K)
 		MD4_Init(&HashInstanceED2K);
@@ -254,8 +259,8 @@ bool MD4_Hash(
 			if (HashFamilyID == HASH_ID_ED2K)
 			{
 				MD4_Final(Buffer.get(), &HashInstance);
-				memcpy_s(BufferED2K.get(), MD4_SIZE_DIGEST, Buffer.get(), MD4_SIZE_DIGEST);
-				MD4_Update(&HashInstanceED2K, Buffer.get(), MD4_SIZE_DIGEST);
+				memcpy_s(BufferED2K.get(), MD4_DIGEST_SIZE, Buffer.get(), MD4_DIGEST_SIZE);
+				MD4_Update(&HashInstanceED2K, Buffer.get(), MD4_DIGEST_SIZE);
 				MD4_Init(&HashInstance);
 			}
 
@@ -263,7 +268,7 @@ bool MD4_Hash(
 		}
 	}
 
-//Binary to hex
+//Finish hash process.
 	memset(Buffer.get(), 0, ReadBlockSize);
 	if (HashFamilyID == HASH_ID_MD4)
 	{
@@ -274,12 +279,15 @@ bool MD4_Hash(
 		if (RoundCount > 1U)
 			MD4_Final(Buffer.get(), &HashInstanceED2K);
 		else 
-			memcpy_s(Buffer.get(), MD4_SIZE_DIGEST, BufferED2K.get(), MD4_SIZE_DIGEST);
+			memcpy_s(Buffer.get(), MD4_DIGEST_SIZE, BufferED2K.get(), MD4_DIGEST_SIZE);
 	}
 	else {
+		fwprintf_s(stderr, L"[Error] Parameters error.\n");
 		return false;
 	}
-	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), MD4_SIZE_DIGEST) == nullptr)
+
+//Binary to hex
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), MD4_DIGEST_SIZE) == nullptr)
 	{
 		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;

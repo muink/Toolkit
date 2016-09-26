@@ -18,6 +18,11 @@
 
 
 #include "Base.h"
+#if defined(PLATFORM_WIN)
+	#include "SHA3\\KeccakHash.h"
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+	#include "SHA3/KeccakHash.h"
+#endif
 
 //Hash function ID
 #define HASH_ID_SHA3_224           1U
@@ -29,10 +34,10 @@
 #define DEFAULT_HASH_FUNCTION_ID   HASH_ID_SHA3_256
 
 //Size definitions
-#define SHA3_SIZE_224              224U
-#define SHA3_SIZE_256              256U
-#define SHA3_SIZE_384              384U
-#define SHA3_SIZE_512              512U
+#define SHA3_DIGEST_SIZE_224       224U
+#define SHA3_DIGEST_SIZE_256       256U
+#define SHA3_DIGEST_SIZE_384       384U
+#define SHA3_DIGEST_SIZE_512       512U
 
 //Commands definitions
 #if defined(PLATFORM_WIN)

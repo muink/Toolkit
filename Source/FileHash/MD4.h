@@ -20,9 +20,9 @@
 #include "Base.h"
 
 //The MD4 block size and message digest size
-#define MD4_SIZE_BLOCK     64U
-#define MD4_LENGTH_BLOCK   (MD4_SIZE_BLOCK / 4U)
-#define MD4_SIZE_DIGEST    16U
+#define MD4_BLOCK_SIZE     64U
+#define MD4_BLOCK_LENGTH   (MD4_BLOCK_SIZE / 4U)
+#define MD4_DIGEST_SIZE    16U
 #define MD4_LONG           uint32_t
 #define ED2K_SIZE_BLOCK    9728000U
 
@@ -66,7 +66,7 @@ typedef struct _md4_state_st_
 {
 	MD4_LONG       A, B, C, D;
 	MD4_LONG       Nl, Nh;
-	MD4_LONG       Data[MD4_LENGTH_BLOCK];
+	MD4_LONG       Data[MD4_BLOCK_LENGTH];
 	unsigned int   Num;
 }MD4_CTX;
 

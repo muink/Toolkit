@@ -403,7 +403,7 @@ bool SendProcess(
 	auto Result = (long double)(AfterTime.tv_sec - BeforeTime.tv_sec) * (long double)SECOND_TO_MILLISECOND;
 	if (AfterTime.tv_sec >= BeforeTime.tv_sec)
 		Result += (long double)(AfterTime.tv_usec - BeforeTime.tv_usec) / (long double)MICROSECOND_TO_MILLISECOND;
-	else
+	else 
 		Result += (long double)(AfterTime.tv_usec + SECOND_TO_MILLISECOND * MICROSECOND_TO_MILLISECOND - BeforeTime.tv_usec) / (long double)MICROSECOND_TO_MILLISECOND;
 #endif
 
@@ -519,7 +519,7 @@ bool SendProcess(
 					Result = (long double)(AfterTime.tv_sec - BeforeTime.tv_sec) * (long double)SECOND_TO_MILLISECOND;
 					if (AfterTime.tv_sec >= BeforeTime.tv_sec)
 						Result += (long double)(AfterTime.tv_usec - BeforeTime.tv_usec) / (long double)MICROSECOND_TO_MILLISECOND;
-					else
+					else 
 						Result += (long double)(AfterTime.tv_usec + SECOND_TO_MILLISECOND * MICROSECOND_TO_MILLISECOND - BeforeTime.tv_usec) / (long double)MICROSECOND_TO_MILLISECOND;
 				#endif
 
@@ -1088,7 +1088,7 @@ void PrintErrorToScreen(
 	ErrorCodeToMessage(ErrorCode, InnerMessage);
 	if (ErrorCode == 0)
 		fwprintf_s(stderr, InnerMessage.c_str());
-	else
+	else 
 		fwprintf_s(stderr, InnerMessage.c_str(), (int)ErrorCode);
 
 	return;

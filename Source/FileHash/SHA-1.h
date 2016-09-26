@@ -20,8 +20,8 @@
 #include "Base.h"
 
 //The SHA-1 block size, message digest size in bytes and some useful types.
-#define SHA1_SIZE_BLOCK         64U
-#define SHA1_SIZE_DIGEST        20U
+#define SHA1_BLOCK_SIZE         64U
+#define SHA1_DIGEST_SIZE        20U
 typedef int32_t                 SHA1_INT32;
 typedef int64_t                 SHA1_INT64;
 
@@ -30,39 +30,39 @@ typedef struct _sha1_state_
 {
 	SHA1_INT64     Length;
 	SHA1_INT32     State[5U], Curlen;
-	uint8_t        Buffer[SHA1_SIZE_BLOCK];
+	uint8_t        Buffer[SHA1_BLOCK_SIZE];
 }SHA1_State;
 
 //Rotate the hard way(platform optimizations could be done).
-#define ROL(x, y) ((((unsigned long)(x) << (unsigned long)((y) & 31)) | (((unsigned long)(x) & 0xFFFFFFFFUL) >> (unsigned long)(32 - ((y) & 31)))) & 0xFFFFFFFFUL)
-#define ROLc(x, y) ((((unsigned long)(x) << (unsigned long)((y) & 31)) | (((unsigned long)(x) & 0xFFFFFFFFUL) >> (unsigned long)(32 - ((y) & 31)))) & 0xFFFFFFFFUL)
+#define ROL(x, y) ((((uint32_t)(x) << (uint32_t)((y) & 31)) | (((uint32_t)(x) & 0xFFFFFFFFUL) >> (uint32_t)(32 - ((y) & 31)))) & 0xFFFFFFFFUL)
+#define ROLc(x, y) ((((uint32_t)(x) << (uint32_t)((y) & 31)) | (((uint32_t)(x) & 0xFFFFFFFFUL) >> (uint32_t)(32 - ((y) & 31)))) & 0xFFFFFFFFUL)
 
 //Endian Neutral macros that work on all platforms
-#define STORE32H(x, y)                                                                              \
-	{(y)[0] = (unsigned char)(((x) >> 24U) & 255); (y)[1U] = (unsigned char)(((x) >> 16U) & 255);   \
-		(y)[2U] = (unsigned char)(((x) >> 8U) & 255); (y)[3U] = (unsigned char)((x) & 255);}
+#define STORE32H(x, y)                                                                  \
+	{(y)[0] = (uint8_t)(((x) >> 24U) & 255); (y)[1U] = (uint8_t)(((x) >> 16U) & 255);   \
+		(y)[2U] = (uint8_t)(((x) >> 8U) & 255); (y)[3U] = (uint8_t)((x) & 255);}
 
-#define LOAD32H(x, y)                               \
-	{x = ((unsigned long)((y)[0] & 255) << 24U) |   \
-		((unsigned long)((y)[1U] & 255) << 16U) |   \
-		((unsigned long)((y)[2U] & 255) << 8U)  |   \
-		((unsigned long)((y)[3U] & 255));}
+#define LOAD32H(x, y)                            \
+	{x = ((SHA1_INT32)((y)[0] & 255) << 24U) |   \
+		((SHA1_INT32)((y)[1U] & 255) << 16U) |   \
+		((SHA1_INT32)((y)[2U] & 255) << 8U)  |   \
+		((SHA1_INT32)((y)[3U] & 255));}
 
-#define STORE64H(x, y)                                                                                  \
-	{(y)[0] = (unsigned char)(((x) >> 56U) & 255); (y)[1U] = (unsigned char)(((x) >> 48U) & 255);       \
-		(y)[2U] = (unsigned char)(((x) >> 40U) & 255); (y)[3U] = (unsigned char)(((x) >> 32U) & 255);   \
-		(y)[4U] = (unsigned char)(((x) >> 24U) & 255); (y)[5U] = (unsigned char)(((x) >> 16U) & 255);   \
-		(y)[6U] = (unsigned char)(((x) >> 8U) & 255); (y)[7U] = (unsigned char)((x) & 255);}
+#define STORE64H(x, y)                                                                      \
+	{(y)[0] = (uint8_t)(((x) >> 56U) & 255); (y)[1U] = (uint8_t)(((x) >> 48U) & 255);       \
+		(y)[2U] = (uint8_t)(((x) >> 40U) & 255); (y)[3U] = (uint8_t)(((x) >> 32U) & 255);   \
+		(y)[4U] = (uint8_t)(((x) >> 24U) & 255); (y)[5U] = (uint8_t)(((x) >> 16U) & 255);   \
+		(y)[6U] = (uint8_t)(((x) >> 8U) & 255); (y)[7U] = (uint8_t)((x) & 255);}
 
 #ifndef MIN
 	#define MIN(x, y) (((x)<(y)) ? (x):(y))
 #endif
 
 //SHA-1 macros
-#define SHA1_F0(x, y, z)   (z ^ (x & (y ^ z)))
-#define SHA1_F1(x, y, z)   (x ^ y ^ z)
-#define SHA1_F2(x, y, z)   ((x & y) | (z & (x | y)))
-#define SHA1_F3(x, y, z)   (x ^ y ^ z)
+#define SHA1_F0(x, y, z) (z ^ (x & (y ^ z)))
+#define SHA1_F1(x, y, z) (x ^ y ^ z)
+#define SHA1_F2(x, y, z) ((x & y) | (z & (x | y)))
+#define SHA1_F3(x, y, z) (x ^ y ^ z)
 
 //Global variables
 extern size_t HashFamilyID;
@@ -76,7 +76,7 @@ void SHA1_Init(
 void SHA1_Process(
 	SHA1_State *sha1, 
 	const uint8_t *in, 
-	unsigned long inlen);
+	uint32_t inlen);
 void SHA1_Done(
 	SHA1_State *sha1, 
 	uint8_t *out);

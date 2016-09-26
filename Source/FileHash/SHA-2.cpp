@@ -22,11 +22,11 @@
 //When run on a little-endian CPU we need to perform byte reversal on an array of longwords.
 //SHA-2(256) long reverse process
 static void SHA2_256_LongReverse(
-	SHA_INT32 *buffer, 
+	SHA2_INT32 *buffer, 
 	int byteCount, 
 	int Endianness)
 {
-	SHA_INT32 value = 0;
+	SHA2_INT32 value = 0;
 	if (Endianness == PCT_BIG_ENDIAN)
 		return;
 
@@ -34,31 +34,12 @@ static void SHA2_256_LongReverse(
 	while (byteCount--)
 	{
 		value = *buffer;
-		value = ((value & 0xFF00FF00L) >> 8U) |   \
-			((value & 0x00FF00FFL) << 8U);
+		value = (SHA2_INT32)((value & 0xFF00FF00L) >> 8U) | (SHA2_INT32)((value & 0x00FF00FFL) << 8U);
 		*buffer++ = (value << 16U) | (value >> 16U);
 	}
 
 	return;
 }
-
-/*
-//SHA-2(256) copy process
-static void SHA2_256_Copy(
-	SHA2_256_Object *src, 
-	SHA2_256_Object *dest)
-{
-	dest->Endianness = src->Endianness;
-	dest->Local = src->Local;
-	dest->DigestSize = src->DigestSize;
-	dest->CountLow = src->CountLow;
-	dest->CountHigh = src->CountHigh;
-	memcpy(dest->Digest, src->Digest, sizeof(src->Digest));
-	memcpy(dest->Data, src->Data, sizeof(src->Data));
-
-	return;
-}
-*/
 
 //SHA-2(256) various logical functions
 #define ROR(x, y)                                                  \
@@ -78,9 +59,7 @@ static void SHA2_256_Transform(
 	SHA2_256_Object *sha_info)
 {
 	size_t Index = 0;
-	SHA_INT32 S[8U], W[64U], t0 = 0, t1 = 0;
-	memset(S, 0, sizeof(SHA_INT32) * 8U);
-	memset(W, 0, sizeof(SHA_INT32) * 64U);
+	SHA2_INT32 S[8U] = {0}, W[64U] = {0}, t0 = 0, t1 = 0;
 
 	memcpy(W, sha_info->Data, sizeof(sha_info->Data));
 	SHA2_256_LongReverse(W, (int)sizeof(sha_info->Data), sha_info->Endianness);
@@ -197,7 +176,7 @@ static void SHA2_256_Init(
 	sha_info->CountLow = 0L;
 	sha_info->CountHigh = 0L;
 	sha_info->Local = 0;
-	sha_info->DigestSize = SHA2_256_SIZE_DIGEST;
+	sha_info->DigestSize = SHA2_DIGEST_SIZE_256 / BYTES_TO_BITS;
 
 	return;
 }
@@ -218,7 +197,7 @@ static void SHA2_224_Init(
 	sha_info->CountLow = 0L;
 	sha_info->CountHigh = 0L;
 	sha_info->Local = 0;
-	sha_info->DigestSize = SHA2_224_SIZE_DIGEST;
+	sha_info->DigestSize = SHA2_DIGEST_SIZE_224 / BYTES_TO_BITS;
 
 	return;
 }
@@ -230,32 +209,32 @@ static void SHA2_256_Update(
 	int count)
 {
 	int i = 0;
-	SHA_INT32 clo = 0;
+	SHA2_INT32 clo = 0;
 
-	clo = sha_info->CountLow + ((SHA_INT32)count << 3U);
+	clo = sha_info->CountLow + ((SHA2_INT32)count << 3U);
 	if (clo < sha_info->CountLow)
 		++sha_info->CountHigh;
 	sha_info->CountLow = clo;
-	sha_info->CountHigh += (SHA_INT32)count >> 29U;
+	sha_info->CountHigh += (SHA2_INT32)count >> 29U;
 	if (sha_info->Local)
 	{
-		i = SHA2_256_SIZE_BLOCK - sha_info->Local;
+		i = SHA2_BLOCK_SIZE_256 - sha_info->Local;
 		if (i > count)
 			i = count;
 		memcpy(((SHA2_256_BYTE *)sha_info->Data) + sha_info->Local, buffer, i);
 		count -= i;
 		buffer += i;
 		sha_info->Local += i;
-		if (sha_info->Local == SHA2_256_SIZE_BLOCK)
+		if (sha_info->Local == SHA2_BLOCK_SIZE_256)
 			SHA2_256_Transform(sha_info);
 		else 
 			return;
 	}
-	while (count >= (int)SHA2_256_SIZE_BLOCK)
+	while (count >= (int)SHA2_BLOCK_SIZE_256)
 	{
-		memcpy(sha_info->Data, buffer, SHA2_256_SIZE_BLOCK);
-		buffer += SHA2_256_SIZE_BLOCK;
-		count -= SHA2_256_SIZE_BLOCK;
+		memcpy(sha_info->Data, buffer, SHA2_BLOCK_SIZE_256);
+		buffer += SHA2_BLOCK_SIZE_256;
+		count -= SHA2_BLOCK_SIZE_256;
 		SHA2_256_Transform(sha_info);
 	}
 	memcpy(sha_info->Data, buffer, count);
@@ -266,24 +245,24 @@ static void SHA2_256_Update(
 
 //Finish computing the SHA-2(256) digest
 static void SHA2_256_Final(
-	uint8_t digest[SHA2_256_SIZE_DIGEST], 
+	uint8_t digest[SHA2_DIGEST_SIZE_256 / BYTES_TO_BITS],
 	SHA2_256_Object *sha_info)
 {
 	int count = 0;
-	SHA_INT32 lo_bit_count = 0, hi_bit_count = 0;
+	SHA2_INT32 lo_bit_count = 0, hi_bit_count = 0;
 
 	lo_bit_count = sha_info->CountLow;
 	hi_bit_count = sha_info->CountHigh;
 	count = (int)((lo_bit_count >> 3U) & 0x3F);
 	((SHA2_256_BYTE *)sha_info->Data)[count++] = 0x80;
-	if (count > (int)SHA2_256_SIZE_BLOCK - 8)
+	if (count > (int)SHA2_BLOCK_SIZE_256 - 8)
 	{
-		memset(((SHA2_256_BYTE *)sha_info->Data) + count, 0, SHA2_256_SIZE_BLOCK - count);
+		memset(((SHA2_256_BYTE *)sha_info->Data) + count, 0, SHA2_BLOCK_SIZE_256 - count);
 		SHA2_256_Transform(sha_info);
-		memset((SHA2_256_BYTE *)sha_info->Data, 0, SHA2_256_SIZE_BLOCK - 8);
+		memset((SHA2_256_BYTE *)sha_info->Data, 0, SHA2_BLOCK_SIZE_256 - 8);
 	}
 	else {
-		memset(((SHA2_256_BYTE *)sha_info->Data) + count, 0, SHA2_256_SIZE_BLOCK - 8 - count);
+		memset(((SHA2_256_BYTE *)sha_info->Data) + count, 0, SHA2_BLOCK_SIZE_256 - 8 - count);
 	}
 
 //GJS: note that we add the hi/lo in big-endian. SHA2_256_Transform will swap these values into host-order.
@@ -334,11 +313,11 @@ static void SHA2_256_Final(
 
 //SHA-2(512) long reverse process
 static void SHA2_512_LongReverse(
-	SHA_INT64 *buffer, 
+	SHA2_INT64 *buffer, 
 	int byteCount, 
 	int Endianness)
 {
-	SHA_INT64 value = 0;
+	SHA2_INT64 value = 0;
 	if (Endianness == PCT_BIG_ENDIAN)
 		return;
 
@@ -361,27 +340,9 @@ static void SHA2_512_LongReverse(
 	return;
 }
 
-/*
-//SHA-2(512) copy process
-static void SHA2_512_Copy(
-	SHA2_512_Object *src, 
-	SHA2_512_Object *dest)
-{
-	dest->Endianness = src->Endianness;
-	dest->Local = src->Local;
-	dest->DigestSize = src->DigestSize;
-	dest->CountLow = src->CountLow;
-	dest->CountHigh = src->CountHigh;
-	memcpy(dest->Digest, src->Digest, sizeof(src->Digest));
-	memcpy(dest->Data, src->Data, sizeof(src->Data));
-
-	return;
-}
-*/
-
 //SHA-2(512) various logical functions
-#define ROR64(x, y) \
-	(((((x) & Py_ULL(0xFFFFFFFFFFFFFFFF))>>((uint64_t)(y) & 63)) |   \
+#define ROR64(x, y)                                                        \
+	(((((x) & Py_ULL(0xFFFFFFFFFFFFFFFF))>>((uint64_t)(y) & 63)) |         \
 	((x) << ((uint64_t)(64 - ((y) & 63))))) & Py_ULL(0xFFFFFFFFFFFFFFFF))
 #define Ch(x, y, z)     (z ^ (x & (y ^ z)))
 #define Maj(x, y, z)    (((x | y) & z) | (x & y))
@@ -397,9 +358,7 @@ static void SHA2_512_Transform(
 	SHA2_512_Object *sha_info)
 {
 	size_t Index = 0;
-	SHA_INT64 S[8U], W[80U], t0 = 0, t1 = 0;
-	memset(S, 0, sizeof(SHA_INT64) * 8U);
-	memset(W, 0, sizeof(SHA_INT64) * 80U);
+	SHA2_INT64 S[8U] = {0}, W[80U] = {0}, t0 = 0, t1 = 0;
 
 	memcpy(W, sha_info->Data, sizeof(sha_info->Data));
 	SHA2_512_LongReverse(W, (int)sizeof(sha_info->Data), sha_info->Endianness);
@@ -532,7 +491,7 @@ static void SHA2_512_Init(
 	sha_info->CountLow = 0L;
 	sha_info->CountHigh = 0L;
 	sha_info->Local = 0;
-	sha_info->DigestSize = SHA2_512_SIZE_DIGEST;
+	sha_info->DigestSize = SHA2_DIGEST_SIZE_512 / BYTES_TO_BITS;
 
 	return;
 }
@@ -553,7 +512,7 @@ static void SHA2_384_Init(
 	sha_info->CountLow = 0L;
 	sha_info->CountHigh = 0L;
 	sha_info->Local = 0;
-	sha_info->DigestSize = SHA2_384_SIZE_DIGEST;
+	sha_info->DigestSize = SHA2_DIGEST_SIZE_384 / BYTES_TO_BITS;
 
 	return;
 }
@@ -574,7 +533,7 @@ static void SHA2_512_256_Init(
 	sha_info->CountLow = 0L;
 	sha_info->CountHigh = 0L;
 	sha_info->Local = 0;
-	sha_info->DigestSize = SHA2_512_256_SIZE_DIGEST;
+	sha_info->DigestSize = SHA2_DIGEST_SIZE_512_256 / BYTES_TO_BITS;
 
 	return;
 }
@@ -595,7 +554,7 @@ static void SHA2_512_224_Init(
 	sha_info->CountLow = 0L;
 	sha_info->CountHigh = 0L;
 	sha_info->Local = 0;
-	sha_info->DigestSize = SHA2_512_224_SIZE_DIGEST;
+	sha_info->DigestSize = SHA2_DIGEST_SIZE_512_224 / BYTES_TO_BITS;
 
 	return;
 }
@@ -607,32 +566,32 @@ static void SHA2_512_Update(
 	int count)
 {
 	int i = 0;
-	SHA_INT32 clo = 0;
+	SHA2_INT32 clo = 0;
 
-	clo = sha_info->CountLow + ((SHA_INT32)count << 3U);
+	clo = sha_info->CountLow + ((SHA2_INT32)count << 3U);
 	if (clo < sha_info->CountLow)
 		++sha_info->CountHigh;
 	sha_info->CountLow = clo;
-	sha_info->CountHigh += (SHA_INT32)count >> 29U;
+	sha_info->CountHigh += (SHA2_INT32)count >> 29U;
 	if (sha_info->Local)
 	{
-		i = SHA2_512_SIZE_BLOCK - sha_info->Local;
+		i = SHA2_BLOCK_SIZE_512 - sha_info->Local;
 		if (i > count)
 			i = count;
 		memcpy(((SHA2_512_BYTE *)sha_info->Data) + sha_info->Local, buffer, i);
 		count -= i;
 		buffer += i;
 		sha_info->Local += i;
-		if (sha_info->Local == SHA2_512_SIZE_BLOCK)
+		if (sha_info->Local == SHA2_BLOCK_SIZE_512)
 			SHA2_512_Transform(sha_info);
 		else 
 			return;
 	}
-	while (count >= (int)SHA2_512_SIZE_BLOCK)
+	while (count >= (int)SHA2_BLOCK_SIZE_512)
 	{
-		memcpy(sha_info->Data, buffer, SHA2_512_SIZE_BLOCK);
-		buffer += SHA2_512_SIZE_BLOCK;
-		count -= SHA2_512_SIZE_BLOCK;
+		memcpy(sha_info->Data, buffer, SHA2_BLOCK_SIZE_512);
+		buffer += SHA2_BLOCK_SIZE_512;
+		count -= SHA2_BLOCK_SIZE_512;
 		SHA2_512_Transform(sha_info);
 	}
 	memcpy(sha_info->Data, buffer, count);
@@ -643,24 +602,24 @@ static void SHA2_512_Update(
 
 //Finish computing the SHA-2(512) digest
 static void SHA2_512_Final(
-	uint8_t digest[SHA2_512_SIZE_DIGEST], 
+	uint8_t digest[SHA2_DIGEST_SIZE_512 / BYTES_TO_BITS],
 	SHA2_512_Object *sha_info)
 {
 	int count = 0;
-	SHA_INT32 lo_bit_count = 0, hi_bit_count = 0;
+	SHA2_INT32 lo_bit_count = 0, hi_bit_count = 0;
 
 	lo_bit_count = sha_info->CountLow;
 	hi_bit_count = sha_info->CountHigh;
 	count = (int)((lo_bit_count >> 3U) & 0x7F);
 	((SHA2_512_BYTE *)sha_info->Data)[count++] = 0x80;
-	if (count > (int)SHA2_512_SIZE_BLOCK - 16)
+	if (count > (int)SHA2_BLOCK_SIZE_512 - 16)
 	{
-		memset(((SHA2_512_BYTE *)sha_info->Data) + count, 0, SHA2_512_SIZE_BLOCK - count);
+		memset(((SHA2_512_BYTE *)sha_info->Data) + count, 0, SHA2_BLOCK_SIZE_512 - count);
 		SHA2_512_Transform(sha_info);
-		memset((SHA2_512_BYTE *)sha_info->Data, 0, SHA2_512_SIZE_BLOCK - 16);
+		memset((SHA2_512_BYTE *)sha_info->Data, 0, SHA2_BLOCK_SIZE_512 - 16);
 	}
 	else {
-		memset(((SHA2_512_BYTE *)sha_info->Data) + count, 0, SHA2_512_SIZE_BLOCK - 16 - count);
+		memset(((SHA2_512_BYTE *)sha_info->Data) + count, 0, SHA2_BLOCK_SIZE_512 - 16 - count);
 	}
 
 //GJS: note that we add the hi/lo in big-endian. SHA2_512_Transform will swap these values into host-order.
@@ -749,6 +708,9 @@ static void SHA2_512_Final(
 	return;
 }
 
+//////////////////////////////////////////////////
+// Hash function
+// 
 //Read commands(SHA-2)
 bool ReadCommands_SHA2(
 #if defined(PLATFORM_WIN)
@@ -806,44 +768,45 @@ bool SHA2_Hash(
 	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
+	size_t ReadLength = 0, DigestSize = 0;
+
+//SHA-2 initialization
 	SHA2_256_Object HashInstance256;
 	SHA2_512_Object HashInstance512;
 	memset(&HashInstance256, 0, sizeof(HashInstance256));
 	memset(&HashInstance512, 0, sizeof(HashInstance512));
-	size_t ReadLength = 0, DigestSize = 0;
-
-//SHA-2 initialization
 	if (SHA2_HashFunctionID == HASH_ID_SHA2_224) //SHA-2 224 bits
 	{
 		SHA2_224_Init(&HashInstance256);
-		DigestSize = SHA2_224_SIZE_DIGEST;
+		DigestSize = SHA2_DIGEST_SIZE_224;
 	}
 	else if (SHA2_HashFunctionID == HASH_ID_SHA2_256) //SHA-2 256 bits
 	{
 		SHA2_256_Init(&HashInstance256);
-		DigestSize = SHA2_256_SIZE_DIGEST;
+		DigestSize = SHA2_DIGEST_SIZE_256;
 	}
 	else if (SHA2_HashFunctionID == HASH_ID_SHA2_384) //SHA-2 384 bits
 	{
 		SHA2_384_Init(&HashInstance512);
-		DigestSize = SHA2_384_SIZE_DIGEST;
+		DigestSize = SHA2_DIGEST_SIZE_384;
 	}
 	else if (SHA2_HashFunctionID == HASH_ID_SHA2_512) //SHA-2 512 bits
 	{
 		SHA2_512_Init(&HashInstance512);
-		DigestSize = SHA2_512_SIZE_DIGEST;
+		DigestSize = SHA2_DIGEST_SIZE_512;
 	}
 	else if (SHA2_HashFunctionID == HASH_ID_SHA2_512_224) //SHA-2 512/224 bits
 	{
 		SHA2_512_224_Init(&HashInstance512);
-		DigestSize = SHA2_512_224_SIZE_DIGEST;
+		DigestSize = SHA2_DIGEST_SIZE_512_224;
 	}
 	else if (SHA2_HashFunctionID == HASH_ID_SHA2_512_256) //SHA-2 512/256 bits
 	{
 		SHA2_512_256_Init(&HashInstance512);
-		DigestSize = SHA2_512_256_SIZE_DIGEST;
+		DigestSize = SHA2_DIGEST_SIZE_512_256;
 	}
 	else {
+		fwprintf_s(stderr, L"[Error] Parameters error.\n");
 		return false;
 	}
 
@@ -875,16 +838,24 @@ bool SHA2_Hash(
 		}
 	}
 
-//Binary to hex
+//Finish hash process.
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	if (SHA2_HashFunctionID == HASH_ID_SHA2_224 || SHA2_HashFunctionID == HASH_ID_SHA2_256)
+	{
 		SHA2_256_Final(Buffer.get(), &HashInstance256);
+	}
 	else if (SHA2_HashFunctionID == HASH_ID_SHA2_384 || SHA2_HashFunctionID == HASH_ID_SHA2_512 || 
 		SHA2_HashFunctionID == HASH_ID_SHA2_512_224 || SHA2_HashFunctionID == HASH_ID_SHA2_512_256)
-			SHA2_512_Final(Buffer.get(), &HashInstance512);
-	else 
+	{
+		SHA2_512_Final(Buffer.get(), &HashInstance512);
+	}
+	else {
+		fwprintf_s(stderr, L"[Error] Parameters error.\n");
 		return false;
-	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), DigestSize) == nullptr)
+	}
+
+//Binary to hex
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), DigestSize / BYTES_TO_BITS) == nullptr)
 	{
 		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;

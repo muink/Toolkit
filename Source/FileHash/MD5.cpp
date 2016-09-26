@@ -52,7 +52,7 @@ void MD5_Update(
 	context->Count[0] += inputlen << 3U;
 	if (context->Count[0] < (inputlen << 3U))
 		context->Count[1U]++;
-	context->Count[1] += inputlen >> 29U;
+	context->Count[1U] += inputlen >> 29U;
 	if (inputlen >= partlen)
 	{
 		memcpy(&context->Buffer[index], input, partlen);
@@ -72,7 +72,7 @@ void MD5_Update(
 //Finish MD5 process
 void MD5_Final(
 	MD5_CTX *context, 
-	uint8_t digest[MD5_SIZE_DIGEST])
+	uint8_t digest[MD5_DIGEST_SIZE])
 {
 	unsigned int index = 0, padlen = 0;
 	uint8_t bits[8U] = {0};
@@ -81,7 +81,7 @@ void MD5_Final(
 	MD5_Encode(bits, context->Count, 8U);
 	MD5_Update(context, PADDING, padlen);
 	MD5_Update(context, bits, 8U);
-	MD5_Encode(digest, context->State, MD5_SIZE_DIGEST);
+	MD5_Encode(digest, context->State, MD5_DIGEST_SIZE);
 
 	return;
 }
@@ -115,10 +115,7 @@ void MD5_Decode(
 	unsigned int i = 0, j = 0;
 	while (j < len)
 	{
-		output[i] = (input[j])        |
-			(input[j + 1] << 8U)      |
-			(input[j + 2] << 16U)     |
-			(input[j + 3] << 24U);
+		output[i] = (input[j]) | (input[j + 1] << 8U) | (input[j + 2] << 16U) | (input[j + 3] << 24U);
 		i++;
 		j += 4;
 	}
@@ -129,14 +126,9 @@ void MD5_Decode(
 //MD5 transform process
 void MD5_Transform(
 	unsigned int state[4U], 
-	uint8_t block[MD5_SIZE_BLOCK])
+	uint8_t block[MD5_BLOCK_SIZE])
 {
-	unsigned int a = state[0];
-	unsigned int b = state[1U];
-	unsigned int c = state[2U];
-	unsigned int d = state[3U];
-	unsigned int x[64U];
-	memset(x, 0, sizeof(unsigned int) * 64U);
+	unsigned int a = state[0], b = state[1U], c = state[2U], d = state[3U], x[64U] = {0};
 	MD5_Decode(x, block, 64U);
 	FF(a, b, c, d, x[0], 7, 0xD76AA478);
 	FF(d, a, b, c, x[1U], 12, 0xE8C7B756);
@@ -210,6 +202,9 @@ void MD5_Transform(
 	return;
 }
 
+//////////////////////////////////////////////////
+// Hash function
+// 
 //MD5 hash function
 bool MD5_Hash(
 	FILE *FileHandle)
@@ -225,17 +220,17 @@ bool MD5_Hash(
 	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
-	MD5_CTX HashInstance;
-	memset(&HashInstance, 0, sizeof(HashInstance));
 	size_t ReadLength = 0;
 
 //MD5 initialization
+	MD5_CTX HashInstance;
+	memset(&HashInstance, 0, sizeof(HashInstance));
 	MD5_Init(&HashInstance);
 
 //Hash process
-//n * 512 + 448 + 64 = (n + 1) * 512 bits
 	while (!feof(FileHandle))
 	{
+	//n * 512 + 448 + 64 = (n + 1) * 512 bits
 		memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 		_set_errno(0);
 		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(uint8_t), FILE_BUFFER_SIZE, FileHandle);
@@ -255,10 +250,10 @@ bool MD5_Hash(
 		}
 	}
 
-//Binary to hex
+//Finish hash process and binary to hex.
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	MD5_Final(&HashInstance, Buffer.get());
-	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), MD5_SIZE_DIGEST) == nullptr)
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), MD5_DIGEST_SIZE) == nullptr)
 	{
 		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;

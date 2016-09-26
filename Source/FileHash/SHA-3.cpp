@@ -19,6 +19,9 @@
 
 #include "SHA-3.h"
 
+//////////////////////////////////////////////////
+// Hash function
+// 
 //Read commands(SHA-3)
 bool ReadCommands_SHA3(
 #if defined(PLATFORM_WIN)
@@ -55,7 +58,7 @@ bool ReadCommands_SHA3(
 		if (Command == COMMAND_SHA3_SHAKE)
 		{
 			SHA3_HashFunctionID = HASH_ID_SHA3_SHAKE_128;
-			SHA3_SHAKE_Length = SHA3_SIZE_256;
+			SHA3_SHAKE_Length = SHA3_DIGEST_SIZE_256;
 		}
 	//SHA-3 SHAKE 128 bits and default command is SHA-3 SHAKE 128 bits and output 256 bits..
 		else if (Command.find(COMMAND_SHA3_SHAKE_SIZE) == 0 || Command.find(COMMAND_SHA3_SHAKE_128) == 0)
@@ -142,34 +145,40 @@ bool SHA3_Hash(
 	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
-	Keccak_HashInstance HashInstance;
-	memset(&HashInstance, 0, sizeof(HashInstance));
-	size_t ReadLength = 0;
+	size_t ReadLength = 0, DigestSize = 0;
 
 //SHA-3 initialization
+	Keccak_HashInstance HashInstance;
+	memset(&HashInstance, 0, sizeof(HashInstance));
 	if (SHA3_HashFunctionID == HASH_ID_SHA3_224)
 	{
 		Keccak_HashInitialize_SHA3_224(&HashInstance);
+		DigestSize = SHA3_DIGEST_SIZE_224;
 	}
 	else if (SHA3_HashFunctionID == HASH_ID_SHA3_256)
 	{
 		Keccak_HashInitialize_SHA3_256(&HashInstance);
+		DigestSize = SHA3_DIGEST_SIZE_256;
 	}
 	else if (SHA3_HashFunctionID == HASH_ID_SHA3_384)
 	{
 		Keccak_HashInitialize_SHA3_384(&HashInstance);
+		DigestSize = SHA3_DIGEST_SIZE_384;
 	}
 	else if (SHA3_HashFunctionID == HASH_ID_SHA3_512)
 	{
 		Keccak_HashInitialize_SHA3_512(&HashInstance);
+		DigestSize = SHA3_DIGEST_SIZE_512;
 	}
 	else if (SHA3_HashFunctionID == HASH_ID_SHA3_SHAKE_128)
 	{
 		Keccak_HashInitialize_SHAKE128(&HashInstance);
+		DigestSize = SHA3_SHAKE_Length;
 	}
 	else if (SHA3_HashFunctionID == HASH_ID_SHA3_SHAKE_256)
 	{
 		Keccak_HashInitialize_SHAKE256(&HashInstance);
+		DigestSize = SHA3_SHAKE_Length;
 	}
 	else {
 		fwprintf_s(stderr, L"[Error] Parameters error.\n");
@@ -188,7 +197,7 @@ bool SHA3_Hash(
 			ErrorCodeToMessage(errno, Message);
 			if (errno == 0)
 				fwprintf_s(stderr, Message.c_str());
-			else
+			else 
 				fwprintf_s(stderr, Message.c_str(), errno);
 
 			return false;
@@ -200,74 +209,29 @@ bool SHA3_Hash(
 		}
 	}
 
-//Binary to hex
+//Finish hash process.
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
-	if (Keccak_HashFinal(&HashInstance, (BitSequence *)Buffer.get()) == SUCCESS)
+	if (Keccak_HashFinal(&HashInstance, (BitSequence *)Buffer.get()) != SUCCESS)
 	{
-	//SHA-3 224 bits
-		if (SHA3_HashFunctionID == HASH_ID_SHA3_224)
-		{
-			if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA3_SIZE_224 / BYTES_TO_BITS) == nullptr)
-			{
-				fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
-				return false;
-			}
-		}
-	//SHA-3 256 bits
-		else if (SHA3_HashFunctionID == HASH_ID_SHA3_256)
-		{
-			if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA3_SIZE_256 / BYTES_TO_BITS) == nullptr)
-			{
-				fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
-				return false;
-			}
-		}
-	//SHA-3 384 bits
-		else if (SHA3_HashFunctionID == HASH_ID_SHA3_384)
-		{
-			if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA3_SIZE_384 / BYTES_TO_BITS) == nullptr)
-			{
-				fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
-				return false;
-			}
-		}
-	//SHA-3 512 bits
-		else if (SHA3_HashFunctionID == HASH_ID_SHA3_512)
-		{
-			if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA3_SIZE_512 / BYTES_TO_BITS) == nullptr)
-			{
-				fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
-				return false;
-			}
-		}
-	//SHAKE_128 or SHAKE_256
-		else if (SHA3_HashFunctionID == HASH_ID_SHA3_SHAKE_128 || SHA3_HashFunctionID == HASH_ID_SHA3_SHAKE_256)
-		{
-		//SHA-3 squeeze.
-			if (Keccak_HashSqueeze(&HashInstance, (BitSequence *)Buffer.get(), SHA3_SHAKE_Length) == SUCCESS)
-			{
-				if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA3_SHAKE_Length / BYTES_TO_BITS) == nullptr)
-				{
-					fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
-					return false;
-				}
-			}
-			else {
-				fwprintf_s(stderr, L"[Error] Hash squeeze error.\n");
-				return false;
-			}
-		}
-		else {
-			fwprintf_s(stderr, L"[Error] Parameters error.\n");
-			return false;
-		}
-
-	//Print to screen.
-		PrintToScreen(StringBuffer.get());
+		fwprintf_s(stderr, L"[Error] Hash process error");
+		return false;
+	}
+	else if ((SHA3_HashFunctionID == HASH_ID_SHA3_SHAKE_128 || SHA3_HashFunctionID == HASH_ID_SHA3_SHAKE_256) && 
+		Keccak_HashSqueeze(&HashInstance, (BitSequence *)Buffer.get(), SHA3_SHAKE_Length) != SUCCESS)
+	{
+		fwprintf_s(stderr, L"[Error] Hash squeeze error.\n");
+		return false;
+	}
+	
+//Binary to hex
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), DigestSize / BYTES_TO_BITS) == nullptr)
+	{
+		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
+		return false;
 	}
 	else {
-		fwprintf_s(stderr, L"[Error] Hash final error.\n");
-		return false;
+	//Print to screen.
+		PrintToScreen(StringBuffer.get());
 	}
 
 	return true;

@@ -69,6 +69,15 @@
     <ClInclude Include="Base.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="BLAKE.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BLAKE2.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RIPEMD.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="SHA3\CMakeLists.txt">
@@ -119,6 +128,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="SHA-2.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BLAKE.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BLAKE2.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RIPEMD.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

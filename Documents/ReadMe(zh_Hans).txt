@@ -128,6 +128,23 @@
    -?/-h/--help      输出程序的帮助信息
 
 支持的 Hash 算法:
+   * BLAKE family:   -BLAKE                      = -BLAKE_256
+                     -BLAKE_224                  BLAKE 224 位
+                     -BLAKE_256                  BLAKE 256 位
+                     -BLAKE_384                  BLAKE 384 位
+                     -BLAKE_512                  BLAKE 512 位
+   * BLAKE2 family:  -BLAKE2                     = -BLAKE2B_256
+                     -BLAKE2_128                 = -BLAKE2S_128
+                     -BLAKE2_224                 = -BLAKE2S_224
+                     -BLAKE2_384                 = -BLAKE2B_384
+                     -BLAKE2_512                 = -BLAKE2B_512
+                     -BLAKE2B_256                BLAKE2B 256 位
+                     -BLAKE2B_384                BLAKE2B 384 位
+                     -BLAKE2B_512                BLAKE2B 512 位
+                     -BLAKE2S_128                BLAKE2S 128 位
+                     -BLAKE2S_160                BLAKE2S 160 位
+                     -BLAKE2S_224                BLAKE2S 224 位
+                     -BLAKE2S_256                BLAKE2S 256 位
    * CRC family:     -CRC                        = -CRC32
                      -CRC8                       CRC 8 位
                      -CRC8_ITU                   CRC 8 位 ITU
@@ -184,6 +201,11 @@
    * MD4 family:     -MD4
                      -ED2K                       eDonkey/eMule Hash 算法
    * MD5:            -MD5
+   * RIPEMD family:  -RIPEMD                     = -RIPEMD_160
+                     -RIPEMD_128                 RIPEMD 128 位
+                     -RIPEMD_160                 RIPEMD 160 位
+                     -RIPEMD_256                 RIPEMD 256 位
+                     -RIPEMD_320                 RIPEMD 320 位
    * SHA-1:          -SHA1
    * SHA-2 family:   -SHA2                       = -SHA2_256
                      -SHA224/-SHA2_224           SHA-2 224 位
@@ -207,12 +229,12 @@
 
 ### Release hash[SHA-3(256)]
 * Windows
-  * DNSPing.exe: C979DDFF547566A5823A26DDA591387E684AD69710E99B771633FFC2F031603F
-  * DNSPing_x86.exe: 9360C5410D1A17460545E190B1E71B239B6205A8C7FFE4237FBF0A71793E1038
-  * DNSPing_XP.exe: F54514014A962D9ABA260110652492649BF043B13B36FFD002693001990F1F95
-  * FileHash.exe: FFED15513906D2AC0DC8BA616CF4A4FE82DFE350C1A525B8F21607955B1B1D79
-  * FileHash_x86.exe: 2E776EB2FFAF9EBC9151C8AFF15E3CE40E34CB12A7C18E43768FA3BC4B16F84A
-  * FileHash_XP.exe: 0B6A852A7B2F16088A454D516990D391155B5D7595FB36E465D54FB69141EA02
+  * DNSPing.exe: 77E7188BCBD280FDD3787F728F67DF7108458764854C91846AEDCAE9A9FA5790
+  * DNSPing_x86.exe: C62A924350B6F48ABACE9FE297A806576948D1FBD53007331AB605BE44E13665
+  * DNSPing_XP.exe: 637FFE5564D8E994A4BC845D960C9294F93453F383258D028C4F0C8DD112D763
+  * FileHash.exe: 27F135ECC3FCBC4B7213B4CB0F7313BBA1732F0218B040CD31B801CBF8B7D044
+  * FileHash_x86.exe: AFD14D954055D38DEABBB03DE652B69C04255F87A22FD54593AE02D23A4821E2
+  * FileHash_XP.exe: 8F5561F1A7027B6A2C482BFAB3096E0967134EF44A2BC6EB7EFBA828F3DE2913
 * Mac
-  * DNSPing: ABCA0B323CA5ED69FF3A24EEFA81786F5D23D12FBD2002BDE0E7F54A41A420BE
-  * FileHash: FA343E85CC6192817FFA108A3ED9F59F8580BFD3FACAF5A4F60BA703A5C106C4
+  * DNSPing: 0F3EA9E37A223A7D071C12DDCDC551619683E678B6DA0E3DFCFAC0050263357E
+  * FileHash: A31BFD34E998F60815656E0FE3D0CB12FC163DD3BC97CF166D724ADB770E5922

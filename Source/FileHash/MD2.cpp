@@ -122,6 +122,9 @@ void MD2_Final(
 	return;
 }
 
+//////////////////////////////////////////////////
+// Hash function
+// 
 //MD2 hash function
 bool MD2_Hash(
 	FILE *FileHandle)
@@ -137,11 +140,11 @@ bool MD2_Hash(
 	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
-	MD2_CTX HashInstance;
-	memset(&HashInstance, 0, sizeof(HashInstance));
 	size_t ReadLength = 0;
 
 //MD2 initialization
+	MD2_CTX HashInstance;
+	memset(&HashInstance, 0, sizeof(HashInstance));
 	MD2_Init(&HashInstance);
 
 //Hash process
@@ -166,7 +169,7 @@ bool MD2_Hash(
 		}
 	}
 
-//Binary to hex
+//Finish hash process and binary to hex.
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	MD2_Final(&HashInstance, Buffer.get());
 	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), MD2_DIGEST_SIZE) == nullptr)

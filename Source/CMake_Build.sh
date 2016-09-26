@@ -23,7 +23,7 @@
 if (uname -s | grep -iq "Darwin"); then
 	ThreadNum=`sysctl -n hw.ncpu`
 else
-	ThreadNum=`grep "processor" /proc/cpuinfo | sort -u | wc -l`
+	ThreadNum=`nproc`
 fi
 rm -Rrf Object
 mkdir Release

@@ -20,15 +20,15 @@
 #include "Base.h"
 
 //The MD5 block size and message digest size
-#define MD5_SIZE_BLOCK    64U
-#define MD5_SIZE_DIGEST   16U
+#define MD5_BLOCK_SIZE    64U
+#define MD5_DIGEST_SIZE   16U
 
 //The structure for storing MD5 info
 typedef struct _md5_ctx_
 {
 	uint32_t   Count[2U];
 	uint32_t   State[4U];
-	uint8_t    Buffer[MD5_SIZE_BLOCK];
+	uint8_t    Buffer[MD5_BLOCK_SIZE];
 }MD5_CTX;
 
 //Code definitions
@@ -74,10 +74,10 @@ void MD5_Update(
 	unsigned int inputlen);
 void MD5_Final(
 	MD5_CTX *context, 
-	uint8_t digest[MD5_SIZE_DIGEST]);
+	uint8_t digest[MD5_DIGEST_SIZE]);
 void MD5_Transform(
 	unsigned int state[4U], 
-	uint8_t block[MD5_SIZE_BLOCK]);
+	uint8_t block[MD5_BLOCK_SIZE]);
 void MD5_Encode(
 	uint8_t *output, 
 	unsigned int *input, 

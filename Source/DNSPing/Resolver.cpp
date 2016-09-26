@@ -45,7 +45,7 @@ void PrintHexResponse(
 					fwprintf_s(FileHandle, L" ");
 				if (Buffer[InnerIndex] >= ASCII_SPACE && Buffer[InnerIndex] <= ASCII_TILDE)
 					fwprintf_s(FileHandle, L"%c", (uint8_t)Buffer[InnerIndex]);
-				else
+				else 
 					fwprintf_s(FileHandle, L".");
 			}
 			if (Index + 1U < Length)
@@ -75,7 +75,7 @@ void PrintHexResponse(
 		{
 			if (Buffer[Index] >= ASCII_SPACE && Buffer[Index] <= ASCII_TILDE)
 				fwprintf_s(FileHandle, L"%c", (uint8_t)Buffer[Index]);
-			else
+			else 
 				fwprintf_s(FileHandle, L".");
 		}
 	}
@@ -246,7 +246,7 @@ void PrintFlags(
 			fwprintf_s(FileHandle, L"Notify");
 		else if (FlagsBits == DNS_OPCODE_UPDATE)
 			fwprintf_s(FileHandle, L"Update");
-		else
+		else 
 			fwprintf_s(FileHandle, L"%x", FlagsBits);
 
 	//Print RCode.
@@ -293,7 +293,7 @@ void PrintFlags(
 			fwprintf_s(FileHandle, L"Reserved Private use");
 		else if (FlagsBits == DNS_OPCODE_RESERVED)
 			fwprintf_s(FileHandle, L"Reserved");
-		else
+		else 
 			fwprintf_s(FileHandle, L"%x", FlagsBits);
 		fwprintf_s(FileHandle, L")");
 	}
@@ -714,7 +714,7 @@ void PrintResourseData(
 		fwprintf_s(FileHandle, L"\n         EDNS Version: %u", pdns_opt_record->Version);
 		if (ntohs(pdns_opt_record->Z_Field) >> HIGHEST_MOVE_BIT_U16 == 0)
 			fwprintf_s(FileHandle, L"\n         Server cannot handle DNSSEC security RRs.");
-		else
+		else 
 			fwprintf_s(FileHandle, L"\n         Server can handle DNSSEC security RRs.");
 
 	//EDNS Option
@@ -742,7 +742,7 @@ void PrintResourseData(
 				fwprintf_s(FileHandle, L"EDNS_EXPIRE");
 			else if (ntohs(pdns_edns0_option->Code) == EDNS0_CODE_CLIENT_SUBNET_EXP)
 				fwprintf_s(FileHandle, L"CLIENT_SUBNET_EXP");
-			else
+			else 
 				fwprintf_s(FileHandle, L"%x", ntohs(pdns_edns0_option->Code));
 			fwprintf_s(FileHandle, L"\n                         Length: %x", ntohs(pdns_edns0_option->Length));
 		}

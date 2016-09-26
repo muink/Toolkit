@@ -52,6 +52,9 @@ uint16_t Checksum_Final(
 	return (uint16_t)(~Checksum);
 }
 
+//////////////////////////////////////////////////
+// Hash function
+// 
 //Internet protocol checksum hash function
 bool Checksum_Hash(
 	FILE *FileHandle)
@@ -67,6 +70,8 @@ bool Checksum_Hash(
 	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	size_t ReadLength = 0;
+
+//Checksum initialization
 	uint16_t Checksum16 = 0;
 	uint32_t Checksum32 = 0;
 
@@ -92,7 +97,7 @@ bool Checksum_Hash(
 		}
 	}
 
-//Binary to hex
+//Finish hash process and binary to hex.
 	Checksum16 = Checksum_Final(Checksum32, (uint16_t *)(Buffer.get() + ReadLength - ReadLength % sizeof(uint16_t)), ReadLength % sizeof(uint16_t));
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	if (sodium_bin2hex(Buffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)&Checksum16, sizeof(uint16_t)) == nullptr)

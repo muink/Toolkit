@@ -21,6 +21,9 @@
 		D942ECB81D12F73800F7C65A /* KeccakHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942ECAE1D12F73800F7C65A /* KeccakHash.cpp */; };
 		D942ECB91D12F73800F7C65A /* KeccakSponge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942ECB01D12F73800F7C65A /* KeccakSponge.cpp */; };
 		D942ECBA1D12F73800F7C65A /* SnP-FBWL-default.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942ECB21D12F73800F7C65A /* SnP-FBWL-default.cpp */; };
+		D9E4034A1D9955A500560BC5 /* BLAKE.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9E403461D9955A500560BC5 /* BLAKE.cpp */; };
+		D9E4034B1D9955A500560BC5 /* BLAKE2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9E403481D9955A500560BC5 /* BLAKE2.cpp */; };
+		D9E4034E1D9955B100560BC5 /* RIPEMD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9E4034C1D9955B100560BC5 /* RIPEMD.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -67,6 +70,12 @@
 		D942ECB61D12F73800F7C65A /* SnP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SnP.h; path = FileHash/SHA3/SnP.h; sourceTree = "<group>"; };
 		D99427D51D12F15900280D91 /* FileHash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FileHash; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9AC805E1D903757007FD633 /* Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base.h; sourceTree = "<group>"; };
+		D9E403461D9955A500560BC5 /* BLAKE.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BLAKE.cpp; sourceTree = "<group>"; };
+		D9E403471D9955A500560BC5 /* BLAKE.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLAKE.h; sourceTree = "<group>"; };
+		D9E403481D9955A500560BC5 /* BLAKE2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BLAKE2.cpp; sourceTree = "<group>"; };
+		D9E403491D9955A500560BC5 /* BLAKE2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLAKE2.h; sourceTree = "<group>"; };
+		D9E4034C1D9955B100560BC5 /* RIPEMD.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RIPEMD.cpp; sourceTree = "<group>"; };
+		D9E4034D1D9955B100560BC5 /* RIPEMD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RIPEMD.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,20 +129,26 @@
 			isa = PBXGroup;
 			children = (
 				D942EC921D12F31A00F7C65A /* Base.cpp */,
+				D9E403461D9955A500560BC5 /* BLAKE.cpp */,
+				D9E403481D9955A500560BC5 /* BLAKE2.cpp */,
 				D942EC931D12F31A00F7C65A /* Checksum.cpp */,
 				D942EC7A1D12F30D00F7C65A /* CRC.cpp */,
 				D942EC7C1D12F30D00F7C65A /* FileHash.cpp */,
 				D942EC7E1D12F30D00F7C65A /* MD2.cpp */,
 				D942EC801D12F30D00F7C65A /* MD4.cpp */,
 				D942EC821D12F30D00F7C65A /* MD5.cpp */,
+				D9E4034C1D9955B100560BC5 /* RIPEMD.cpp */,
 				D942EC841D12F30D00F7C65A /* SHA-1.cpp */,
 				D942EC861D12F30D00F7C65A /* SHA-2.cpp */,
 				D942EC881D12F30D00F7C65A /* SHA-3.cpp */,
 				D9AC805E1D903757007FD633 /* Base.h */,
+				D9E403471D9955A500560BC5 /* BLAKE.h */,
+				D9E403491D9955A500560BC5 /* BLAKE2.h */,
 				D942EC7B1D12F30D00F7C65A /* CRC.h */,
 				D942EC7F1D12F30D00F7C65A /* MD2.h */,
 				D942EC811D12F30D00F7C65A /* MD4.h */,
 				D942EC831D12F30D00F7C65A /* MD5.h */,
+				D9E4034D1D9955B100560BC5 /* RIPEMD.h */,
 				D942EC851D12F30D00F7C65A /* SHA-1.h */,
 				D942EC871D12F30D00F7C65A /* SHA-2.h */,
 				D942EC891D12F30D00F7C65A /* SHA-3.h */,
@@ -197,7 +212,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D9E4034E1D9955B100560BC5 /* RIPEMD.cpp in Sources */,
 				D942ECBA1D12F73800F7C65A /* SnP-FBWL-default.cpp in Sources */,
+				D9E4034A1D9955A500560BC5 /* BLAKE.cpp in Sources */,
 				D942EC941D12F31A00F7C65A /* Base.cpp in Sources */,
 				D942ECB71D12F73800F7C65A /* KeccakF-1600-compact64.cpp in Sources */,
 				D942EC8F1D12F30D00F7C65A /* SHA-1.cpp in Sources */,
@@ -208,6 +225,7 @@
 				D942ECB91D12F73800F7C65A /* KeccakSponge.cpp in Sources */,
 				D942EC901D12F30D00F7C65A /* SHA-2.cpp in Sources */,
 				D942EC8E1D12F30D00F7C65A /* MD5.cpp in Sources */,
+				D9E4034B1D9955A500560BC5 /* BLAKE2.cpp in Sources */,
 				D942ECB81D12F73800F7C65A /* KeccakHash.cpp in Sources */,
 				D942EC911D12F30D00F7C65A /* SHA-3.cpp in Sources */,
 				D942EC8B1D12F30D00F7C65A /* FileHash.cpp in Sources */,

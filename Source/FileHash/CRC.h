@@ -75,12 +75,12 @@
 
 //Size definitions
 #define CRC_TABLE_SIZE                256U
-#define CRC8_SIZE_BLOCK               sizeof(uint8_t)
-#define CRC16_SIZE_BLOCK              sizeof(uint16_t)
-#define CRC24_SIZE_BLOCK              (sizeof(uint32_t) - sizeof(uint8_t))
-#define CRC32_SIZE_BLOCK              sizeof(uint32_t)
-#define CRC40_SIZE_BLOCK              (sizeof(uint32_t) + sizeof(uint8_t))
-#define CRC64_SIZE_BLOCK              sizeof(uint64_t)
+#define CRC8_BLOCK_SIZE               sizeof(uint8_t)
+#define CRC16_BLOCK_SIZE              sizeof(uint16_t)
+#define CRC24_BLOCK_SIZE              (sizeof(uint32_t) - sizeof(uint8_t))
+#define CRC32_BLOCK_SIZE              sizeof(uint32_t)
+#define CRC40_BLOCK_SIZE              (sizeof(uint32_t) + sizeof(uint8_t))
+#define CRC64_BLOCK_SIZE              sizeof(uint64_t)
 
 //Commands definitions
 #if defined(PLATFORM_WIN)

@@ -24,8 +24,7 @@ static void SHA1_Compress(
 	SHA1_State *sha1, 
 	uint8_t *buf)
 {
-	SHA1_INT32 a = 0, b = 0, c = 0, d = 0, e = 0, W[80U];
-	memset(W, 0, sizeof(SHA1_INT32) * 80U);
+	SHA1_INT32 a = 0, b = 0, c = 0, d = 0, e = 0, W[80U] = {0};
 	size_t Index = 0;
 
  //Copy the state into 512-bits into W[0..15].
@@ -133,25 +132,25 @@ void SHA1_Process(
 	unsigned long inlen)
 {
 	unsigned long n = 0;
-	while (inlen > 0) 
+	while (inlen > 0)
 	{
-		if (sha1->Curlen == 0 && inlen >= SHA1_SIZE_BLOCK)
+		if (sha1->Curlen == 0 && inlen >= SHA1_BLOCK_SIZE)
 		{
 			SHA1_Compress(sha1, (uint8_t *)in);
-			sha1->Length += SHA1_SIZE_BLOCK * 8;
-			in += SHA1_SIZE_BLOCK;
-			inlen -= SHA1_SIZE_BLOCK;
+			sha1->Length += SHA1_BLOCK_SIZE * 8;
+			in += SHA1_BLOCK_SIZE;
+			inlen -= SHA1_BLOCK_SIZE;
 		}
 		else {
-			n = MIN(inlen, (SHA1_SIZE_BLOCK - sha1->Curlen));
+			n = MIN(inlen, (SHA1_BLOCK_SIZE - sha1->Curlen));
 			memcpy(sha1->Buffer + sha1->Curlen, in, (size_t)n);
 			sha1->Curlen += n;
 			in += n;
 			inlen -= n;
-			if (sha1->Curlen == SHA1_SIZE_BLOCK)
+			if (sha1->Curlen == SHA1_BLOCK_SIZE)
 			{
 				SHA1_Compress(sha1, sha1->Buffer);
-				sha1->Length += 8 * SHA1_SIZE_BLOCK;
+				sha1->Length += 8 * SHA1_BLOCK_SIZE;
 				sha1->Curlen = 0;
 			}
 		}
@@ -202,6 +201,9 @@ void SHA1_Done(
 	return;
 }
 
+//////////////////////////////////////////////////
+// Hash function
+// 
 //SHA-1 hash function
 bool SHA1_Hash(
 	FILE *FileHandle)
@@ -217,11 +219,11 @@ bool SHA1_Hash(
 	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
-	SHA1_State HashInstance;
-	memset(&HashInstance, 0, sizeof(HashInstance));
 	size_t ReadLength = 0;
 
 //SHA-1 initialization
+	SHA1_State HashInstance;
+	memset(&HashInstance, 0, sizeof(HashInstance));
 	SHA1_Init(&HashInstance);
 
 //Hash process
@@ -246,10 +248,10 @@ bool SHA1_Hash(
 		}
 	}
 
-//Binary to hex
+//Finish hash process and binary to hex.
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	SHA1_Done(&HashInstance, Buffer.get());
-	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA1_SIZE_DIGEST) == nullptr)
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA1_DIGEST_SIZE) == nullptr)
 	{
 		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;

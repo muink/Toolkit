@@ -29,12 +29,12 @@
 #define DEFAULT_HASH_FUNCTION_ID   HASH_ID_SHA2_256
 
 //Size definitions
-#define SHA2_SIZE_224              224U
-#define SHA2_SIZE_256              256U
-#define SHA2_SIZE_384              384U
-#define SHA2_SIZE_512              512U
-#define SHA2_SIZE_512_224          224U
-#define SHA2_SIZE_512_256          256U
+#define SHA2_DIGEST_SIZE_224       224U
+#define SHA2_DIGEST_SIZE_256       256U
+#define SHA2_DIGEST_SIZE_384       384U
+#define SHA2_DIGEST_SIZE_512       512U
+#define SHA2_DIGEST_SIZE_512_224   224U
+#define SHA2_DIGEST_SIZE_512_256   256U
 
 //Commands definitions
 #if defined(PLATFORM_WIN)
@@ -63,7 +63,7 @@
 
 //Endianness testing and definitions
 #define TestEndianness(variable) {int i = 1;variable = PCT_BIG_ENDIAN;   \
-			if (*((char *) & i) == 1) variable = PCT_LITTLE_ENDIAN;}
+			if (*((uint8_t *) & i) == 1) variable = PCT_LITTLE_ENDIAN;}
 #define PCT_LITTLE_ENDIAN      1
 #define PCT_BIG_ENDIAN         0
 
@@ -76,25 +76,19 @@
 #endif
 
 //The SHA-2(256) block size, message digest size in bytes and some useful types.
-#define SHA2_256_SIZE_BLOCK        64U
-#define SHA2_224_SIZE_DIGEST       28U
-#define SHA2_256_SIZE_DIGEST       32U
-#define SHA2_512_SIZE_BLOCK        128U
-#define SHA2_384_SIZE_DIGEST       48U
-#define SHA2_512_SIZE_DIGEST       64U
-#define SHA2_512_256_SIZE_DIGEST   SHA2_256_SIZE_DIGEST
-#define SHA2_512_224_SIZE_DIGEST   SHA2_224_SIZE_DIGEST
+#define SHA2_BLOCK_SIZE_256        64U
+#define SHA2_BLOCK_SIZE_512        128U
 typedef uint8_t                    SHA2_256_BYTE;
 typedef uint8_t                    SHA2_512_BYTE;
-typedef uint32_t                   SHA_INT32;
-typedef uint64_t                   SHA_INT64;
+typedef uint32_t                   SHA2_INT32;
+typedef uint64_t                   SHA2_INT64;
 
 //The structure for storing SHA info
 typedef struct _sha2_256_object_
 {
-	SHA_INT32       Digest[8U];                  //Message digest
-	SHA_INT32       CountLow, CountHigh;         //64-bit bit count
-	SHA2_256_BYTE   Data[SHA2_256_SIZE_BLOCK];   //SHA data buffer
+	SHA2_INT32      Digest[8U];                  //Message digest
+	SHA2_INT32      CountLow, CountHigh;         //64-bit bit count
+	SHA2_256_BYTE   Data[SHA2_BLOCK_SIZE_256];   //SHA data buffer
 	int             Endianness;
 	int             Local;                       //Unprocessed amount in data
 	int             DigestSize;
@@ -103,9 +97,9 @@ typedef struct _sha2_256_object_
 //The structure for storing SHA info
 typedef struct _sha2_512_object_
 {
-	SHA_INT64       Digest[8U];                  //Message digest
-	SHA_INT32       CountLow, CountHigh;         //64-bit bit count
-	SHA2_512_BYTE   Data[SHA2_512_SIZE_BLOCK];   //SHA data buffer
+	SHA2_INT64      Digest[8U];                  //Message digest
+	SHA2_INT32      CountLow, CountHigh;         //64-bit bit count
+	SHA2_512_BYTE   Data[SHA2_BLOCK_SIZE_512];   //SHA data buffer
 	int             Endianness;
 	int             Local;                       //Unprocessed amount in data
 	int             DigestSize;
@@ -117,7 +111,7 @@ size_t SHA2_HashFunctionID = DEFAULT_HASH_FUNCTION_ID;
 
 //Functions
 static void SHA2_256_LongReverse(
-	SHA_INT32 *buffer, 
+	SHA2_INT32 *buffer, 
 	int byteCount, 
 	int Endianness);
 /*
@@ -136,10 +130,10 @@ static void SHA2_256_Update(
 	SHA2_256_BYTE *buffer, 
 	int count);
 static void SHA2_256_Final(
-	uint8_t digest[SHA2_256_SIZE_DIGEST], 
+	uint8_t digest[SHA2_DIGEST_SIZE_256], 
 	SHA2_256_Object *sha_info);
 static void SHA2_512_LongReverse(
-	SHA_INT64 *buffer, 
+	SHA2_INT64 *buffer, 
 	int byteCount, 
 	int Endianness);
 /*
@@ -162,5 +156,5 @@ static void SHA2_512_Update(
 	SHA2_512_BYTE *buffer, 
 	int count);
 static void SHA2_512_Final(
-	uint8_t digest[SHA2_512_SIZE_DIGEST], 
+	uint8_t digest[SHA2_DIGEST_SIZE_512], 
 	SHA2_512_Object *sha_info);

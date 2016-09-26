@@ -2128,36 +2128,50 @@ bool CRC_Hash(
 	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	size_t ReadLength = 0;
+
+//CRC initialization
 	uint8_t ResultCRC8 = 0, ParameterA = 0, ParameterB = 0;
 	uint16_t ResultCRC16 = 0;
 	uint32_t ResultCRC32 = 0;
 	uint64_t ResultCRC64 = 0;
-
-//CRC initialization
 	if (CRC_HashFunctionID == HASH_ID_CRC_8 || CRC_HashFunctionID == HASH_ID_CRC_8_ITU || CRC_HashFunctionID == HASH_ID_CRC_8_ATM || 
 		CRC_HashFunctionID == HASH_ID_CRC_8_CCITT || CRC_HashFunctionID == HASH_ID_CRC_8_MAXIM || CRC_HashFunctionID == HASH_ID_CRC_8_ICODE || 
 		CRC_HashFunctionID == HASH_ID_CRC_8_J1850 || CRC_HashFunctionID == HASH_ID_CRC_8_WCDMA || CRC_HashFunctionID == HASH_ID_CRC_8_ROHC || 
 		CRC_HashFunctionID == HASH_ID_CRC_8_DARC)
-			ResultCRC8 = CRC8_Init(CRC_HashFunctionID);
+	{
+		ResultCRC8 = CRC8_Init(CRC_HashFunctionID);
+	}
 	else if (CRC_HashFunctionID == HASH_ID_CRC_16 || CRC_HashFunctionID == HASH_ID_CRC_16_BUYPASS || CRC_HashFunctionID == HASH_ID_CRC_16_DDS_110 || 
-		CRC_HashFunctionID == HASH_ID_CRC_16_EN_13757 ||CRC_HashFunctionID == HASH_ID_CRC_16_TELEDISK || CRC_HashFunctionID == HASH_ID_CRC_16_MODBUS || 
+		CRC_HashFunctionID == HASH_ID_CRC_16_EN_13757 || CRC_HashFunctionID == HASH_ID_CRC_16_TELEDISK || CRC_HashFunctionID == HASH_ID_CRC_16_MODBUS || 
 		CRC_HashFunctionID == HASH_ID_CRC_16_MAXIM || CRC_HashFunctionID == HASH_ID_CRC_16_USB || CRC_HashFunctionID == HASH_ID_CRC_16_T10_DIF || 
 		CRC_HashFunctionID == HASH_ID_CRC_16_DECT_X || CRC_HashFunctionID == HASH_ID_CRC_16_DECT_R || CRC_HashFunctionID == HASH_ID_CRC_16_SICK || 
 		CRC_HashFunctionID == HASH_ID_CRC_16_DNP || CRC_HashFunctionID == HASH_ID_CRC_16_CCITT_XMODEM || CRC_HashFunctionID == HASH_ID_CRC_16_CCITT_FFFF || 
 		CRC_HashFunctionID == HASH_ID_CRC_16_CCITT_1D0F || CRC_HashFunctionID == HASH_ID_CRC_16_GENIBUS || CRC_HashFunctionID == HASH_ID_CRC_16_KERMIT || 
 		CRC_HashFunctionID == HASH_ID_CRC_16_X25 || CRC_HashFunctionID == HASH_ID_CRC_16_MCRF4XX || CRC_HashFunctionID == HASH_ID_CRC_16_RIELLO || 
 		CRC_HashFunctionID == HASH_ID_CRC_16_FLETCHER)
-			ResultCRC16 = CRC16_Init(CRC_HashFunctionID);
+	{
+		ResultCRC16 = CRC16_Init(CRC_HashFunctionID);
+	}
 	else if (CRC_HashFunctionID == HASH_ID_CRC_24_FLEXRAY_A || CRC_HashFunctionID == HASH_ID_CRC_24_FLEXRAY_B || CRC_HashFunctionID == HASH_ID_CRC_24_R64)
+	{
 		ResultCRC32 = CRC24_Init(CRC_HashFunctionID);
+	}
 	else if (CRC_HashFunctionID == HASH_ID_CRC_32 || CRC_HashFunctionID == HASH_ID_CRC_32_JAM || CRC_HashFunctionID == HASH_ID_CRC_32_C || 
 		CRC_HashFunctionID == HASH_ID_CRC_32_D || CRC_HashFunctionID == HASH_ID_CRC_32_BZIP2 || CRC_HashFunctionID == HASH_ID_CRC_32_MPEG2 || 
 		CRC_HashFunctionID == HASH_ID_CRC_32_POSIX || CRC_HashFunctionID == HASH_ID_CRC_32_K || CRC_HashFunctionID == HASH_ID_CRC_32_Q || 
 		CRC_HashFunctionID == HASH_ID_CRC_32_XFER)
-			ResultCRC32 = CRC32_Init(CRC_HashFunctionID);
+	{
+		ResultCRC32 = CRC32_Init(CRC_HashFunctionID);
+	}
 	else if (CRC_HashFunctionID == HASH_ID_CRC_64 || CRC_HashFunctionID == HASH_ID_CRC_64_1B || CRC_HashFunctionID == HASH_ID_CRC_64_WE || 
 		CRC_HashFunctionID == HASH_ID_CRC_64_JONES)
-			ResultCRC64 = CRC64_Init(CRC_HashFunctionID);
+	{
+		ResultCRC64 = CRC64_Init(CRC_HashFunctionID);
+	}
+	else {
+		fwprintf_s(stderr, L"[Error] Parameters error.\n");
+		return false;
+	}
 
 //Hash process
 	while (!feof(FileHandle))
@@ -2181,7 +2195,9 @@ bool CRC_Hash(
 				CRC_HashFunctionID == HASH_ID_CRC_8_CCITT || CRC_HashFunctionID == HASH_ID_CRC_8_MAXIM || CRC_HashFunctionID == HASH_ID_CRC_8_ICODE || 
 				CRC_HashFunctionID == HASH_ID_CRC_8_J1850 || CRC_HashFunctionID == HASH_ID_CRC_8_WCDMA || CRC_HashFunctionID == HASH_ID_CRC_8_ROHC || 
 				CRC_HashFunctionID == HASH_ID_CRC_8_DARC)
-					ResultCRC8 = CRC8_Calculate(ResultCRC8, CRC_HashFunctionID, Buffer.get(), ReadLength);
+			{
+				ResultCRC8 = CRC8_Calculate(ResultCRC8, CRC_HashFunctionID, Buffer.get(), ReadLength);
+			}
 			else if (CRC_HashFunctionID == HASH_ID_CRC_16 || CRC_HashFunctionID == HASH_ID_CRC_16_BUYPASS || CRC_HashFunctionID == HASH_ID_CRC_16_DDS_110 || 
 				CRC_HashFunctionID == HASH_ID_CRC_16_EN_13757 || CRC_HashFunctionID == HASH_ID_CRC_16_TELEDISK || CRC_HashFunctionID == HASH_ID_CRC_16_MODBUS || 
 				CRC_HashFunctionID == HASH_ID_CRC_16_MAXIM || CRC_HashFunctionID == HASH_ID_CRC_16_USB || CRC_HashFunctionID == HASH_ID_CRC_16_T10_DIF || 
@@ -2190,27 +2206,39 @@ bool CRC_Hash(
 				CRC_HashFunctionID == HASH_ID_CRC_16_CCITT_1D0F || CRC_HashFunctionID == HASH_ID_CRC_16_GENIBUS || CRC_HashFunctionID == HASH_ID_CRC_16_KERMIT || 
 				CRC_HashFunctionID == HASH_ID_CRC_16_X25 || CRC_HashFunctionID == HASH_ID_CRC_16_MCRF4XX || CRC_HashFunctionID == HASH_ID_CRC_16_RIELLO || 
 				CRC_HashFunctionID == HASH_ID_CRC_16_FLETCHER)
-					ResultCRC16 = CRC16_Calculate(ResultCRC16, &ParameterA, &ParameterB, CRC_HashFunctionID, Buffer.get(), ReadLength);
+			{
+				ResultCRC16 = CRC16_Calculate(ResultCRC16, &ParameterA, &ParameterB, CRC_HashFunctionID, Buffer.get(), ReadLength);
+			}
 			else if (CRC_HashFunctionID == HASH_ID_CRC_24_FLEXRAY_A || CRC_HashFunctionID == HASH_ID_CRC_24_FLEXRAY_B || CRC_HashFunctionID == HASH_ID_CRC_24_R64)
+			{
 				ResultCRC32 = CRC24_Calculate(ResultCRC32, CRC_HashFunctionID, Buffer.get(), ReadLength);
+			}
 			else if (CRC_HashFunctionID == HASH_ID_CRC_32 || CRC_HashFunctionID == HASH_ID_CRC_32_JAM || CRC_HashFunctionID == HASH_ID_CRC_32_C || 
 				CRC_HashFunctionID == HASH_ID_CRC_32_D || CRC_HashFunctionID == HASH_ID_CRC_32_BZIP2 || CRC_HashFunctionID == HASH_ID_CRC_32_MPEG2 || 
 				CRC_HashFunctionID == HASH_ID_CRC_32_POSIX || CRC_HashFunctionID == HASH_ID_CRC_32_K || CRC_HashFunctionID == HASH_ID_CRC_32_Q || 
 				CRC_HashFunctionID == HASH_ID_CRC_32_XFER)
-					ResultCRC32 = CRC32_Calculate(ResultCRC32, CRC_HashFunctionID, Buffer.get(), ReadLength);
+			{
+				ResultCRC32 = CRC32_Calculate(ResultCRC32, CRC_HashFunctionID, Buffer.get(), ReadLength);
+			}
 			else if (CRC_HashFunctionID == HASH_ID_CRC_40)
+			{
 				ResultCRC64 = CRC40_Calculate(ResultCRC64, Buffer.get(), ReadLength);
+			}
 			else if (CRC_HashFunctionID == HASH_ID_CRC_64 || CRC_HashFunctionID == HASH_ID_CRC_64_1B || CRC_HashFunctionID == HASH_ID_CRC_64_WE || 
 				CRC_HashFunctionID == HASH_ID_CRC_64_JONES)
-					ResultCRC64 = CRC64_Calculate(ResultCRC64, CRC_HashFunctionID, Buffer.get(), ReadLength);
-			else 
+			{
+				ResultCRC64 = CRC64_Calculate(ResultCRC64, CRC_HashFunctionID, Buffer.get(), ReadLength);
+			}
+			else {
+				fwprintf_s(stderr, L"[Error] Parameters error.\n");
 				return false;
+			}
 		}
 	}
 
 //Finish hash process, endian check and set pointer.
 	void *Result = nullptr;
-	size_t BlockSize = 0;
+	size_t DigestSize = 0;
 	if (CRC_HashFunctionID == HASH_ID_CRC_8 || CRC_HashFunctionID == HASH_ID_CRC_8_ITU || CRC_HashFunctionID == HASH_ID_CRC_8_ATM || 
 		CRC_HashFunctionID == HASH_ID_CRC_8_CCITT || CRC_HashFunctionID == HASH_ID_CRC_8_MAXIM || CRC_HashFunctionID == HASH_ID_CRC_8_ICODE || 
 		CRC_HashFunctionID == HASH_ID_CRC_8_J1850 || CRC_HashFunctionID == HASH_ID_CRC_8_WCDMA || CRC_HashFunctionID == HASH_ID_CRC_8_ROHC || 
@@ -2218,7 +2246,7 @@ bool CRC_Hash(
 	{
 		ResultCRC8 = CRC8_Final(ResultCRC8, CRC_HashFunctionID);
 		Result = &ResultCRC8;
-		BlockSize = CRC8_SIZE_BLOCK;
+		DigestSize = CRC8_BLOCK_SIZE;
 	}
 	else if (CRC_HashFunctionID == HASH_ID_CRC_16 || CRC_HashFunctionID == HASH_ID_CRC_16_BUYPASS || CRC_HashFunctionID == HASH_ID_CRC_16_DDS_110 || 
 		CRC_HashFunctionID == HASH_ID_CRC_16_EN_13757 || CRC_HashFunctionID == HASH_ID_CRC_16_TELEDISK || CRC_HashFunctionID == HASH_ID_CRC_16_MODBUS || 
@@ -2233,13 +2261,13 @@ bool CRC_Hash(
 		if (CRC_HashFunctionID != HASH_ID_CRC_16_DNP && CRC_HashFunctionID != HASH_ID_CRC_16_KERMIT)
 			ResultCRC16 = ntohs(ResultCRC16);
 		Result = &ResultCRC16;
-		BlockSize = CRC16_SIZE_BLOCK;
+		DigestSize = CRC16_BLOCK_SIZE;
 	}
 	else if (CRC_HashFunctionID == HASH_ID_CRC_24_FLEXRAY_A || CRC_HashFunctionID == HASH_ID_CRC_24_FLEXRAY_B || CRC_HashFunctionID == HASH_ID_CRC_24_R64)
 	{
 		ResultCRC32 = ntohl(ResultCRC32 << 8U) & ntohl(0xFFFFFF00);
 		Result = &ResultCRC32;
-		BlockSize = CRC24_SIZE_BLOCK;
+		DigestSize = CRC24_BLOCK_SIZE;
 	}
 	else if (CRC_HashFunctionID == HASH_ID_CRC_32 || CRC_HashFunctionID == HASH_ID_CRC_32_JAM || CRC_HashFunctionID == HASH_ID_CRC_32_C || 
 		CRC_HashFunctionID == HASH_ID_CRC_32_D || CRC_HashFunctionID == HASH_ID_CRC_32_BZIP2 || CRC_HashFunctionID == HASH_ID_CRC_32_MPEG2 || 
@@ -2249,13 +2277,13 @@ bool CRC_Hash(
 		ResultCRC32 = CRC32_Final(ResultCRC32, CRC_HashFunctionID);
 		ResultCRC32 = ntohl(ResultCRC32);
 		Result = &ResultCRC32;
-		BlockSize = CRC32_SIZE_BLOCK;
+		DigestSize = CRC32_BLOCK_SIZE;
 	}
 	else if (CRC_HashFunctionID == HASH_ID_CRC_40)
 	{
 		ResultCRC64 = ntoh64(ResultCRC64 << 24U) & ntoh64(0xFFFFFFFFFF000000ULL);
 		Result = &ResultCRC64;
-		BlockSize = CRC40_SIZE_BLOCK;
+		DigestSize = CRC40_BLOCK_SIZE;
 	}
 	else if (CRC_HashFunctionID == HASH_ID_CRC_64 || CRC_HashFunctionID == HASH_ID_CRC_64_1B || CRC_HashFunctionID == HASH_ID_CRC_64_WE || 
 		CRC_HashFunctionID == HASH_ID_CRC_64_JONES)
@@ -2263,15 +2291,16 @@ bool CRC_Hash(
 		ResultCRC64 = CRC64_Final(ResultCRC64, CRC_HashFunctionID);
 		ResultCRC64 = ntoh64(ResultCRC64);
 		Result = &ResultCRC64;
-		BlockSize = CRC64_SIZE_BLOCK;
+		DigestSize = CRC64_BLOCK_SIZE;
 	}
 	else {
+		fwprintf_s(stderr, L"[Error] Parameters error.\n");
 		return false;
 	}
 
 //Binary to hex
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
-	if (sodium_bin2hex(Buffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Result, BlockSize) == nullptr)
+	if (sodium_bin2hex(Buffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Result, DigestSize) == nullptr)
 	{
 		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;
