@@ -4,6 +4,9 @@
 * Run "./CMake_Build.sh" to build binary.
 
 
+----------------------------------------------------------------------------------------------------
+
+
 ### Usage and options(DNSPing)
        DNSPing [-options] domain target
   e.g. DNSPing -a -qt AAAA -n 5 -w 500 -edns0 www.google.com 8.8.4.4
@@ -57,8 +60,8 @@
                            IPSECKEY|RRSIG|NSEC|DNSKEY|DHCID|NSEC3|NSEC3PARAM|
                            TLSA|HIP|NINFO|RKEY|TALINK|CDS|CDNSKEY|OPENPGPKEY|
                            SPF|UINFO|UID|GID|UNSPEC|NID|L32|L64|LP|EUI48|
-                           EUI64|TKEY|TSIG|IXFR|AXFR|MAILB|MAILA|ANY|URI|
-                           CAA|TA|DLV|RESERVED
+                           EUI64|ADDRS|TKEY|TSIG|IXFR|AXFR|MAILB|MAILA|ANY|
+                           URI|CAA|TA|DLV|RESERVED
    -qc classes       Specifie Query classes.
                      Query classes must between 0x0001 - 0xFFFF/65535.
                      Classes: IN|CSNET|CHAOS|HESIOD|NONE|ALL|ANY
@@ -118,6 +121,9 @@
    domain                   A domain name which will make request to send
                             to DNS server.
    target                   Target of DNSPing, support IPv4/IPv6 address and domain.
+
+
+----------------------------------------------------------------------------------------------------
 
 
 ### Usage and options(FileHash)
@@ -228,14 +234,17 @@ Supported hash algorithms:
                                                  Size = Digest output length
 
 
+----------------------------------------------------------------------------------------------------
+
+
 ### Release hash[SHA-3(256)]
 * Windows
-  * DNSPing.exe: 77E7188BCBD280FDD3787F728F67DF7108458764854C91846AEDCAE9A9FA5790
-  * DNSPing_x86.exe: C62A924350B6F48ABACE9FE297A806576948D1FBD53007331AB605BE44E13665
-  * DNSPing_XP.exe: 637FFE5564D8E994A4BC845D960C9294F93453F383258D028C4F0C8DD112D763
-  * FileHash.exe: 27F135ECC3FCBC4B7213B4CB0F7313BBA1732F0218B040CD31B801CBF8B7D044
-  * FileHash_x86.exe: AFD14D954055D38DEABBB03DE652B69C04255F87A22FD54593AE02D23A4821E2
-  * FileHash_XP.exe: 8F5561F1A7027B6A2C482BFAB3096E0967134EF44A2BC6EB7EFBA828F3DE2913
+  * DNSPing.exe: A97A4B60B1D228EB6707302CDC2AB7D78ABB6D8667201DDB10396CD295D61E6F
+  * DNSPing_x86.exe: F11B22FF241D3A05A038B28B094D7A295993C672534134B48EF1E2683B9778B3
+  * DNSPing_XP.exe: 888F22C2E014F68C849789E167752DA987B94E91D816CB848375580C7B761BBF
+  * FileHash.exe: C89869502986D5A42FD00C46A07C7ED5E7AF545094D0DB00B30E3F8FBB8DCB37
+  * FileHash_x86.exe: 94B439E7A2187FADE3A11AED96E99CC0A072A5191F94A5C21E6A931DA8A8FE11
+  * FileHash_XP.exe: 8A8A806DB34D2660A0B7B86999E0A3A643D2720C1E5201862A70D9CA7BE3DAEE
 * Mac
-  * DNSPing: 0F3EA9E37A223A7D071C12DDCDC551619683E678B6DA0E3DFCFAC0050263357E
-  * FileHash: A31BFD34E998F60815656E0FE3D0CB12FC163DD3BC97CF166D724ADB770E5922
+  * DNSPing: BE749E2676582862592428ED0D31FD204662A03824F68D77D078D51CCD0E9E61
+  * FileHash: F99DBBC16AF6C4F2D6EDABB1C9C86D764961E705A7B4B533748272926461F1C5

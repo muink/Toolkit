@@ -17,7 +17,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#include "Structures.h"
+#include "Structure.h"
 
 //////////////////////////////////////////////////
 // Main header
@@ -56,8 +56,8 @@
 #define DNS_PACKET_MINSIZE           (sizeof(dns_hdr) + 4U + sizeof(dns_qry))   //Minimum DNS packet size(DNS Header + Minimum Domain + DNS Query)
 
 //Version definitions
-#define FULL_VERSION                                  L"0.3.3.0"
-#define COPYRIGHT_MESSAGE                             L"Copyright (C) 2014-2016 Chengr28"
+#define FULL_VERSION                 L"0.3.4.0"
+#define COPYRIGHT_MESSAGE            L"Copyright (C) 2014-2016 Chengr28"
 
 
 //////////////////////////////////////////////////
@@ -179,41 +179,41 @@ void PrintHeaderToScreen(
 	const std::wstring wTargetAddressString, 
 	const std::wstring wTestDomain);
 void PrintErrorToScreen(
-	const wchar_t *Message, 
+	const wchar_t * const Message, 
 	const ssize_t ErrorCode);
 void PrintDescription(
 	void);
 
 //Protocol.h
 bool CheckEmptyBuffer(
-	const void *Buffer, 
+	const void * const Buffer, 
 	const size_t Length);
 bool MBSToWCSString(
-	const uint8_t *Buffer, 
+	const uint8_t * const Buffer, 
 	const size_t MaxLen, 
 	std::wstring &Target);
 bool WCSToMBSString(
-	const wchar_t *Buffer, 
+	const wchar_t * const Buffer, 
 	const size_t MaxLen, 
 	std::string &Target);
 void CaseConvert(
 	const bool IsLowerUpper, 
-	uint8_t *Buffer, 
+	uint8_t * const Buffer, 
 	const size_t Length);
 void CaseConvert(
 	std::wstring &Buffer, 
 	const bool IsLowerToUpper);
 bool AddressStringToBinary(
 	const uint16_t Protocol, 
-	const uint8_t *AddrString, 
-	void *OriginalAddr, 
+	const uint8_t * const AddrString, 
+	void * const OriginalAddr, 
 	ssize_t &ErrorCode);
 bool BinaryToAddressString(
 	const uint16_t Protocol, 
-	const void *OriginalAddr, 
-	void *AddressString, 
+	const void * const OriginalAddr, 
+	void * const AddressString, 
 	const size_t StringSize, 
-	ssize_t *ErrorCode);
+	ssize_t * const ErrorCode);
 uint16_t ProtocolNameToBinary(
 	const std::wstring &Buffer);
 uint16_t ServiceNameToBinary(
@@ -223,21 +223,21 @@ uint16_t DNSClassesNameToBinary(
 uint16_t DNSTypeNameToBinary(
 	const std::wstring &Buffer);
 size_t CharToDNSQuery(
-	const uint8_t *FName, 
-	uint8_t *TName);
+	const uint8_t * const FName, 
+	uint8_t * const TName);
 size_t DNSQueryToChar(
-	const uint8_t *TName, 
-	uint8_t *FName, 
+	const uint8_t * const TName, 
+	uint8_t * const FName, 
 	uint16_t &Truncated);
 bool ValidatePacket(
-	const uint8_t *Buffer, 
+	const uint8_t * const Buffer, 
 	const size_t Length, 
 	const uint16_t DNS_ID);
 void PrintSecondsInDateTime(
-	FILE *FileHandle, 
+	FILE * const FileHandle, 
 	const time_t Seconds);
 void PrintDateTime(
-	FILE *FileHandle, 
+	FILE * const FileHandle, 
 	const time_t Time);
 
 //ReadCommands.cpp
@@ -253,10 +253,10 @@ bool ReadCommands(
 
 //Resolver.h
 void PrintHexResponse(
-	FILE *FileHandle, 
-	const uint8_t *Buffer, 
+	FILE * const FileHandle, 
+	const uint8_t * const Buffer, 
 	const size_t Length);
 void PrintResponse(
-	FILE *FileHandle, 
-	const uint8_t *Buffer, 
+	FILE * const FileHandle, 
+	const uint8_t * const Buffer, 
 	const size_t Length);

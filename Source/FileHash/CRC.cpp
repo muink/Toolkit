@@ -637,7 +637,7 @@ const uint16_t CRC16_Table_Teledisk[] =
 
 //CRC-16 common routines for calculations
 uint16_t CRC16_Update_Normal(
-	const uint16_t *Table, 
+	const uint16_t * const Table, 
 	uint16_t CRC, 
 	const uint8_t Buffer)
 {
@@ -649,7 +649,7 @@ uint16_t CRC16_Update_Normal(
 }
 
 uint16_t CRC16_Update_Reflected(
-	const uint16_t *Table, 
+	const uint16_t * const Table, 
 	uint16_t CRC, 
 	const uint8_t Buffer)
 {
@@ -790,8 +790,8 @@ uint16_t CRC16_Init(
 //CRC-16 calculate process
 uint16_t CRC16_Calculate(
 	uint16_t CRC, 
-	uint8_t *ParameterA, 
-	uint8_t *ParameterB, 
+	uint8_t * const ParameterA,  
+	uint8_t * const ParameterB, 
 	const size_t TableType, 
 	uint8_t *Buffer, 
 	const size_t Length)
@@ -855,8 +855,8 @@ uint16_t CRC16_Calculate(
 //Finish CRC-16 process
 uint16_t CRC16_Final(
 	const uint16_t CRC, 
-	uint8_t *ParameterA, 
-	uint8_t *ParameterB, 
+	uint8_t * const ParameterA, 
+	uint8_t * const ParameterB, 
 	const size_t TableType)
 {
 	switch (TableType)
@@ -1304,7 +1304,7 @@ const uint32_t CRC32_Table_Q[] =
 
 //CRC-32 common routines for calculations
 uint32_t CRC32_Update_Normal(
-	const uint32_t *Table, 
+	const uint32_t * const Table, 
 	const uint32_t CRC, 
 	const uint8_t Buffer)
 {
@@ -1313,7 +1313,7 @@ uint32_t CRC32_Update_Normal(
 }
 
 uint32_t CRC32_Update_Reflected(
-	const uint32_t *Table, 
+	const uint32_t * const Table, 
 	const uint32_t CRC, 
 	const uint8_t Buffer)
 {
@@ -1557,7 +1557,7 @@ const uint64_t CRC40_Table_Normal[] =
 //CRC-40 calculate process
 uint64_t CRC40_Calculate(
 	uint64_t CRC, 
-	uint8_t *Buffer, 
+	uint8_t * const Buffer, 
 	const size_t Length)
 {
 	uint32_t long64_c = 0;
@@ -1789,7 +1789,7 @@ const uint64_t CRC64_Table_Jones_Reflected[] =
 
 //CRC-64 common routines for calculations
 uint64_t CRC64_Update_Normal(
-	const uint64_t *Table, 
+	const uint64_t * const Table, 
 	const uint64_t CRC, 
 	const uint8_t Buffer)
 {
@@ -1798,7 +1798,7 @@ uint64_t CRC64_Update_Normal(
 }
 
 uint64_t CRC64_Update_Reflected(
-	const uint64_t *Table, 
+	const uint64_t * const Table, 
 	const uint64_t CRC, 
 	const uint8_t Buffer)
 {
@@ -2115,7 +2115,7 @@ bool ReadCommands_CRC(
 
 //CRC hash process 
 bool CRC_Hash(
-	FILE *FileHandle)
+	FILE * const FileHandle)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_CRC || FileHandle == nullptr)

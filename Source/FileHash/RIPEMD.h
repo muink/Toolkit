@@ -51,26 +51,20 @@ extern size_t HashFamilyID;
 size_t RIPEMD_HashFunctionID = DEFAULT_HASH_FUNCTION_ID;
 
 //RIPEMD definitions
-// Typedef 8 and 32 bit types, resp.
-// Adapt these, if necessary, for your operating system and compiler
 typedef uint32_t dword;
+typedef int the_correct_size_was_chosen[sizeof(dword) == 4 ? 1 : -1]; //If this line causes a compiler error, adapt the defintion of dword above
 
-// If this line causes a compiler error, adapt the defintion of dword above
-typedef int the_correct_size_was_chosen[sizeof(dword) == 4 ? 1 : -1];
-
-// Macro definitions
-// Collect four bytes into one word.
+//Macro definitions
 #define BYTES_TO_DWORD(strptr)            \
 	(((dword) *((strptr) + 3) << 24U) |   \
 	((dword) *((strptr) + 2) << 16U) |    \
 	((dword) *((strptr) + 1) << 8U) |     \
 	((dword) *(strptr)))
 
-// ROL(x, n) cyclically rotates x over n bits to the left
-// x must be of an unsigned 32 bits type and 0 <= n < 32.
+//ROL(x, n) cyclically rotates x over n bits to the left
 #define ROL(x, n)        (((x) << (n)) | ((x) >> (32 - (n))))
 
-//the four basic functions F_128(), G_128() and H_128()
+//The four basic functions F_128(), G_128() and H_128()
 #define F_128(x, y, z)        ((x) ^ (y) ^ (z))
 #define G_128(x, y, z)        (((x) & (y)) | (~(x) & (z)))
 #define H_128(x, y, z)        (((x) | ~(y)) ^ (z))

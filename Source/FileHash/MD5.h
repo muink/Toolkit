@@ -23,6 +23,9 @@
 #define MD5_BLOCK_SIZE    64U
 #define MD5_DIGEST_SIZE   16U
 
+//Global variables
+extern size_t HashFamilyID;
+
 //The structure for storing MD5 info
 typedef struct _md5_ctx_
 {
@@ -61,28 +64,3 @@ typedef struct _md5_ctx_
 	a = ROTATE_LEFT(a, s);         \
 	a += b;                        \
 }
-
-//Global variables
-extern size_t HashFamilyID;
-
-//Functions
-void MD5_Init(
-	MD5_CTX *context);
-void MD5_Update(
-	MD5_CTX *context, 
-	uint8_t *input, 
-	unsigned int inputlen);
-void MD5_Final(
-	MD5_CTX *context, 
-	uint8_t digest[MD5_DIGEST_SIZE]);
-void MD5_Transform(
-	unsigned int state[4U], 
-	uint8_t block[MD5_BLOCK_SIZE]);
-void MD5_Encode(
-	uint8_t *output, 
-	unsigned int *input, 
-	unsigned int len);
-void MD5_Decode(
-	unsigned int *output, 
-	uint8_t *input, 
-	unsigned int len);

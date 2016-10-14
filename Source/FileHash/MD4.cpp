@@ -21,7 +21,7 @@
 
 //Initialize the hash state
 void MD4_Init(
-	MD4_CTX *c)
+	MD4_CTX * const c)
 {
 	memset(c, 0, sizeof(MD4_CTX));
 	c->A = INIT_DATA_A;
@@ -34,8 +34,8 @@ void MD4_Init(
 
 //MD4 Block data order setting
 void MD4_BlockDataOrder(
-	MD4_CTX *c, 
-	const void *data_, 
+	MD4_CTX * const c, 
+	const void * const data_, 
 	size_t num)
 {
 	const uint8_t *data = (const uint8_t *)data_;
@@ -118,8 +118,8 @@ void MD4_BlockDataOrder(
 
 //Update MD4 status
 void MD4_Update(
-	MD4_CTX *c, 
-	const void *data_, 
+	MD4_CTX * const c, 
+	const void * const data_, 
 	size_t len)
 {
 	const uint8_t *data = (const uint8_t *)data_;
@@ -175,7 +175,7 @@ void MD4_Update(
 //Finish MD4 process
 void MD4_Final(
 	uint8_t *md, 
-	MD4_CTX *c)
+	MD4_CTX * const c)
 {
 	uint8_t *p = (uint8_t *)c->Data;
 	size_t n = c->Num;
@@ -211,7 +211,7 @@ void MD4_Final(
 // 
 //MD4 hash function
 bool MD4_Hash(
-	FILE *FileHandle)
+	FILE * const FileHandle)
 {
 //Parameters check
 	if ((HashFamilyID != HASH_ID_MD4 && HashFamilyID != HASH_ID_ED2K) || FileHandle == nullptr)

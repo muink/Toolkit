@@ -61,9 +61,12 @@
 	#define COMMAND_SHA2_512_256_UL    ("-SHA2_512_256")
 #endif
 
+//Global variables
+extern size_t HashFamilyID;
+size_t SHA2_HashFunctionID = DEFAULT_HASH_FUNCTION_ID;
+
 //Endianness testing and definitions
-#define TestEndianness(variable) {int i = 1;variable = PCT_BIG_ENDIAN;   \
-			if (*((uint8_t *) & i) == 1) variable = PCT_LITTLE_ENDIAN;}
+#define TestEndianness(variable) {int i = 1;variable = PCT_BIG_ENDIAN;if (*((uint8_t *) & i) == 1) variable = PCT_LITTLE_ENDIAN;}
 #define PCT_LITTLE_ENDIAN      1
 #define PCT_BIG_ENDIAN         0
 
@@ -104,57 +107,3 @@ typedef struct _sha2_512_object_
 	int             Local;                       //Unprocessed amount in data
 	int             DigestSize;
 }SHA2_512_Object;
-
-//Global variables
-extern size_t HashFamilyID;
-size_t SHA2_HashFunctionID = DEFAULT_HASH_FUNCTION_ID;
-
-//Functions
-static void SHA2_256_LongReverse(
-	SHA2_INT32 *buffer, 
-	int byteCount, 
-	int Endianness);
-/*
-static void SHA2_256_Copy(
-	SHA2_256_Object *src, 
-	SHA2_256_Object *dest);
-*/
-static void SHA2_256_Transform(
-	SHA2_256_Object *sha_info);
-static void SHA2_256_Init(
-	SHA2_256_Object *sha_info);
-static void SHA2_224_Init(
-	SHA2_256_Object *sha_info);
-static void SHA2_256_Update(
-	SHA2_256_Object *sha_info, 
-	SHA2_256_BYTE *buffer, 
-	int count);
-static void SHA2_256_Final(
-	uint8_t digest[SHA2_DIGEST_SIZE_256], 
-	SHA2_256_Object *sha_info);
-static void SHA2_512_LongReverse(
-	SHA2_INT64 *buffer, 
-	int byteCount, 
-	int Endianness);
-/*
-static void SHA2_512_Copy(
-	SHA2_512_Object *src, 
-	SHA2_512_Object *dest);
-*/
-static void SHA2_512_Transform(
-	SHA2_512_Object *sha_info);
-static void SHA2_512_Init(
-	SHA2_512_Object *sha_info);
-static void SHA2_384_Init(
-	SHA2_512_Object *sha_info);
-static void SHA2_512_256_Init(
-	SHA2_512_Object *sha_info);
-static void SHA2_512_224_Init(
-	SHA2_512_Object *sha_info);
-static void SHA2_512_Update(
-	SHA2_512_Object *sha_info, 
-	SHA2_512_BYTE *buffer, 
-	int count);
-static void SHA2_512_Final(
-	uint8_t digest[SHA2_DIGEST_SIZE_512], 
-	SHA2_512_Object *sha_info);

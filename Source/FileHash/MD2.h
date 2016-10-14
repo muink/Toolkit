@@ -19,6 +19,9 @@
 
 #include "Base.h"
 
+//Global variables
+extern size_t HashFamilyID;
+
 //The MD2 block size and message digest size
 enum {
 	MD2 = 6,                //Hash type unique
@@ -40,17 +43,3 @@ typedef struct _md2_info_
 	uint8_t    C[MD2_BLOCK_SIZE];
 	uint8_t    Buffer[MD2_BLOCK_SIZE];
 }MD2_CTX;
-
-//Global variables
-extern size_t HashFamilyID;
-
-//Functions
-void MD2_Init(
-	MD2_CTX *md2);
-void MD2_Update(
-	MD2_CTX *md2, 
-	const uint8_t *data, 
-	uint32_t len);
-void MD2_Final(
-	MD2_CTX *md2, 
-	uint8_t *hash);

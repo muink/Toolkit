@@ -138,13 +138,13 @@ int main(
 
 	//Check DNS query.
 		if (ConfigurationParameter.Parameter_Query.Classes == 0)
-			ConfigurationParameter.Parameter_Query.Classes = htons(DNS_CLASS_IN);
+			ConfigurationParameter.Parameter_Query.Classes = htons(DNS_CLASS_INTERNET);
 		if (ConfigurationParameter.Parameter_Query.Type == 0)
 		{
 			if (ConfigurationParameter.SockAddr_Normal.ss_family == AF_INET6)
-				ConfigurationParameter.Parameter_Query.Type = htons(DNS_RECORD_AAAA);
+				ConfigurationParameter.Parameter_Query.Type = htons(DNS_TYPE_AAAA);
 			else //IPv4
-				ConfigurationParameter.Parameter_Query.Type = htons(DNS_RECORD_A);
+				ConfigurationParameter.Parameter_Query.Type = htons(DNS_TYPE_A);
 		}
 
 	//Check EDNS Label.
@@ -153,7 +153,7 @@ int main(
 		if (ConfigurationParameter.IsEDNS)
 		{
 			ConfigurationParameter.Parameter_Header.Additional = htons(U16_NUM_ONE);
-			ConfigurationParameter.Parameter_EDNS.Type = htons(DNS_RECORD_OPT);
+			ConfigurationParameter.Parameter_EDNS.Type = htons(DNS_TYPE_OPT);
 			if (ConfigurationParameter.EDNSPayloadSize == 0)
 				ConfigurationParameter.Parameter_EDNS.UDPPayloadSize = htons(EDNS0_MINSIZE);
 			else 

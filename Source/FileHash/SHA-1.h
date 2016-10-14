@@ -25,6 +25,9 @@
 typedef int32_t                 SHA1_INT32;
 typedef int64_t                 SHA1_INT64;
 
+//Global variables
+extern size_t HashFamilyID;
+
 //The structure for storing SHA1 info
 typedef struct _sha1_state_
 {
@@ -63,20 +66,3 @@ typedef struct _sha1_state_
 #define SHA1_F1(x, y, z) (x ^ y ^ z)
 #define SHA1_F2(x, y, z) ((x & y) | (z & (x | y)))
 #define SHA1_F3(x, y, z) (x ^ y ^ z)
-
-//Global variables
-extern size_t HashFamilyID;
-
-//Functions
-static void SHA1_Compress(
-	SHA1_State *sha1, 
-	uint8_t *buf);
-void SHA1_Init(
-	SHA1_State *sha1);
-void SHA1_Process(
-	SHA1_State *sha1, 
-	const uint8_t *in, 
-	uint32_t inlen);
-void SHA1_Done(
-	SHA1_State *sha1, 
-	uint8_t *out);

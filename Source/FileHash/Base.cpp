@@ -21,7 +21,7 @@
 
 //Check empty buffer
 bool CheckEmptyBuffer(
-	const void *Buffer, 
+	const void * const Buffer, 
 	const size_t Length)
 {
 //Null pointer
@@ -43,7 +43,7 @@ bool CheckEmptyBuffer(
 
 //Convert multiple bytes to wide char string
 bool MBSToWCSString(
-	const uint8_t *Buffer, 
+	const uint8_t * const Buffer, 
 	const size_t MaxLen, 
 	std::wstring &Target)
 {
@@ -119,10 +119,10 @@ void CaseConvert(
 }
 
 //Derived from original code by CodesInChaos(LibSodium)
-uint8_t *sodium_bin2hex(
-	uint8_t *const hex, 
+uint8_t * sodium_bin2hex(
+	uint8_t * const hex, 
 	const size_t hex_maxlen, 
-	const uint8_t *const bin, 
+	const uint8_t * const bin, 
 	const size_t bin_len)
 {
 	size_t       i = (size_t)0U;
@@ -161,7 +161,7 @@ void ErrorCodeToMessage(
 
 //Convert error code to error message.
 #if defined(PLATFORM_WIN)
-	wchar_t *InnerMessage = nullptr;
+	const wchar_t *InnerMessage = nullptr;
 	if (FormatMessageW(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS|FORMAT_MESSAGE_MAX_WIDTH_MASK, 
 		nullptr, 
@@ -183,7 +183,7 @@ void ErrorCodeToMessage(
 
 //Free pointer.
 	if (InnerMessage != nullptr)
-		LocalFree(InnerMessage);
+		LocalFree((HLOCAL)InnerMessage);
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
 	std::wstring InnerMessage;
 	auto ErrorMessage = strerror((int)ErrorCode);
@@ -204,7 +204,7 @@ void ErrorCodeToMessage(
 
 //Print to screen
 void PrintToScreen(
-	const uint8_t *Message)
+	const uint8_t * const Message)
 {
 	std::string InnerMessage((const char *)Message);
 	CaseConvert(InnerMessage, true);

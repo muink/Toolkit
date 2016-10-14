@@ -19,7 +19,6 @@
 
 #include "SHA-2.h"
 
-//When run on a little-endian CPU we need to perform byte reversal on an array of longwords.
 //SHA-2(256) long reverse process
 static void SHA2_256_LongReverse(
 	SHA2_INT32 *buffer, 
@@ -56,10 +55,10 @@ static void SHA2_256_LongReverse(
 
 //SHA-2(256) transform process
 static void SHA2_256_Transform(
-	SHA2_256_Object *sha_info)
+	SHA2_256_Object * const sha_info)
 {
 	size_t Index = 0;
-	SHA2_INT32 S[8U] = {0}, W[64U] = {0}, t0 = 0, t1 = 0;
+	SHA2_INT32 S[8U]{0}, W[64U]{0}, t0 = 0, t1 = 0;
 
 	memcpy(W, sha_info->Data, sizeof(sha_info->Data));
 	SHA2_256_LongReverse(W, (int)sizeof(sha_info->Data), sha_info->Endianness);
@@ -162,7 +161,7 @@ static void SHA2_256_Transform(
 
 //Initialize the SHA-2(256) digest
 static void SHA2_256_Init(
-	SHA2_256_Object *sha_info)
+	SHA2_256_Object * const sha_info)
 {
 	TestEndianness(sha_info->Endianness)
 	sha_info->Digest[0] = 0x6A09E667L;
@@ -183,7 +182,7 @@ static void SHA2_256_Init(
 
 //Initialize the SHA-2(224) digest
 static void SHA2_224_Init(
-	SHA2_256_Object *sha_info)
+	SHA2_256_Object * const sha_info)
 {
 	TestEndianness(sha_info->Endianness)
 	sha_info->Digest[0] = 0xC1059ED8L;
@@ -204,7 +203,7 @@ static void SHA2_224_Init(
 
 //Update the SHA-2(256) digest
 static void SHA2_256_Update(
-	SHA2_256_Object *sha_info, 
+	SHA2_256_Object * const sha_info, 
 	SHA2_256_BYTE *buffer, 
 	int count)
 {
@@ -245,8 +244,8 @@ static void SHA2_256_Update(
 
 //Finish computing the SHA-2(256) digest
 static void SHA2_256_Final(
-	uint8_t digest[SHA2_DIGEST_SIZE_256 / BYTES_TO_BITS],
-	SHA2_256_Object *sha_info)
+	uint8_t digest[SHA2_DIGEST_SIZE_256 / BYTES_TO_BITS], 
+	SHA2_256_Object * const sha_info)
 {
 	int count = 0;
 	SHA2_INT32 lo_bit_count = 0, hi_bit_count = 0;
@@ -355,11 +354,10 @@ static void SHA2_512_LongReverse(
 
 //SHA-2(512) transform process
 static void SHA2_512_Transform(
-	SHA2_512_Object *sha_info)
+	SHA2_512_Object * const sha_info)
 {
 	size_t Index = 0;
-	SHA2_INT64 S[8U] = {0}, W[80U] = {0}, t0 = 0, t1 = 0;
-
+	SHA2_INT64 S[8U]{0}, W[80U]{0}, t0 = 0, t1 = 0;
 	memcpy(W, sha_info->Data, sizeof(sha_info->Data));
 	SHA2_512_LongReverse(W, (int)sizeof(sha_info->Data), sha_info->Endianness);
 	for (Index = 16U;Index < 80U;++Index)
@@ -477,7 +475,7 @@ static void SHA2_512_Transform(
 
 //Initialize the SHA-2(512) digest
 static void SHA2_512_Init(
-	SHA2_512_Object *sha_info)
+	SHA2_512_Object * const sha_info)
 {
 	TestEndianness(sha_info->Endianness)
 		sha_info->Digest[0] = Py_ULL(0x6A09E667F3BCC908);
@@ -498,7 +496,7 @@ static void SHA2_512_Init(
 
 //Initialize the SHA-2(384) digest
 static void SHA2_384_Init(
-	SHA2_512_Object *sha_info)
+	SHA2_512_Object * const sha_info)
 {
 	TestEndianness(sha_info->Endianness)
 		sha_info->Digest[0] = Py_ULL(0xCBBB9D5DC1059ED8);
@@ -519,7 +517,7 @@ static void SHA2_384_Init(
 
 //Initialize the SHA-2(512/256) digest
 static void SHA2_512_256_Init(
-	SHA2_512_Object *sha_info)
+	SHA2_512_Object * const sha_info)
 {
 	TestEndianness(sha_info->Endianness)
 		sha_info->Digest[0] = Py_ULL(0x22312194FC2BF72C);
@@ -540,7 +538,7 @@ static void SHA2_512_256_Init(
 
 //Initialize the SHA-2(512/224) digest
 static void SHA2_512_224_Init(
-	SHA2_512_Object *sha_info)
+	SHA2_512_Object * const sha_info)
 {
 	TestEndianness(sha_info->Endianness)
 		sha_info->Digest[0] = Py_ULL(0x8C3D37C819544DA2);
@@ -561,7 +559,7 @@ static void SHA2_512_224_Init(
 
 //Update the SHA-2(512) digest
 static void SHA2_512_Update(
-	SHA2_512_Object *sha_info, 
+	SHA2_512_Object * const sha_info, 
 	SHA2_512_BYTE *buffer, 
 	int count)
 {
@@ -602,8 +600,8 @@ static void SHA2_512_Update(
 
 //Finish computing the SHA-2(512) digest
 static void SHA2_512_Final(
-	uint8_t digest[SHA2_DIGEST_SIZE_512 / BYTES_TO_BITS],
-	SHA2_512_Object *sha_info)
+	uint8_t digest[SHA2_DIGEST_SIZE_512 / BYTES_TO_BITS], 
+	SHA2_512_Object * const sha_info)
 {
 	int count = 0;
 	SHA2_INT32 lo_bit_count = 0, hi_bit_count = 0;
@@ -755,7 +753,7 @@ bool ReadCommands_SHA2(
 
 //SHA-2 hash function
 bool SHA2_Hash(
-	FILE *FileHandle)
+	FILE * const FileHandle)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_SHA2 || FileHandle == nullptr)

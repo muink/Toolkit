@@ -30,7 +30,7 @@
     <ClInclude Include="Protocol.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Structures.h">
+    <ClInclude Include="Structure.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

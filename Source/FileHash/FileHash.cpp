@@ -109,9 +109,9 @@ int main(
 //Read commands
 bool ReadCommands(
 #if defined(PLATFORM_WIN)
-	const wchar_t *Command, 
+	const wchar_t * const Command, 
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-	const char *Command, 
+	const char * const Command, 
 #endif
 	const bool IsFileNameOnly)
 {
@@ -235,7 +235,7 @@ bool ReadCommands(
 
 //Main hash process
 bool MainHashProcess(
-	FILE *FileHandle)
+	FILE * const FileHandle)
 {
 	if ((HashFamilyID == HASH_ID_BLAKE && !BLAKE_Hash(FileHandle)) ||                                 //BLAKE family
 		(HashFamilyID == HASH_ID_BLAKE2 && !BLAKE2_Hash(FileHandle)) ||                               //BLAKE2 family

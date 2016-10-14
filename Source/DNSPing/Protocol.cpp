@@ -28,7 +28,7 @@ bool IsLowerThanWin8(
 	OSVERSIONINFOEX OSVI;
 	memset(&OSVI, 0, sizeof(OSVI));
 	OSVI.dwOSVersionInfoSize = sizeof(OSVI);
-	BOOL bOsVersionInfoEx = GetVersionExW((OSVERSIONINFO *)&OSVI);
+	const BOOL bOsVersionInfoEx = GetVersionExW((OSVERSIONINFO *)&OSVI);
 
 	if (bOsVersionInfoEx && OSVI.dwPlatformId == VER_PLATFORM_WIN32_NT && 
 		(OSVI.dwMajorVersion < 6U || (OSVI.dwMajorVersion == 6U && OSVI.dwMinorVersion < 2U)))
@@ -40,7 +40,7 @@ bool IsLowerThanWin8(
 
 //Check empty buffer
 bool CheckEmptyBuffer(
-	const void *Buffer, 
+	const void * const Buffer, 
 	const size_t Length)
 {
 //Null pointer
@@ -62,7 +62,7 @@ bool CheckEmptyBuffer(
 
 //Convert multiple bytes to wide char string
 bool MBSToWCSString(
-	const uint8_t *Buffer, 
+	const uint8_t * const Buffer, 
 	const size_t MaxLen, 
 	std::wstring &Target)
 {
@@ -103,7 +103,7 @@ bool MBSToWCSString(
 
 //Convert wide char string to multiple bytes
 bool WCSToMBSString(
-	const wchar_t *Buffer, 
+	const wchar_t * const Buffer, 
 	const size_t MaxLen, 
 	std::string &Target)
 {
@@ -147,7 +147,7 @@ bool WCSToMBSString(
 //Convert lowercase/uppercase words to uppercase/lowercase words(C-Style version)
 void CaseConvert(
 	const bool IsLowerUpper, 
-	uint8_t *Buffer, 
+	uint8_t * const Buffer, 
 	const size_t Length)
 {
 	for (size_t Index = 0;Index < Length;++Index)
@@ -184,8 +184,8 @@ void CaseConvert(
 //Convert address strings to binary.
 bool AddressStringToBinary(
 	const uint16_t Protocol, 
-	const uint8_t *AddrString, 
-	void *OriginalAddr, 
+	const uint8_t * const AddrString, 
+	void * const OriginalAddr, 
 	ssize_t &ErrorCode)
 {
 	size_t UnsignedResult = 0;
@@ -303,10 +303,10 @@ bool AddressStringToBinary(
 //Convert binary address strings
 bool BinaryToAddressString(
 	const uint16_t Protocol, 
-	const void *OriginalAddr, 
-	void *AddressString, 
+	const void * const OriginalAddr, 
+	void * const AddressString, 
 	const size_t StringSize, 
-	ssize_t *ErrorCode)
+	ssize_t * const ErrorCode)
 {
 //Initialization
 	if (ErrorCode != nullptr)
@@ -856,7 +856,7 @@ uint16_t DNSClassesNameToBinary(
 
 //DNS classes name
 	if (InnerBuffer == L"INTERNET")
-		return htons(DNS_CLASS_IN);
+		return htons(DNS_CLASS_INTERNET);
 	else if (InnerBuffer == L"CSNET")
 		return htons(DNS_CLASS_CSNET);
 	else if (InnerBuffer == L"CHAOS")
@@ -883,171 +883,173 @@ uint16_t DNSTypeNameToBinary(
 
 //DNS type name
 	if (InnerBuffer == (L"A"))
-		return htons(DNS_RECORD_A);
+		return htons(DNS_TYPE_A);
 	else if (InnerBuffer == (L"NS"))
-		return htons(DNS_RECORD_NS);
+		return htons(DNS_TYPE_NS);
 	else if (InnerBuffer == (L"MD"))
-		return htons(DNS_RECORD_MD);
+		return htons(DNS_TYPE_MD);
 	else if (InnerBuffer == (L"MF"))
-		return htons(DNS_RECORD_MF);
+		return htons(DNS_TYPE_MF);
 	else if (InnerBuffer == (L"CNAME"))
-		return htons(DNS_RECORD_CNAME);
+		return htons(DNS_TYPE_CNAME);
 	else if (InnerBuffer == (L"SOA"))
-		return htons(DNS_RECORD_SOA);
+		return htons(DNS_TYPE_SOA);
 	else if (InnerBuffer == (L"MB"))
-		return htons(DNS_RECORD_MB);
+		return htons(DNS_TYPE_MB);
 	else if (InnerBuffer == (L"MG"))
-		return htons(DNS_RECORD_MG);
+		return htons(DNS_TYPE_MG);
 	else if (InnerBuffer == (L"MR"))
-		return htons(DNS_RECORD_MR);
+		return htons(DNS_TYPE_MR);
 	else if (InnerBuffer == (L"PTR"))
-		return htons(DNS_RECORD_PTR);
+		return htons(DNS_TYPE_PTR);
 	else if (InnerBuffer == (L"NULL"))
-		return htons(DNS_RECORD_NULL);
+		return htons(DNS_TYPE_NULL);
 	else if (InnerBuffer == (L"WKS"))
-		return htons(DNS_RECORD_WKS);
+		return htons(DNS_TYPE_WKS);
 	else if (InnerBuffer == (L"HINFO"))
-		return htons(DNS_RECORD_HINFO);
+		return htons(DNS_TYPE_HINFO);
 	else if (InnerBuffer == (L"MINFO"))
-		return htons(DNS_RECORD_MINFO);
+		return htons(DNS_TYPE_MINFO);
 	else if (InnerBuffer == (L"MX"))
-		return htons(DNS_RECORD_MX);
+		return htons(DNS_TYPE_MX);
 	else if (InnerBuffer == (L"TXT"))
-		return htons(DNS_RECORD_TXT);
+		return htons(DNS_TYPE_TEXT);
 	else if (InnerBuffer == (L"RP"))
-		return htons(DNS_RECORD_RP);
+		return htons(DNS_TYPE_RP);
 	else if (InnerBuffer == (L"SIG"))
-		return htons(DNS_RECORD_SIG);
+		return htons(DNS_TYPE_SIG);
 	else if (InnerBuffer == (L"AFSDB"))
-		return htons(DNS_RECORD_AFSDB);
+		return htons(DNS_TYPE_AFSDB);
 	else if (InnerBuffer == (L"X25"))
-		return htons(DNS_RECORD_X25);
+		return htons(DNS_TYPE_X25);
 	else if (InnerBuffer == (L"ISDN"))
-		return htons(DNS_RECORD_ISDN);
+		return htons(DNS_TYPE_ISDN);
 	else if (InnerBuffer == (L"RT"))
-		return htons(DNS_RECORD_RT);
+		return htons(DNS_TYPE_RT);
 	else if (InnerBuffer == (L"NSAP"))
-		return htons(DNS_RECORD_NSAP);
+		return htons(DNS_TYPE_NSAP);
 	else if (InnerBuffer == (L"NSAPPTR"))
-		return htons(DNS_RECORD_NSAP_PTR);
+		return htons(DNS_TYPE_NSAPPTR);
 	else if (InnerBuffer == (L"SIG"))
-		return htons(DNS_RECORD_SIG);
+		return htons(DNS_TYPE_SIG);
 	else if (InnerBuffer == (L"KEY"))
-		return htons(DNS_RECORD_KEY);
+		return htons(DNS_TYPE_KEY);
 	else if (InnerBuffer == (L"AAAA"))
-		return htons(DNS_RECORD_AAAA);
+		return htons(DNS_TYPE_AAAA);
 	else if (InnerBuffer == (L"PX"))
-		return htons(DNS_RECORD_PX);
+		return htons(DNS_TYPE_PX);
 	else if (InnerBuffer == (L"GPOS"))
-		return htons(DNS_RECORD_GPOS);
+		return htons(DNS_TYPE_GPOS);
 	else if (InnerBuffer == (L"LOC"))
-		return htons(DNS_RECORD_LOC);
+		return htons(DNS_TYPE_LOC);
 	else if (InnerBuffer == (L"NXT"))
-		return htons(DNS_RECORD_NXT);
+		return htons(DNS_TYPE_NXT);
 	else if (InnerBuffer == (L"EID"))
-		return htons(DNS_RECORD_EID);
+		return htons(DNS_TYPE_EID);
 	else if (InnerBuffer == (L"NIMLOC"))
-		return htons(DNS_RECORD_NIMLOC);
+		return htons(DNS_TYPE_NIMLOC);
 	else if (InnerBuffer == (L"SRV"))
-		return htons(DNS_RECORD_SRV);
+		return htons(DNS_TYPE_SRV);
 	else if (InnerBuffer == (L"ATMA"))
-		return htons(DNS_RECORD_ATMA);
+		return htons(DNS_TYPE_ATMA);
 	else if (InnerBuffer == (L"NAPTR"))
-		return htons(DNS_RECORD_NAPTR);
+		return htons(DNS_TYPE_NAPTR);
 	else if (InnerBuffer == (L"KX"))
-		return htons(DNS_RECORD_KX);
+		return htons(DNS_TYPE_KX);
 	else if (InnerBuffer == (L"CERT"))
-		return htons(DNS_RECORD_CERT);
+		return htons(DNS_TYPE_CERT);
 	else if (InnerBuffer == (L"A6"))
-		return htons(DNS_RECORD_A6);
+		return htons(DNS_TYPE_A6);
 	else if (InnerBuffer == (L"DNAME"))
-		return htons(DNS_RECORD_DNAME);
+		return htons(DNS_TYPE_DNAME);
 	else if (InnerBuffer == (L"SINK"))
-		return htons(DNS_RECORD_SINK);
+		return htons(DNS_TYPE_SINK);
 	else if (InnerBuffer == (L"OPT"))
-		return htons(DNS_RECORD_OPT);
+		return htons(DNS_TYPE_OPT);
 	else if (InnerBuffer == (L"APL"))
-		return htons(DNS_RECORD_APL);
+		return htons(DNS_TYPE_APL);
 	else if (InnerBuffer == (L"DS"))
-		return htons(DNS_RECORD_DS);
+		return htons(DNS_TYPE_DS);
 	else if (InnerBuffer == (L"SSHFP"))
-		return htons(DNS_RECORD_SSHFP);
+		return htons(DNS_TYPE_SSHFP);
 	else if (InnerBuffer == (L"IPSECKEY"))
-		return htons(DNS_RECORD_IPSECKEY);
+		return htons(DNS_TYPE_IPSECKEY);
 	else if (InnerBuffer == (L"RRSIG"))
-		return htons(DNS_RECORD_RRSIG);
+		return htons(DNS_TYPE_RRSIG);
 	else if (InnerBuffer == (L"NSEC"))
-		return htons(DNS_RECORD_NSEC);
+		return htons(DNS_TYPE_NSEC);
 	else if (InnerBuffer == (L"DNSKEY"))
-		return htons(DNS_RECORD_DNSKEY);
+		return htons(DNS_TYPE_DNSKEY);
 	else if (InnerBuffer == (L"DHCID"))
-		return htons(DNS_RECORD_DHCID);
+		return htons(DNS_TYPE_DHCID);
 	else if (InnerBuffer == (L"NSEC3"))
-		return htons(DNS_RECORD_NSEC3);
+		return htons(DNS_TYPE_NSEC3);
 	else if (InnerBuffer == (L"NSEC3PARAM"))
-		return htons(DNS_RECORD_NSEC3PARAM);
+		return htons(DNS_TYPE_NSEC3PARAM);
 	else if (InnerBuffer == (L"TLSA"))
-		return htons(DNS_RECORD_TLSA);
+		return htons(DNS_TYPE_TLSA);
 	else if (InnerBuffer == (L"HIP"))
-		return htons(DNS_RECORD_HIP);
+		return htons(DNS_TYPE_HIP);
 	else if (InnerBuffer == (L"HINFO"))
-		return htons(DNS_RECORD_HINFO);
+		return htons(DNS_TYPE_HINFO);
 	else if (InnerBuffer == (L"RKEY"))
-		return htons(DNS_RECORD_RKEY);
+		return htons(DNS_TYPE_RKEY);
 	else if (InnerBuffer == (L"TALINK"))
-		return htons(DNS_RECORD_TALINK);
+		return htons(DNS_TYPE_TALINK);
 	else if (InnerBuffer == (L"CDS"))
-		return htons(DNS_RECORD_CDS);
+		return htons(DNS_TYPE_CDS);
 	else if (InnerBuffer == (L"CDNSKEY"))
-		return htons(DNS_RECORD_CDNSKEY);
+		return htons(DNS_TYPE_CDNSKEY);
 	else if (InnerBuffer == (L"OPENPGPKEY"))
-		return htons(DNS_RECORD_OPENPGPKEY);
+		return htons(DNS_TYPE_OPENPGPKEY);
 	else if (InnerBuffer == (L"SPF"))
-		return htons(DNS_RECORD_SPF);
+		return htons(DNS_TYPE_SPF);
 	else if (InnerBuffer == (L"UINFO"))
-		return htons(DNS_RECORD_UINFO);
+		return htons(DNS_TYPE_UINFO);
 	else if (InnerBuffer == (L"UID"))
-		return htons(DNS_RECORD_UID);
+		return htons(DNS_TYPE_UID);
 	else if (InnerBuffer == (L"GID"))
-		return htons(DNS_RECORD_GID);
+		return htons(DNS_TYPE_GID);
 	else if (InnerBuffer == (L"UNSPEC"))
-		return htons(DNS_RECORD_UNSPEC);
+		return htons(DNS_TYPE_UNSPEC);
 	else if (InnerBuffer == (L"NID"))
-		return htons(DNS_RECORD_NID);
+		return htons(DNS_TYPE_NID);
 	else if (InnerBuffer == (L"L32"))
-		return htons(DNS_RECORD_L32);
+		return htons(DNS_TYPE_L32);
 	else if (InnerBuffer == (L"L64"))
-		return htons(DNS_RECORD_L64);
+		return htons(DNS_TYPE_L64);
 	else if (InnerBuffer == (L"LP"))
-		return htons(DNS_RECORD_LP);
+		return htons(DNS_TYPE_LP);
 	else if (InnerBuffer == (L"EUI48"))
-		return htons(DNS_RECORD_EUI48);
+		return htons(DNS_TYPE_EUI48);
 	else if (InnerBuffer == (L"EUI64"))
-		return htons(DNS_RECORD_EUI64);
+		return htons(DNS_TYPE_EUI64);
+	else if (InnerBuffer == (L"ADDRS"))
+		return htons(DNS_TYPE_ADDRS);
 	else if (InnerBuffer == (L"TKEY"))
-		return htons(DNS_RECORD_TKEY);
+		return htons(DNS_TYPE_TKEY);
 	else if (InnerBuffer == (L"TSIG"))
-		return htons(DNS_RECORD_TSIG);
+		return htons(DNS_TYPE_TSIG);
 	else if (InnerBuffer == (L"IXFR"))
-		return htons(DNS_RECORD_IXFR);
+		return htons(DNS_TYPE_IXFR);
 	else if (InnerBuffer == (L"AXFR"))
-		return htons(DNS_RECORD_AXFR);
+		return htons(DNS_TYPE_AXFR);
 	else if (InnerBuffer == (L"MAILB"))
-		return htons(DNS_RECORD_MAILB);
+		return htons(DNS_TYPE_MAILB);
 	else if (InnerBuffer == (L"MAILA"))
-		return htons(DNS_RECORD_MAILA);
+		return htons(DNS_TYPE_MAILA);
 	else if (InnerBuffer == (L"ANY"))
-		return htons(DNS_RECORD_ANY);
+		return htons(DNS_TYPE_ANY);
 	else if (InnerBuffer == (L"URI"))
-		return htons(DNS_RECORD_URI);
+		return htons(DNS_TYPE_URI);
 	else if (InnerBuffer == (L"CAA"))
-		return htons(DNS_RECORD_CAA);
+		return htons(DNS_TYPE_CAA);
 	else if (InnerBuffer == (L"TA"))
-		return htons(DNS_RECORD_TA);
+		return htons(DNS_TYPE_TA);
 	else if (InnerBuffer == (L"DLV"))
-		return htons(DNS_RECORD_DLV);
+		return htons(DNS_TYPE_DLV);
 	else if (InnerBuffer == (L"RESERVED"))
-		return htons(DNS_RECORD_RESERVED);
+		return htons(DNS_TYPE_RESERVED);
 
 //No match.
 	return 0;
@@ -1055,8 +1057,8 @@ uint16_t DNSTypeNameToBinary(
 
 //Convert data from string to DNS query
 size_t CharToDNSQuery(
-	const uint8_t *FName, 
-	uint8_t *TName)
+	const uint8_t * const FName, 
+	uint8_t * const TName)
 {
 //Initialization
 	int Index[]{(int)strnlen_s((const char *)FName, DOMAIN_MAXSIZE) - 1, 0, 0};
@@ -1083,13 +1085,13 @@ size_t CharToDNSQuery(
 
 //Convert data from DNS query to char(s)
 size_t DNSQueryToChar(
-	const uint8_t *TName, 
-	uint8_t *FName, 
+	const uint8_t * const TName, 
+	uint8_t * const FName, 
 	uint16_t &Truncated)
 {
 //Initialization
 	size_t uIndex = 0;
-	int Index[] = {0, 0};
+	int Index[]{0, 0};
 
 //Convert domain.
 	for (uIndex = 0;uIndex < DOMAIN_MAXSIZE;++uIndex)
@@ -1126,7 +1128,7 @@ size_t DNSQueryToChar(
 
 //Validate packets
 bool ValidatePacket(
-	const uint8_t *Buffer, 
+	const uint8_t * const Buffer, 
 	const size_t Length, 
 	const uint16_t DNS_ID)
 {
@@ -1164,7 +1166,7 @@ bool ValidatePacket(
 
 //Print date from seconds to file
 void PrintSecondsInDateTime(
-	FILE *FileHandle, 
+	FILE * const FileHandle, 
 	const time_t Seconds)
 {
 //Less than 1 minute
@@ -1245,7 +1247,7 @@ void PrintSecondsInDateTime(
 
 //Print Date and Time with UNIX time to file
 void PrintDateTime(
-	FILE *FileHandle, 
+	FILE * const FileHandle, 
 	const time_t Time)
 {
 	tm TimeStructure;

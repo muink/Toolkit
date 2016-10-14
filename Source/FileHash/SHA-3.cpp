@@ -132,7 +132,7 @@ bool ReadCommands_SHA3(
 
 //SHA-3 hash function
 bool SHA3_Hash(
-	FILE *FileHandle)
+	FILE * const FileHandle)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_SHA3 || FileHandle == nullptr)

@@ -21,10 +21,10 @@
 
 //BLAKE-224 compress process
 void blake224_compress(
-	state224 *S, 
-	const uint8_t *block)
+	state224 * const S, 
+	const uint8_t * const block)
 {
-	uint32_t v[16U] = {0}, m[16U] = {0}, i = 0;
+	uint32_t v[16U]{0}, m[16U]{0}, i = 0;
 #define ROT(x, n) (((x) << (32 - n)) | ((x) >> (n)))
 #define G(a, b, c, d, e)                                       \
 	v[a] += (m[sigma[i][e]] ^ u256[sigma[i][e + 1]]) + v[b];   \
@@ -85,7 +85,7 @@ void blake224_compress(
 
 //BLAKE init process
 void blake224_init(
-	state224 *S)
+	state224 * const S)
 {
 	S->h[0] = 0xC1059ED8;
 	S->h[1U] = 0x367CD507;
@@ -103,7 +103,7 @@ void blake224_init(
 
 //BLAKE-224 update process
 void blake224_update(
-	state224 *S, 
+	state224 * const S, 
 	const uint8_t *in, 
 	uint64_t inlen)
 {
@@ -152,8 +152,8 @@ void blake224_update(
 
 //BLAKE-224 final process
 void blake224_final(
-	state224 *S, 
-	uint8_t *out)
+	state224 * const S, 
+	uint8_t * const out)
 {
 	uint8_t msglen[8U], zz = 0x00, oz = 0x80;
 	uint32_t lo = S->t[0] + (S->buflen << 3U), hi = S->t[1U];
@@ -209,10 +209,10 @@ void blake224_final(
 
 //BLAKE-256 compress process
 void blake256_compress(
-	state256 *S, 
-	const uint8_t *block)
+	state256 * const S, 
+	const uint8_t * const block)
 {
-	uint32_t v[16U] = {0}, m[16U] = {0}, i = 0;
+	uint32_t v[16U]{0}, m[16U]{0}, i = 0;
 #define ROT(x, n) (((x) << (32 - n)) | ((x) >> (n)))
 #define G(a, b, c, d, e)                                       \
 	v[a] += (m[sigma[i][e]] ^ u256[sigma[i][e + 1]]) + v[b];   \
@@ -273,7 +273,7 @@ void blake256_compress(
 
 //BLAKE-256 init process
 void blake256_init(
-	state256 *S)
+	state256 * const S)
 {
 	S->h[0] = 0x6A09E667;
 	S->h[1U] = 0xBB67AE85;
@@ -291,7 +291,7 @@ void blake256_init(
 
 //BLAKE-256 update process
 void blake256_update(
-	state256 *S, 
+	state256 * const S, 
 	const uint8_t *in, 
 	uint64_t inlen)
 {
@@ -340,8 +340,8 @@ void blake256_update(
 
 //BLAKE-256 final process
 void blake256_final(
-	state256 *S, 
-	uint8_t *out)
+	state256 * const S, 
+	uint8_t * const out)
 {
 	uint8_t msglen[8U], zo = 0x01, oo = 0x81;
 	uint32_t lo = S->t[0] + (S->buflen << 3U), hi = S->t[1U];
@@ -398,10 +398,10 @@ void blake256_final(
 
 //BLAKE-384 compress process
 void blake384_compress(
-	state384 *S, 
-	const uint8_t *block)
+	state384 * const S, 
+	const uint8_t * const block)
 {
-	uint64_t v[16U] = {0}, m[16U] = {0}, i = 0;
+	uint64_t v[16U]{0}, m[16U]{0}, i = 0;
 #define ROT(x, n) (((x) << (64 - n)) | ((x) >> (n)))
 #define G(a, b, c, d, e)                                       \
 	v[a] += (m[sigma[i][e]] ^ u512[sigma[i][e + 1]]) + v[b];   \
@@ -462,7 +462,7 @@ void blake384_compress(
 
 //BLAKE-384 init process
 void blake384_init(
-	state384 *S)
+	state384 * const S)
 {
 	S->h[0] = 0xCBBB9D5DC1059ED8ULL;
 	S->h[1U] = 0x629A292A367CD507ULL;
@@ -480,7 +480,7 @@ void blake384_init(
 
 //BLAKE-384 update process
 void blake384_update(
-	state384 *S, 
+	state384 * const S, 
 	const uint8_t *in, 
 	uint64_t inlen)
 {
@@ -529,8 +529,8 @@ void blake384_update(
 
 //BLAKE-384 final process
 void blake384_final(
-	state384 *S, 
-	uint8_t *out)
+	state384 * const S, 
+	uint8_t * const out)
 {
 	uint8_t msglen[16U], zz = 0x00, oz = 0x80;
 	uint64_t lo = S->t[0] + (((uint64_t)S->buflen) << 3U), hi = S->t[1U];
@@ -584,10 +584,10 @@ void blake384_final(
 
 //BLAKE-512 compress process
 void blake512_compress(
-	state512 *S, 
-	const uint8_t *block)
+	state512 * const S, 
+	const uint8_t * const block)
 {
-	uint64_t v[16U] = {0}, m[16U] = {0}, i = 0;
+	uint64_t v[16U]{0}, m[16U]{0}, i = 0;
 #define ROT(x, n) (((x) << (64 - n)) | ((x) >> (n)))
 #define G(a, b, c, d, e)                                       \
 	v[a] += (m[sigma[i][e]] ^ u512[sigma[i][e + 1]]) + v[b];   \
@@ -648,7 +648,7 @@ void blake512_compress(
 
 //BLAKE-512 init process
 void blake512_init(
-	state512 *S)
+	state512 * const S)
 {
 	S->h[0] = 0x6A09E667F3BCC908ULL;
 	S->h[1U] = 0xBB67AE8584CAA73BULL;
@@ -666,7 +666,7 @@ void blake512_init(
 
 //BLAKE-512 update process
 void blake512_update(
-	state512 *S, 
+	state512 * const S, 
 	const uint8_t *in, 
 	uint64_t inlen)
 {
@@ -715,8 +715,8 @@ void blake512_update(
 
 //BLAKE-512 final process
 void blake512_final(
-	state512 *S, 
-	uint8_t *out)
+	state512 * const S, 
+	uint8_t * const out)
 {
 	uint8_t msglen[16U], zo = 0x01, oo = 0x81;
 	uint64_t lo = S->t[0] + (((uint64_t)S->buflen) << 3U), hi = S->t[1U];
@@ -808,7 +808,7 @@ bool ReadCommands_BLAKE(
 
 //BLAKE hash function
 bool BLAKE_Hash(
-	FILE *FileHandle)
+	FILE * const FileHandle)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_BLAKE || FileHandle == nullptr)

@@ -260,7 +260,7 @@
     <ClInclude Include="Protocol.h" />
     <ClInclude Include="Resolver.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Structures.h" />
+    <ClInclude Include="Structure.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Console.cpp" />

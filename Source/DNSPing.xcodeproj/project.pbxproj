@@ -39,10 +39,10 @@
 		D942EC6D1D12F2E200F7C65A /* Protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Protocol.h; path = DNSPing/Protocol.h; sourceTree = "<group>"; };
 		D942EC6E1D12F2E200F7C65A /* Resolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Resolver.cpp; path = DNSPing/Resolver.cpp; sourceTree = "<group>"; };
 		D942EC6F1D12F2E200F7C65A /* Resolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Resolver.h; path = DNSPing/Resolver.h; sourceTree = "<group>"; };
-		D942EC701D12F2E200F7C65A /* Structures.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Structures.h; path = DNSPing/Structures.h; sourceTree = "<group>"; };
 		D942EC711D12F2E200F7C65A /* Terminal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Terminal.cpp; path = DNSPing/Terminal.cpp; sourceTree = "<group>"; };
 		D942EC791D12F2ED00F7C65A /* Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Base.h; path = DNSPing/Base.h; sourceTree = "<group>"; };
 		D99427BC1D12F0FE00280D91 /* DNSPing */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = DNSPing; sourceTree = BUILT_PRODUCTS_DIR; };
+		D9A033F51DB0E42200F7A96F /* Structure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Structure.h; path = DNSPing/Structure.h; sourceTree = "<group>"; };
 		D9AC805C1D903736007FD633 /* ReadCommands.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ReadCommands.cpp; path = DNSPing/ReadCommands.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -88,7 +88,7 @@
 				D942EC6B1D12F2E200F7C65A /* Process.h */,
 				D942EC6D1D12F2E200F7C65A /* Protocol.h */,
 				D942EC6F1D12F2E200F7C65A /* Resolver.h */,
-				D942EC701D12F2E200F7C65A /* Structures.h */,
+				D9A033F51DB0E42200F7A96F /* Structure.h */,
 			);
 			name = DNSPing;
 			sourceTree = "<group>";
@@ -119,7 +119,7 @@
 		D99427B41D12F0FE00280D91 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = Chengr28;
 				TargetAttributes = {
 					D99427BB1D12F0FE00280D91 = {
@@ -176,8 +176,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -219,8 +221,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";

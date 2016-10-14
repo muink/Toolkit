@@ -41,7 +41,7 @@ uint32_t Checksum_Update(
 //Finish checksum hash process
 uint16_t Checksum_Final(
 	uint32_t Checksum, 
-	const uint16_t *Buffer, 
+	const uint16_t * const Buffer, 
 	const size_t Length)
 {
 	if (Length)
@@ -57,7 +57,7 @@ uint16_t Checksum_Final(
 // 
 //Internet protocol checksum hash function
 bool Checksum_Hash(
-	FILE *FileHandle)
+	FILE * const FileHandle)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_CHECKSUM || FileHandle == nullptr)

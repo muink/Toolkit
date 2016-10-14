@@ -21,10 +21,10 @@
 
 //SHA-1 compress process
 static void SHA1_Compress(
-	SHA1_State *sha1, 
-	uint8_t *buf)
+	SHA1_State * const sha1, 
+	uint8_t * const buf)
 {
-	SHA1_INT32 a = 0, b = 0, c = 0, d = 0, e = 0, W[80U] = {0};
+	SHA1_INT32 a = 0, b = 0, c = 0, d = 0, e = 0, W[80U]{0};
 	size_t Index = 0;
 
  //Copy the state into 512-bits into W[0..15].
@@ -102,12 +102,9 @@ static void SHA1_Compress(
 	return;
 }
 
-/***
-	Initialize the hash state
-	@param sha1   The hash state you wish to initialize
-*/
+//Initialize the hash state
 void SHA1_Init(
-	SHA1_State *sha1)
+	SHA1_State * const sha1)
 {
 	sha1->State[0] = 0x67452301UL;
 	sha1->State[1U] = 0xEFCDAB89UL;
@@ -120,14 +117,9 @@ void SHA1_Init(
 	return;
 }
 
-/***
-	Process a block of memory though the hash
-	@param sha1   The hash state
-	@param in     The data to hash
-	@param inlen  The length of the data (octets)
-*/
+//Process a block of memory though the hash
 void SHA1_Process(
-	SHA1_State *sha1, 
+	SHA1_State * const sha1, 
 	const uint8_t *in, 
 	unsigned long inlen)
 {
@@ -159,14 +151,10 @@ void SHA1_Process(
 	return;
 }
 
-/***
-	Terminate the hash to get the digest
-	@param sha1  The hash state
-	@param out [out] The destination of the hash (20 bytes)
-*/
+//Terminate the hash to get the digest
 void SHA1_Done(
-	SHA1_State *sha1, 
-	uint8_t *out)
+	SHA1_State * const sha1, 
+	uint8_t * const out)
 {
 //Increase the length of the message.
 	sha1->Length += sha1->Curlen * 8;
@@ -174,7 +162,7 @@ void SHA1_Done(
 //Append the '1' bit.
 	sha1->Buffer[sha1->Curlen++] = (uint8_t)0x80;
 
-/** if the length is currently above 56 bytes we append zeros
+/** If the length is currently above 56 bytes we append zeros
   * then compress.  Then we can fall back to padding zeros and length
   * encoding like normal.
 */
@@ -206,7 +194,7 @@ void SHA1_Done(
 // 
 //SHA-1 hash function
 bool SHA1_Hash(
-	FILE *FileHandle)
+	FILE * const FileHandle)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_SHA1 || FileHandle == nullptr)

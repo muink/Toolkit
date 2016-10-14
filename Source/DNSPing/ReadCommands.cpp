@@ -694,7 +694,7 @@ bool ReadCommands(
 				memset(TempRawData.get(), 0, PACKET_MAXSIZE);
 				ConfigurationParameter.RawData.swap(TempRawData);
 				TempRawData.reset();
-				uint8_t TempString[5U] = {0};
+				uint8_t TempString[5U]{0};
 				TempString[0] = ASCII_ZERO;
 				TempString[1U] = ASCII_LOWERCASE_X;
 
@@ -926,7 +926,7 @@ bool ReadCommands(
 											((PSOCKADDR_IN6)&ConfigurationParameter.SockAddr_SOCKS)->sin6_port = htons((uint16_t)UnsignedResult);
 
 										//Convert binary to address string.
-											uint8_t Buffer[ADDRESS_STRING_MAXSIZE] = {0};
+											uint8_t Buffer[ADDRESS_STRING_MAXSIZE]{0};
 											if (!BinaryToAddressString(AF_INET6, &((PSOCKADDR_IN6)&ConfigurationParameter.SockAddr_SOCKS)->sin6_addr, Buffer, ADDRESS_STRING_MAXSIZE, &SignedResult))
 											{
 												PrintErrorToScreen(L"\n[Error] IPv6 address format error error", SignedResult);
@@ -943,7 +943,7 @@ bool ReadCommands(
 											((PSOCKADDR_IN)&ConfigurationParameter.SockAddr_SOCKS)->sin_port = htons((uint16_t)UnsignedResult);
 
 										//Convert binary to address string.
-											uint8_t Buffer[ADDRESS_STRING_MAXSIZE] = {0};
+											uint8_t Buffer[ADDRESS_STRING_MAXSIZE]{0};
 											if (!BinaryToAddressString(AF_INET, &((PSOCKADDR_IN)&ConfigurationParameter.SockAddr_SOCKS)->sin_addr, Buffer, ADDRESS_STRING_MAXSIZE, &SignedResult))
 											{
 												PrintErrorToScreen(L"\n[Error] IPv4 address format error error", SignedResult);
@@ -1293,7 +1293,7 @@ bool ReadCommands(
 
 									//Convert binary to address string.
 										ConfigurationParameter.TargetAddressString = ParameterString;
-										uint8_t Buffer[ADDRESS_STRING_MAXSIZE] = {0};
+										uint8_t Buffer[ADDRESS_STRING_MAXSIZE]{0};
 										if (!BinaryToAddressString(AF_INET6, &((PSOCKADDR_IN6)&ConfigurationParameter.SockAddr_Normal)->sin6_addr, Buffer, ADDRESS_STRING_MAXSIZE, &SignedResult))
 										{
 											PrintErrorToScreen(L"\n[Error] IPv6 address format error error", SignedResult);
@@ -1315,7 +1315,7 @@ bool ReadCommands(
 
 									//Convert binary to address string.
 										ConfigurationParameter.TargetAddressString = ParameterString;
-										uint8_t Buffer[ADDRESS_STRING_MAXSIZE] = {0};
+										uint8_t Buffer[ADDRESS_STRING_MAXSIZE]{0};
 										if (!BinaryToAddressString(AF_INET, &((PSOCKADDR_IN)&ConfigurationParameter.SockAddr_Normal)->sin_addr, Buffer, ADDRESS_STRING_MAXSIZE, &SignedResult))
 										{
 											PrintErrorToScreen(L"\n[Error] IPv4 address format error error", SignedResult);

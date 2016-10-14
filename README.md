@@ -3,15 +3,11 @@
 A useful and powerful toolkit
 
 ### Updated
-**0.3.3.0**
+**0.3.4.0**
 
 ### Usage
-* Windows/Linux/Mac - Please visit [ReadMe documents](https://github.com/chengr28/Toolkit/tree/master/Documents).
-* OpenWrt/LEDE - Please visit [openwrt-Toolkit project](https://github.com/wongsyrone/openwrt-Toolkit).
-
-### Binary files
-* [Release branch(Windows)](https://github.com/chengr28/Toolkit/tree/Release/Windows)
-* [Release branch(Mac)](https://github.com/chengr28/Toolkit/tree/Release/Mac)
+* Windows/Linux/Mac: [ReadMe documents](https://github.com/chengr28/Toolkit/tree/master/Documents) and [releases](https://github.com/chengr28/Toolkit/releases)
+* OpenWrt/LEDE: [openwrt-Toolkit project](https://github.com/wongsyrone/openwrt-Toolkit)
 
 ### License
 GNU General Public License/GNU GPL v2

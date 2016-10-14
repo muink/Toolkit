@@ -971,7 +971,7 @@ void PrintHeaderToScreen(
 	{
 		if (wTargetAddressString.empty())
 		{
-			uint8_t FQDN[NI_MAXHOST + 1U] = {0};
+			uint8_t FQDN[NI_MAXHOST + 1U]{0};
 			if (getnameinfo((PSOCKADDR)&ConfigurationParameter.SockAddr_Normal, sizeof(sockaddr_in), (char *)FQDN, NI_MAXHOST, nullptr, 0, NI_NUMERICSERV) != 0)
 			{
 				PrintErrorToScreen(L"[Error] Resolve addresses to host names error", WSAGetLastError());
@@ -1038,7 +1038,7 @@ void ErrorCodeToMessage(
 
 //Convert error code to error message.
 #if defined(PLATFORM_WIN)
-	wchar_t *InnerMessage = nullptr;
+	const wchar_t *InnerMessage = nullptr;
 	if (FormatMessageW(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS|FORMAT_MESSAGE_MAX_WIDTH_MASK, 
 		nullptr, 
@@ -1060,7 +1060,7 @@ void ErrorCodeToMessage(
 
 //Free pointer.
 	if (InnerMessage != nullptr)
-		LocalFree(InnerMessage);
+		LocalFree((HLOCAL)InnerMessage);
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
 	std::wstring InnerMessage;
 	auto ErrorMessage = strerror((int)ErrorCode);
@@ -1081,7 +1081,7 @@ void ErrorCodeToMessage(
 
 //Print errors to screen
 void PrintErrorToScreen(
-	const wchar_t *Message, 
+	const wchar_t * const Message, 
 	const ssize_t ErrorCode)
 {
 	std::wstring InnerMessage(Message);
@@ -1170,8 +1170,8 @@ void PrintDescription(
 	fwprintf_s(stderr, L"                           IPSECKEY|RRSIG|NSEC|DNSKEY|DHCID|NSEC3|NSEC3PARAM|\n");
 	fwprintf_s(stderr, L"                           TLSA|HIP|NINFO|RKEY|TALINK|CDS|CDNSKEY|OPENPGPKEY|\n");
 	fwprintf_s(stderr, L"                           SPF|UINFO|UID|GID|UNSPEC|NID|L32|L64|LP|EUI48|\n");
-	fwprintf_s(stderr, L"                           EUI64|TKEY|TSIG|IXFR|AXFR|MAILB|MAILA|ANY|URI|\n");
-	fwprintf_s(stderr, L"                           CAA|TA|DLV|RESERVED\n");
+	fwprintf_s(stderr, L"                           EUI64|ADDRS|TKEY|TSIG|IXFR|AXFR|MAILB|MAILA|ANY|\n");
+	fwprintf_s(stderr, L"                           URI|CAA|TA|DLV|RESERVED\n");
 	fwprintf_s(stderr, L"   -qc classes       Specifie Query classes.\n");
 	fwprintf_s(stderr, L"                     Query classes must between 0x0001 - 0xFFFF/65535.\n");
 	fwprintf_s(stderr, L"                     Classes: IN|CSNET|CHAOS|HESIOD|NONE|ALL|ANY\n");

@@ -21,7 +21,7 @@
 
 //Initialize the hash state
 void MD2_Init(
-	MD2_CTX *md2)
+	MD2_CTX * const md2)
 {
 	XMEMSET(md2->X, 0, MD2_X_SIZE);
 	XMEMSET(md2->C, 0, MD2_BLOCK_SIZE);
@@ -33,7 +33,7 @@ void MD2_Init(
 
 //Update MD2 status
 void MD2_Update(
-	MD2_CTX *md2, 
+	MD2_CTX * const md2, 
 	const uint8_t *data, 
 	uint32_t len)
 {
@@ -105,10 +105,10 @@ void MD2_Update(
 
 //Finish hash process
 void MD2_Final(
-	MD2_CTX *md2, 
-	uint8_t *hash)
+	MD2_CTX * const md2, 
+	uint8_t * const hash)
 {
-	uint8_t padding[MD2_BLOCK_SIZE] = {0};
+	uint8_t padding[MD2_BLOCK_SIZE]{0};
 	uint32_t padLen = MD2_PAD_SIZE - md2->Count, i = 0;
 
 	for (i = 0;i < padLen;++i)
@@ -127,7 +127,7 @@ void MD2_Final(
 // 
 //MD2 hash function
 bool MD2_Hash(
-	FILE *FileHandle)
+	FILE * const FileHandle)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_MD2 || FileHandle == nullptr)

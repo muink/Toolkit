@@ -78,65 +78,21 @@ extern size_t HashFamilyID;
 size_t BLAKE2_HashFunctionID = DEFAULT_HASH_FUNCTION_ID;
 
 //BLAKE2b Hashing Context and API Prototypes
-// State context
 typedef struct
 {
-	uint8_t b[128U];                    // Input buffer
-	uint64_t h[8U];                     // Chained state
-	uint64_t t[2U];                     // Total number of bytes
-	size_t c;                           // Pointer for b[]
-	size_t outlen;                      // Digest size
+	uint8_t b[128U];                    //Input buffer
+	uint64_t h[8U];                     //Chained state
+	uint64_t t[2U];                     //Total number of bytes
+	size_t c;                           //Pointer for b[]
+	size_t outlen;                      //Digest size
 }blake2b_ctx;
 
-// Initialize the hashing context "ctx" with optional key "key".
-// 1 <= outlen <= 64 gives the digest size in bytes.
-// Secret key (also <= 64 bytes) is optional (keylen = 0).
-int blake2b_init(
-	blake2b_ctx *ctx, 
-	size_t outlen, 
-	const void *key, 
-	size_t keylen);                     // Secret key
-
-// Add "inlen" bytes from "in" into the hash.
-void blake2b_update(
-	blake2b_ctx *ctx,                   // Context
-	const void *in, 
-	size_t inlen);                      // Data to be hashed
-
-// Generate the message digest(size given in init).
-// Result placed in "out".
-void blake2b_final(
-	blake2b_ctx *ctx, 
-	void *out);
-
 //BLAKE2s Hashing Context and API Prototypes
-// State context
 typedef struct
 {
-	uint8_t b[64U];                     // Input buffer
-	uint32_t h[8U];                     // Chained state
-	uint32_t t[2U];                     // Total number of bytes
-	size_t c;                           // Pointer for b[]
-	size_t outlen;                      // Digest size
-} blake2s_ctx;
-
-// Initialize the hashing context "ctx" with optional key "key".
-// 1 <= outlen <= 32 gives the digest size in bytes.
-// Secret key (also <= 32 bytes) is optional (keylen = 0).
-int blake2s_init(
-	blake2s_ctx *ctx, 
-	size_t outlen, 
-	const void *key, 
-	size_t keylen);                     // Secret key
-
-// Add "inlen" bytes from "in" into the hash.
-void blake2s_update(
-	blake2s_ctx *ctx,                   // Context
-	const void *in, 
-	size_t inlen);                      // Data to be hashed
-
-// Generate the message digest (size given in init).
-// Result placed in "out".
-void blake2s_final(
-	blake2s_ctx *ctx, 
-	void *out);
+	uint8_t b[64U];                     //Input buffer
+	uint32_t h[8U];                     //Chained state
+	uint32_t t[2U];                     //Total number of bytes
+	size_t c;                           //Pointer for b[]
+	size_t outlen;                      //Digest size
+}blake2s_ctx;

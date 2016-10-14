@@ -30,7 +30,7 @@ uint8_t PADDING[] =
 
 //Initialize the hash state
 void MD5_Init(
-	MD5_CTX *context)
+	MD5_CTX * const context)
 {
 	context->State[0] = 0x67452301;
 	context->State[1U] = 0xEFCDAB89;
@@ -40,56 +40,10 @@ void MD5_Init(
 	return;
 }
 
-//Update MD5 status
-void MD5_Update(
-	MD5_CTX *context, 
-	uint8_t *input, 
-	unsigned int inputlen)
-{
-	unsigned int i = 0, index = 0, partlen = 0;
-	index = (context->Count[0] >> 3U) & 0x3F;
-	partlen = 64U - index;
-	context->Count[0] += inputlen << 3U;
-	if (context->Count[0] < (inputlen << 3U))
-		context->Count[1U]++;
-	context->Count[1U] += inputlen >> 29U;
-	if (inputlen >= partlen)
-	{
-		memcpy(&context->Buffer[index], input, partlen);
-		MD5_Transform(context->State, context->Buffer);
-		for (i = partlen;i + 64 <= inputlen;i += 64U)
-			MD5_Transform(context->State, &input[i]);
-		index = 0;
-	}
-	else {
-		i = 0;
-	}
-	memcpy(&context->Buffer[index], &input[i], inputlen - i);
-
-	return;
-}
-
-//Finish MD5 process
-void MD5_Final(
-	MD5_CTX *context, 
-	uint8_t digest[MD5_DIGEST_SIZE])
-{
-	unsigned int index = 0, padlen = 0;
-	uint8_t bits[8U] = {0};
-	index = (context->Count[0] >> 3U) & 0x3F;
-	padlen = (index < 56U) ? (56U - index) : (120U - index);
-	MD5_Encode(bits, context->Count, 8U);
-	MD5_Update(context, PADDING, padlen);
-	MD5_Update(context, bits, 8U);
-	MD5_Encode(digest, context->State, MD5_DIGEST_SIZE);
-
-	return;
-}
-
 //MD5 encode process
 void MD5_Encode(
-	uint8_t *output, 
-	unsigned int *input, 
+	uint8_t * const output, 
+	unsigned int * const input, 
 	unsigned int len)
 {
 	unsigned int i = 0, j = 0;
@@ -108,8 +62,8 @@ void MD5_Encode(
 
 //MD5 encode process
 void MD5_Decode(
-	unsigned int *output, 
-	uint8_t *input, 
+	unsigned int * const output, 
+	uint8_t * const input, 
 	unsigned int len)
 {
 	unsigned int i = 0, j = 0;
@@ -128,7 +82,7 @@ void MD5_Transform(
 	unsigned int state[4U], 
 	uint8_t block[MD5_BLOCK_SIZE])
 {
-	unsigned int a = state[0], b = state[1U], c = state[2U], d = state[3U], x[64U] = {0};
+	unsigned int a = state[0], b = state[1U], c = state[2U], d = state[3U], x[64U]{0};
 	MD5_Decode(x, block, 64U);
 	FF(a, b, c, d, x[0], 7, 0xD76AA478);
 	FF(d, a, b, c, x[1U], 12, 0xE8C7B756);
@@ -202,12 +156,58 @@ void MD5_Transform(
 	return;
 }
 
+//Update MD5 status
+void MD5_Update(
+	MD5_CTX * const context, 
+	uint8_t * const input, 
+	unsigned int inputlen)
+{
+	unsigned int i = 0, index = 0, partlen = 0;
+	index = (context->Count[0] >> 3U) & 0x3F;
+	partlen = 64U - index;
+	context->Count[0] += inputlen << 3U;
+	if (context->Count[0] < (inputlen << 3U))
+		context->Count[1U]++;
+	context->Count[1U] += inputlen >> 29U;
+	if (inputlen >= partlen)
+	{
+		memcpy(&context->Buffer[index], input, partlen);
+		MD5_Transform(context->State, context->Buffer);
+		for (i = partlen;i + 64 <= inputlen;i += 64U)
+			MD5_Transform(context->State, &input[i]);
+		index = 0;
+	}
+	else {
+		i = 0;
+	}
+
+	memcpy(&context->Buffer[index], &input[i], inputlen - i);
+	return;
+}
+
+//Finish MD5 process
+void MD5_Final(
+	MD5_CTX * const context, 
+	uint8_t digest[MD5_DIGEST_SIZE])
+{
+	unsigned int index = 0, padlen = 0;
+	uint8_t bits[8U]{0};
+	index = (context->Count[0] >> 3U) & 0x3F;
+	padlen = (index < 56U) ? (56U - index) : (120U - index);
+	MD5_Encode(bits, context->Count, 8U);
+	MD5_Update(context, PADDING, padlen);
+	MD5_Update(context, bits, 8U);
+	MD5_Encode(digest, context->State, MD5_DIGEST_SIZE);
+
+	return;
+}
+
 //////////////////////////////////////////////////
 // Hash function
 // 
 //MD5 hash function
 bool MD5_Hash(
-	FILE *FileHandle)
+	FILE * const FileHandle)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_MD5 || FileHandle == nullptr)

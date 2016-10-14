@@ -34,7 +34,7 @@ set(MAIN_SRC_FILES
 		"Process.h"
 		"Protocol.h"
 		"Resolver.h"
-		"Structures.h"
+		"Structure.h"
 		"Initialization.cpp"
 		"DNSPing.cpp"
 		"Process.cpp"

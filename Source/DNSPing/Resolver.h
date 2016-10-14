@@ -21,20 +21,20 @@
 
 //Functions
 void PrintFlags(
-	FILE *FileHandle, 
+	FILE * const FileHandle, 
 	const uint16_t Flags);
 void PrintTypeClassesName(
-	FILE *FileHandle, 
+	FILE * const FileHandle, 
 	const uint16_t Type, 
 	const uint16_t Classes);
 size_t PrintDomainName(
-	FILE *FileHandle, 
-	const uint8_t *Buffer, 
+	FILE * const FileHandle, 
+	const uint8_t * const Buffer, 
 	const size_t Location);
 void PrintResourseData(
-	FILE *FileHandle, 
+	FILE * const FileHandle, 
 	const uint16_t Type, 
 	const uint16_t Classes, 
-	const uint8_t *Buffer, 
+	const uint8_t * const Buffer, 
 	const size_t Location, 
 	const uint16_t Length);

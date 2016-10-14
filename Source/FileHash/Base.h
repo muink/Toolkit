@@ -181,10 +181,8 @@
 #include <string>                  //String support(STL)
 
 #if defined(PLATFORM_WIN)
-	#include <windows.h>               //Master include file in Windows
-
-//Static libraries
-	#pragma comment(lib, "ws2_32.lib")            //Windows WinSock 2.0+ support
+	#include <windows.h>                 //Master include file in Windows
+	#pragma comment(lib, "ws2_32.lib")   //Windows WinSock 2.0+ support
 
 //Endian definitions
 	#define __LITTLE_ENDIAN            1234                      //Little Endian
@@ -229,8 +227,8 @@
 #define PADDING_RESERVED_BYTES   2U              //Padding reserved bytes(2 bytes)
 
 //Version definitions
-#define FULL_VERSION                 L"0.3.3.0"
-#define COPYRIGHT_MESSAGE            L"Copyright (C) 2012-2016 Chengr28"
+#define FULL_VERSION             L"0.3.4.0"
+#define COPYRIGHT_MESSAGE        L"Copyright (C) 2012-2016 Chengr28"
 
 //Command definitions
 #if defined(PLATFORM_WIN)
@@ -332,10 +330,10 @@
 // 
 //Base.cpp
 bool CheckEmptyBuffer(
-	const void *Buffer, 
+	const void * const Buffer, 
 	const size_t Length);
 bool MBSToWCSString(
-	const uint8_t *Buffer, 
+	const uint8_t * const Buffer, 
 	const size_t MaxLen, 
 	std::wstring &Target);
 void CaseConvert(
@@ -345,15 +343,15 @@ void CaseConvert(
 	std::wstring &Buffer, 
 	const bool IsLowerToUpper);
 uint8_t *sodium_bin2hex(
-	uint8_t *const hex, 
+	uint8_t * const hex, 
 	const size_t hex_maxlen, 
-	const uint8_t *const bin, 
+	const uint8_t * const bin, 
 	const size_t bin_len);
 void ErrorCodeToMessage(
 	const ssize_t ErrorCode, 
 	std::wstring &Message);
 void PrintToScreen(
-	const uint8_t *Message);
+	const uint8_t * const Message);
 void PrintDescription(
 	void);
 
@@ -365,7 +363,7 @@ bool ReadCommands_BLAKE(
 	std::string &Command);
 #endif
 bool BLAKE_Hash(
-	FILE *FileHandle);
+	FILE * const FileHandle);
 
 //BLAKE2.cpp
 bool ReadCommands_BLAKE2(
@@ -375,11 +373,11 @@ bool ReadCommands_BLAKE2(
 	std::string &Command);
 #endif
 bool BLAKE2_Hash(
-	FILE *FileHandle);
+	FILE * const FileHandle);
 
 //Checksum.cpp
 bool Checksum_Hash(
-	FILE *FileHandle);
+	FILE * const FileHandle);
 
 //CRC.cpp
 bool ReadCommands_CRC(
@@ -389,30 +387,30 @@ bool ReadCommands_CRC(
 	std::string &Command);
 #endif
 bool CRC_Hash(
-	FILE *FileHandle);
+	FILE * const FileHandle);
 
 //FileHash.cpp
 bool ReadCommands(
 #if defined(PLATFORM_WIN)
-	const wchar_t *Command, 
+	const wchar_t * const Command, 
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-	const char *Command, 
+	const char * const Command, 
 #endif
 	const bool IsFileNameOnly);
 bool MainHashProcess(
-	FILE *FileHandle);
+	FILE * const FileHandle);
 
 //MD2.cpp
 bool MD2_Hash(
-	FILE *FileHandle);
+	FILE * const FileHandle);
 
 //MD4.cpp
 bool MD4_Hash(
-	FILE *FileHandle);
+	FILE * const FileHandle);
 
 //MD5.cpp
 bool MD5_Hash(
-	FILE *FileHandle);
+	FILE * const FileHandle);
 
 //RIPEMD.cpp
 bool ReadCommands_RIPEMD(
@@ -422,15 +420,15 @@ bool ReadCommands_RIPEMD(
 	std::string &Command);
 #endif
 bool RIPEMD_Hash(
-	FILE *FileHandle);
+	FILE * const FileHandle);
 
 //SHA-1.cpp
 bool SHA1_Hash(
-	FILE *FileHandle);
+	FILE * const FileHandle);
 
 //SHA-2.cpp
 bool SHA2_Hash(
-	FILE *FileHandle);
+	FILE * const FileHandle);
 bool ReadCommands_SHA2(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command);
@@ -440,7 +438,7 @@ bool ReadCommands_SHA2(
 
 //SHA-3.cpp
 bool SHA3_Hash(
-	FILE *FileHandle);
+	FILE * const FileHandle);
 bool ReadCommands_SHA3(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command);

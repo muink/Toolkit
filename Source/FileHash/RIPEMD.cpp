@@ -21,7 +21,7 @@
 
 //RIPEMD-128 init process
 void MD_Init_128(
-	dword *MDbuf)
+	dword * const MDbuf)
 {
 	MDbuf[0] = 0x67452301UL;
 	MDbuf[1U] = 0xEFCDAB89UL;
@@ -33,7 +33,7 @@ void MD_Init_128(
 
 //RIPEMD-160 init process
 void MD_Init_160(
-	dword *MDbuf)
+	dword * const MDbuf)
 {
 	MDbuf[0] = 0x67452301UL;
 	MDbuf[1U] = 0xEFCDAB89UL;
@@ -46,7 +46,7 @@ void MD_Init_160(
 
 //RIPEMD-256 init process
 void MD_Init_256(
-	dword *MDbuf)
+	dword * const MDbuf)
 {
 	MD_Init_128(MDbuf);
 	MDbuf[4U] = 0x76543210UL;
@@ -59,7 +59,7 @@ void MD_Init_256(
 
 //RIPEMD-320 init process
 void MD_Init_320(
-	dword *MDbuf)
+	dword * const MDbuf)
 {
 	MD_Init_160(MDbuf);
 	MDbuf[5U] = 0x76543210UL;
@@ -73,8 +73,8 @@ void MD_Init_320(
 
 //RIPEMD-128 compress process
 void Compress_128(
-	dword *MDbuf, 
-	dword *X)
+	dword * const MDbuf, 
+	dword * const X)
 {
 	dword aa = MDbuf[0], bb = MDbuf[1U], cc = MDbuf[2U], dd = MDbuf[3U];
 	dword aaa = MDbuf[0], bbb = MDbuf[1U], ccc = MDbuf[2U], ddd = MDbuf[3U];
@@ -235,8 +235,8 @@ void Compress_128(
 
 //RIPEMD-160 compress process
 void Compress_160(
-	dword *MDbuf, 
-	dword *X)
+	dword * const MDbuf, 
+	dword * const X)
 {
 	dword aa = MDbuf[0], bb = MDbuf[1U], cc = MDbuf[2U], dd = MDbuf[3U], ee = MDbuf[4U];
 	dword aaa = MDbuf[0], bbb = MDbuf[1U], ccc = MDbuf[2U], ddd = MDbuf[3U], eee = MDbuf[4U];
@@ -434,8 +434,8 @@ void Compress_160(
 
 //RIPEMD-256 compress process
 void Compress_256(
-	dword *MDbuf, 
-	dword *X)
+	dword * const MDbuf, 
+	dword * const X)
 {
 	dword aa = MDbuf[0], bb = MDbuf[1U], cc = MDbuf[2U], dd = MDbuf[3U];
 	dword aaa = MDbuf[4U], bbb = MDbuf[5U], ccc = MDbuf[6U], ddd = MDbuf[7U];
@@ -620,8 +620,8 @@ void Compress_256(
 
 //RIPEMD-320 compress process
 void Compress_320(
-	dword *MDbuf, 
-	dword *X)
+	dword * const MDbuf, 
+	dword * const X)
 {
 	dword aa = MDbuf[0], bb = MDbuf[1U], cc = MDbuf[2U], dd = MDbuf[3U], ee = MDbuf[4U];
 	dword aaa = MDbuf[5U], bbb = MDbuf[6U], ccc = MDbuf[7U], ddd = MDbuf[8U], eee = MDbuf[9U];
@@ -849,13 +849,13 @@ void Compress_320(
 
 //RIPEMD finish process
 void MD_Finish(
-	dword *MDbuf, 
+	dword * const MDbuf, 
 	uint8_t *strptr, 
 	dword lswlen, 
 	dword mswlen)
 {
 	unsigned int i = 0;   //Counter
-	dword X[16U] = {0};   //Message words
+	dword X[16U]{0};   //Message words
 
 //Put bytes from strptr into X.
 	for (i = 0;i < (lswlen & 63);++i)
@@ -934,7 +934,7 @@ bool ReadCommands_RIPEMD(
 
 //RIPEMD hash function
 bool RIPEMD_Hash(
-	FILE *FileHandle)
+	FILE * const FileHandle)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_RIPEMD || FileHandle == nullptr)
@@ -979,7 +979,7 @@ bool RIPEMD_Hash(
 
 //Hash process
 	size_t i = 0, j = 0;
-	dword length[2U] = {0}, X[16U] = {0};
+	dword length[2U]{0}, X[16U]{0};
 	while (!feof(FileHandle))
 	{
 		memset(Buffer.get(), 0, FILE_BUFFER_SIZE);

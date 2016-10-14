@@ -19,6 +19,9 @@
 
 #include "Base.h"
 
+//Global variables
+extern size_t HashFamilyID;
+
 //The MD4 block size and message digest size
 #define MD4_BLOCK_SIZE     64U
 #define MD4_BLOCK_LENGTH   (MD4_BLOCK_SIZE / 4U)
@@ -69,21 +72,3 @@ typedef struct _md4_state_st_
 	MD4_LONG       Data[MD4_BLOCK_LENGTH];
 	unsigned int   Num;
 }MD4_CTX;
-
-//Global variables
-extern size_t HashFamilyID;
-
-//Functions
-void MD4_Init(
-	MD4_CTX *c);
-void MD4_BlockDataOrder(
-	MD4_CTX *c, 
-	const void *data_, 
-	size_t num);
-void MD4_Update(
-	MD4_CTX *c, 
-	const void *data_, 
-	size_t len);
-void MD4_Final(
-	uint8_t *md, 
-	MD4_CTX *c);
