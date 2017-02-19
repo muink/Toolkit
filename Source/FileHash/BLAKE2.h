@@ -1,6 +1,6 @@
 // This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,6 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+
+#ifndef TOOLKIT_FILEHASH_BLAKE2_H
+#define TOOLKIT_FILEHASH_BLAKE2_H
 
 #include "Base.h"
 
@@ -56,7 +59,7 @@
 	#define COMMAND_BLAKE2S_160          L"-BLAKE2S_160"
 	#define COMMAND_BLAKE2S_224          L"-BLAKE2S_224"
 	#define COMMAND_BLAKE2S_256          L"-BLAKE2S_256"
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	#define COMMAND_BLAKE2B              ("-BLAKE2B")
 	#define COMMAND_BLAKE2_128           ("-BLAKE2_128")
 	#define COMMAND_BLAKE2_224           ("-BLAKE2_224")
@@ -75,6 +78,7 @@
 
 //Global variables
 extern size_t HashFamilyID;
+extern bool IsLowerCase;
 size_t BLAKE2_HashFunctionID = DEFAULT_HASH_FUNCTION_ID;
 
 //BLAKE2b Hashing Context and API Prototypes
@@ -96,3 +100,4 @@ typedef struct
 	size_t c;                           //Pointer for b[]
 	size_t outlen;                      //Digest size
 }blake2s_ctx;
+#endif

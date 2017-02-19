@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -41,9 +41,8 @@ static void SHA2_256_LongReverse(
 }
 
 //SHA-2(256) various logical functions
-#define ROR(x, y)                                                  \
-	(((((uint64_t)(x) & 0xFFFFFFFFUL) >> (uint64_t)((y) & 31)) |   \
-	((uint64_t)(x) << (uint64_t)(32 - ((y) & 31)))) & 0xFFFFFFFFUL)
+#define ROR(x, y)         (((((uint64_t)(x) & 0xFFFFFFFFUL) >> (uint64_t)((y) & 31)) | \
+						((uint64_t)(x) << (uint64_t)(32 - ((y) & 31)))) & 0xFFFFFFFFUL)
 #define Ch(x, y, z)       (z ^ (x & (y ^ z)))
 #define Maj(x, y, z)      (((x | y) & z) | (x & y))
 #define S(x, n)           ROR((x), (n))
@@ -710,10 +709,10 @@ static void SHA2_512_Final(
 // Hash function
 // 
 //Read commands(SHA-2)
-bool ReadCommands_SHA2(
+bool ReadCommand_SHA2(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command)
 #endif
 {
@@ -753,7 +752,8 @@ bool ReadCommands_SHA2(
 
 //SHA-2 hash function
 bool SHA2_Hash(
-	FILE * const FileHandle)
+	FILE * const FileHandle, 
+	FILE * const OutputFile)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_SHA2 || FileHandle == nullptr)
@@ -763,7 +763,8 @@ bool SHA2_Hash(
 	}
 
 //Initialization
-	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
+	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
+	std::shared_ptr<uint8_t> StringBuffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	size_t ReadLength = 0, DigestSize = 0;
@@ -827,10 +828,10 @@ bool SHA2_Hash(
 		}
 		else {
 			if (SHA2_HashFunctionID == HASH_ID_SHA2_224 || SHA2_HashFunctionID == HASH_ID_SHA2_256)
-				SHA2_256_Update(&HashInstance256, Buffer.get(), (int)ReadLength);
+				SHA2_256_Update(&HashInstance256, Buffer.get(), static_cast<int>(ReadLength));
 			else if (SHA2_HashFunctionID == HASH_ID_SHA2_384 || SHA2_HashFunctionID == HASH_ID_SHA2_512 || 
 				SHA2_HashFunctionID == HASH_ID_SHA2_512_224 || SHA2_HashFunctionID == HASH_ID_SHA2_512_256)
-					SHA2_512_Update(&HashInstance512, Buffer.get(), (int)ReadLength);
+					SHA2_512_Update(&HashInstance512, Buffer.get(), static_cast<int>(ReadLength));
 			else 
 				return false;
 		}
@@ -853,13 +854,21 @@ bool SHA2_Hash(
 	}
 
 //Binary to hex
-	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), DigestSize / BYTES_TO_BITS) == nullptr)
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, Buffer.get(), DigestSize / BYTES_TO_BITS) == nullptr)
 	{
 		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;
 	}
 	else {
-		PrintToScreen(StringBuffer.get());
+	//Lowercase convert.
+		std::string Hex(reinterpret_cast<const char *>(StringBuffer.get()));
+		if (!IsLowerCase)
+			CaseConvert(Hex, true);
+
+	//Print to screen and file.
+		WriteMessage_ScreenFile(stderr, reinterpret_cast<const uint8_t *>(Hex.c_str()));
+		if (OutputFile != nullptr)
+			WriteMessage_ScreenFile(OutputFile, reinterpret_cast<const uint8_t *>(Hex.c_str()));
 	}
 
 	return true;

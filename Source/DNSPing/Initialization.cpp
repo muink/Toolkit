@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // A useful and powerful toolkit(DNSPing)
-// Copyright (C) 2014-2016 Chengr28
+// Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -26,7 +26,7 @@ ConfigurationTable::ConfigurationTable(
 //Global status
 	OutputFile = nullptr;
 #if defined(PLATFORM_WIN)
-	IsWinSockInitialized = false;
+	IsInitialized_WinSock = false;
 #endif
 
 //C-Syle type parameter block
@@ -40,7 +40,7 @@ ConfigurationTable::ConfigurationTable(
 	IsRawSocket = false;
 	IsEDNS = false;
 	IsDNSSEC = false;
-	IsValidate = true;
+	IsValidated = true;
 	IsShowResponse = false;
 	IsShowHexResponse = false;
 #if (defined(PLATFORM_WIN) || defined(PLATFORM_LINUX))
@@ -48,19 +48,18 @@ ConfigurationTable::ConfigurationTable(
 #endif
 #if defined(PLATFORM_WIN)
 	PacketHopLimits = 0;
-	SocketTimeout = DEFAULT_TIME_OUT;
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+	SocketTimeout = DEFAULT_TIMEOUT;
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	PacketHopLimits = 0;
-	SocketTimeout.tv_sec = DEFAULT_TIME_OUT;
+	SocketTimeout.tv_sec = DEFAULT_TIMEOUT;
 #endif
 	memset(&SockAddr_Normal, 0, sizeof(SockAddr_Normal));
-	memset(&SockAddr_SOCKS, 0, sizeof(SockAddr_SOCKS));
 	memset(&Parameter_Header, 0, sizeof(Parameter_Header));
 	memset(&Parameter_Query, 0, sizeof(Parameter_Query));
 	memset(&Parameter_EDNS, 0, sizeof(Parameter_EDNS));
 
 //C-Syle type result block
-	Statistics_Send = DEFAULT_SEND_TIMES;
+	Statistics_PlanSend = DEFAULT_SEND_TIMES;
 	Statistics_RealSend = 0;
 	Statistics_RecvNum = 0;
 	Statistics_TotalTime = 0;
@@ -74,10 +73,17 @@ ConfigurationTable::ConfigurationTable(
 ConfigurationTable::~ConfigurationTable(
 	void)
 {
+//Close file handle.
+	if (OutputFile != nullptr)
+	{
+		fclose(OutputFile);
+		OutputFile = nullptr;
+	}
+
 //Close all file handles and WinSock cleanup.
 #if defined(PLATFORM_WIN)
 	_fcloseall();
-	if (IsWinSockInitialized)
+	if (IsInitialized_WinSock)
 		WSACleanup();
 #elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
 	fcloseall();

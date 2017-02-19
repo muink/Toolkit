@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -900,10 +900,10 @@ void MD_Finish(
 // Hash function
 // 
 //Read commands(RIPEMD)
-bool ReadCommands_RIPEMD(
+bool ReadCommand_RIPEMD(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command)
 #endif
 {
@@ -934,7 +934,8 @@ bool ReadCommands_RIPEMD(
 
 //RIPEMD hash function
 bool RIPEMD_Hash(
-	FILE * const FileHandle)
+	FILE * const FileHandle, 
+	FILE * const OutputFile)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_RIPEMD || FileHandle == nullptr)
@@ -944,13 +945,14 @@ bool RIPEMD_Hash(
 	}
 
 //Initialization
-	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
+	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
+	std::shared_ptr<uint8_t> StringBuffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	size_t ReadLength = 0, DigestSize = RIPEMD_DIGEST_MAXSIZE;
 
 //RIPEMD initialization
-	std::shared_ptr<dword> MDbuf(new dword[DigestSize / (sizeof(uint32_t) * BYTES_TO_BITS)]());
+	std::shared_ptr<dword> MDbuf(new dword[DigestSize / (sizeof(uint32_t) * BYTES_TO_BITS)](), std::default_delete<dword[]>());
 	memset(MDbuf.get(), 0, DigestSize / (sizeof(uint32_t) * BYTES_TO_BITS));
 	if (RIPEMD_HashFunctionID == HASH_ID_RIPEMD_128)
 	{
@@ -978,8 +980,8 @@ bool RIPEMD_Hash(
 	}
 
 //Hash process
-	size_t i = 0, j = 0;
-	dword length[2U]{0}, X[16U]{0};
+	size_t Index_A = 0, Index_B = 0;
+	dword Length[2U]{0}, X[16U]{0};
 	while (!feof(FileHandle))
 	{
 		memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
@@ -998,10 +1000,10 @@ bool RIPEMD_Hash(
 		}
 		else {
 		//Process all complete blocks.
-			for (i = 0;i < (ReadLength >> 6U);++i)
+			for (Index_A = 0;Index_A < (ReadLength >> 6U);++Index_A)
 			{
-				for (j = 0;j < 16U;++j)
-					X[j] = BYTES_TO_DWORD(Buffer.get() + 64 * i + 4 * j);
+				for (Index_B = 0;Index_B < 16U;++Index_B)
+					X[Index_B] = BYTES_TO_DWORD(Buffer.get() + 64 * Index_A + 4 * Index_B);
 
 			//Compress process
 				if (RIPEMD_HashFunctionID == HASH_ID_RIPEMD_128)
@@ -1026,32 +1028,40 @@ bool RIPEMD_Hash(
 				}
 			}
 
-		//Update length[].
-			if (length[0] + ReadLength < length[0])
-				length[1U]++; //Overflow to msb of length
-			length[0] += (dword)ReadLength;
+		//Update length values.
+			if (Length[0] + ReadLength < Length[0])
+				Length[1U]++; //Overflow to msb of length
+			Length[0] += static_cast<dword>(ReadLength);
 		}
 	}
 
 //Finish hash process.
-	MD_Finish(MDbuf.get(), Buffer.get() + (length[0] & 0x03C0), length[0], length[1U]); //Extract bytes 6 to 10 inclusive
+	MD_Finish(MDbuf.get(), Buffer.get() + (Length[0] & 0x03C0), Length[0], Length[1U]); //Extract bytes 6 to 10 inclusive
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
-	for (i = 0;i < DigestSize / (sizeof(uint8_t) * BYTES_TO_BITS);i += 4U)
+	for (Index_A = 0;Index_A < DigestSize / (sizeof(uint8_t) * BYTES_TO_BITS);Index_A += 4U)
 	{
-		Buffer.get()[i] = (uint8_t)(MDbuf.get()[i >> 2U]);
-		Buffer.get()[i + 1U] = (uint8_t)(MDbuf.get()[i >> 2U] >> 8U);
-		Buffer.get()[i + 2U] = (uint8_t)(MDbuf.get()[i >> 2U] >> 16U);
-		Buffer.get()[i + 3U] = (uint8_t)(MDbuf.get()[i >> 2U] >> 24U);
+		Buffer.get()[Index_A] = static_cast<uint8_t>(MDbuf.get()[Index_A >> 2U]);
+		Buffer.get()[Index_A + 1U] = static_cast<uint8_t>(MDbuf.get()[Index_A >> 2U] >> 8U);
+		Buffer.get()[Index_A + 2U] = static_cast<uint8_t>(MDbuf.get()[Index_A >> 2U] >> 16U);
+		Buffer.get()[Index_A + 3U] = static_cast<uint8_t>(MDbuf.get()[Index_A >> 2U] >> 24U);
 	}
 
 //Binary to hex
-	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), DigestSize / BYTES_TO_BITS) == nullptr)
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, Buffer.get(), DigestSize / BYTES_TO_BITS) == nullptr)
 	{
 		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;
 	}
 	else {
-		PrintToScreen(StringBuffer.get());
+	//Lowercase convert.
+		std::string Hex(reinterpret_cast<const char *>(StringBuffer.get()));
+		if (!IsLowerCase)
+			CaseConvert(Hex, true);
+
+	//Print to screen and file.
+		WriteMessage_ScreenFile(stderr, reinterpret_cast<const uint8_t *>(Hex.c_str()));
+		if (OutputFile != nullptr)
+			WriteMessage_ScreenFile(OutputFile, reinterpret_cast<const uint8_t *>(Hex.c_str()));
 	}
 
 	return true;

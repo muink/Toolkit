@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -44,10 +44,10 @@ static void SHA1_Compress(
 
 //Compress.
 //Round 1
-	#define SHA1_FF0(a, b, c, d, e, Index) e = (ROLc(a, 5) + SHA1_F0(b, c, d) + e + W[Index] + 0x5A827999UL); b = ROLc(b, 30);
-	#define SHA1_FF1(a, b, c, d, e, Index) e = (ROLc(a, 5) + SHA1_F1(b, c, d) + e + W[Index] + 0x6ED9EBA1UL); b = ROLc(b, 30);
-	#define SHA1_FF2(a, b, c, d, e, Index) e = (ROLc(a, 5) + SHA1_F2(b, c, d) + e + W[Index] + 0x8F1BBCDCUL); b = ROLc(b, 30);
-	#define SHA1_FF3(a, b, c, d, e, Index) e = (ROLc(a, 5) + SHA1_F3(b, c, d) + e + W[Index] + 0xCA62C1D6UL); b = ROLc(b, 30);
+	#define SHA1_FF0(a, b, c, d, e, Index) e = (ROLc(a, 5) + SHA1_F0(b, c, d) + e + W[Index] + 0x5A827999UL);b = ROLc(b, 30);
+	#define SHA1_FF1(a, b, c, d, e, Index) e = (ROLc(a, 5) + SHA1_F1(b, c, d) + e + W[Index] + 0x6ED9EBA1UL);b = ROLc(b, 30);
+	#define SHA1_FF2(a, b, c, d, e, Index) e = (ROLc(a, 5) + SHA1_F2(b, c, d) + e + W[Index] + 0x8F1BBCDCUL);b = ROLc(b, 30);
+	#define SHA1_FF3(a, b, c, d, e, Index) e = (ROLc(a, 5) + SHA1_F3(b, c, d) + e + W[Index] + 0xCA62C1D6UL);b = ROLc(b, 30);
 	for (Index = 0;Index < 20U;)
 	{
 		SHA1_FF0(a, b, c, d, e, Index++);
@@ -194,7 +194,8 @@ void SHA1_Done(
 // 
 //SHA-1 hash function
 bool SHA1_Hash(
-	FILE * const FileHandle)
+	FILE * const FileHandle, 
+	FILE * const OutputFile)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_SHA1 || FileHandle == nullptr)
@@ -204,7 +205,8 @@ bool SHA1_Hash(
 	}
 
 //Initialization
-	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
+	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
+	std::shared_ptr<uint8_t> StringBuffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	size_t ReadLength = 0;
@@ -232,20 +234,28 @@ bool SHA1_Hash(
 			return false;
 		}
 		else {
-			SHA1_Process(&HashInstance, Buffer.get(), (unsigned long)ReadLength);
+			SHA1_Process(&HashInstance, Buffer.get(), static_cast<unsigned long>(ReadLength));
 		}
 	}
 
 //Finish hash process and binary to hex.
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	SHA1_Done(&HashInstance, Buffer.get());
-	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), SHA1_DIGEST_SIZE) == nullptr)
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, Buffer.get(), SHA1_DIGEST_SIZE) == nullptr)
 	{
 		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;
 	}
 	else {
-		PrintToScreen(StringBuffer.get());
+	//Lowercase convert.
+		std::string Hex(reinterpret_cast<const char *>(StringBuffer.get()));
+		if (!IsLowerCase)
+			CaseConvert(Hex, true);
+
+	//Print to screen and file.
+		WriteMessage_ScreenFile(stderr, reinterpret_cast<const uint8_t *>(Hex.c_str()));
+		if (OutputFile != nullptr)
+			WriteMessage_ScreenFile(OutputFile, reinterpret_cast<const uint8_t *>(Hex.c_str()));
 	}
 
 	return true;

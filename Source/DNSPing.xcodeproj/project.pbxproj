@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D91134EA1E59C0BF009AE7B0 /* ReadCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91134E91E59C0BF009AE7B0 /* ReadCommand.cpp */; };
 		D942EC721D12F2E200F7C65A /* Console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942EC671D12F2E200F7C65A /* Console.cpp */; };
 		D942EC731D12F2E200F7C65A /* DNSPing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942EC681D12F2E200F7C65A /* DNSPing.cpp */; };
 		D942EC741D12F2E200F7C65A /* Initialization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942EC691D12F2E200F7C65A /* Initialization.cpp */; };
@@ -14,7 +15,6 @@
 		D942EC761D12F2E200F7C65A /* Protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942EC6C1D12F2E200F7C65A /* Protocol.cpp */; };
 		D942EC771D12F2E200F7C65A /* Resolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942EC6E1D12F2E200F7C65A /* Resolver.cpp */; };
 		D942EC781D12F2E200F7C65A /* Terminal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942EC711D12F2E200F7C65A /* Terminal.cpp */; };
-		D9AC805D1D903736007FD633 /* ReadCommands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9AC805C1D903736007FD633 /* ReadCommands.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,6 +30,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D91134E91E59C0BF009AE7B0 /* ReadCommand.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ReadCommand.cpp; path = DNSPing/ReadCommand.cpp; sourceTree = "<group>"; };
 		D942EC671D12F2E200F7C65A /* Console.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Console.cpp; path = DNSPing/Console.cpp; sourceTree = "<group>"; };
 		D942EC681D12F2E200F7C65A /* DNSPing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DNSPing.cpp; path = DNSPing/DNSPing.cpp; sourceTree = "<group>"; };
 		D942EC691D12F2E200F7C65A /* Initialization.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Initialization.cpp; path = DNSPing/Initialization.cpp; sourceTree = "<group>"; };
@@ -43,7 +44,6 @@
 		D942EC791D12F2ED00F7C65A /* Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Base.h; path = DNSPing/Base.h; sourceTree = "<group>"; };
 		D99427BC1D12F0FE00280D91 /* DNSPing */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = DNSPing; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9A033F51DB0E42200F7A96F /* Structure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Structure.h; path = DNSPing/Structure.h; sourceTree = "<group>"; };
-		D9AC805C1D903736007FD633 /* ReadCommands.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ReadCommands.cpp; path = DNSPing/ReadCommands.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,7 +81,7 @@
 				D942EC691D12F2E200F7C65A /* Initialization.cpp */,
 				D942EC6A1D12F2E200F7C65A /* Process.cpp */,
 				D942EC6C1D12F2E200F7C65A /* Protocol.cpp */,
-				D9AC805C1D903736007FD633 /* ReadCommands.cpp */,
+				D91134E91E59C0BF009AE7B0 /* ReadCommand.cpp */,
 				D942EC6E1D12F2E200F7C65A /* Resolver.cpp */,
 				D942EC711D12F2E200F7C65A /* Terminal.cpp */,
 				D942EC791D12F2ED00F7C65A /* Base.h */,
@@ -152,11 +152,11 @@
 				D942EC781D12F2E200F7C65A /* Terminal.cpp in Sources */,
 				D942EC741D12F2E200F7C65A /* Initialization.cpp in Sources */,
 				D942EC771D12F2E200F7C65A /* Resolver.cpp in Sources */,
+				D91134EA1E59C0BF009AE7B0 /* ReadCommand.cpp in Sources */,
 				D942EC721D12F2E200F7C65A /* Console.cpp in Sources */,
 				D942EC731D12F2E200F7C65A /* DNSPing.cpp in Sources */,
 				D942EC761D12F2E200F7C65A /* Protocol.cpp in Sources */,
 				D942EC751D12F2E200F7C65A /* Process.cpp in Sources */,
-				D9AC805D1D903736007FD633 /* ReadCommands.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

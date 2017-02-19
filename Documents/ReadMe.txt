@@ -1,4 +1,4 @@
-﻿### Build in Linux/Mac
+﻿### Build in Linux/macOS
 * Run terminal and enter to Toolkit directory.
 * Run "chmod 755 CMake_Build.sh" to give running privilege to script.
 * Run "./CMake_Build.sh" to build binary.
@@ -9,7 +9,7 @@
 
 ### Usage and options(DNSPing)
        DNSPing [-options] domain target
-  e.g. DNSPing -a -qt AAAA -n 5 -w 500 -edns0 www.google.com 8.8.4.4
+  e.g. DNSPing -a -qt AAAA -n 5 -w 500 -edns www.google.com 8.8.4.4
 
    ?/-h              Description.
    -t                Pings the specified host until stopped.
@@ -19,7 +19,7 @@
    -n count          Set number of echo requests to send.
                      Count must between 1 - 0xFFFF/65535.
    -f                Set the "Do Not Fragment" flag in outgoing packets(IPv4).
-                     No available in Mac OS X.
+                     No available in macOS.
    -i hoplimit/ttl   Specifie a Hop Limit or Time To Live for outgoing packets.
                      HopLimit/TTL must between 1 - 255.
    -w timeout        Set a long wait periods (in milliseconds) for a response
@@ -46,11 +46,11 @@
    -adn count        Specifie DNS header Additional count.
                      Additional count must between 0x0001 - 0xFFFF/65535.
    -ti interval_time Specifie transmission interval time(in milliseconds).
-   -edns0            Send with EDNS0 Label.
-   -payload length   Specifie EDNS0 Label UDP Payload length.
+   -edns             Send with EDNS Label.
+   -payload length   Specifie EDNS Label UDP Payload length.
                      Payload length must between 512 - 0xFFFF/65535.
    -dnssec           Send with DNSSEC request.
-                     EDNS0 Label will enable when DNSSEC is enable.
+                     EDNS Label will enable when DNSSEC is enable.
    -qt type          Specifie Query type.
                      Query type must between 0x0001 - 0xFFFF/65535.
                      Type: A|NS|MD|MF|CNAME|SOA|MB|MG|MR|NULL|WKS|PTR|HINFO|
@@ -103,19 +103,12 @@
                                    SPS|PIPE|SCTP|FC|RSVPE2E|MOBILITY|UDPLITE|
                                    MPLS|MANET|HIP|SHIM6|WESP|ROHC|TEST-1|
                                    TEST-2|RAW
-   -socks target            Specifie target of SOCKS server.
-                            Target is Server:Port, like [::1]:1080.
-   -socks_username username Specifie username of SOCKS server.
-                            Length of SOCKS username must between 1 - 255 bytes.
-   -socks_password password Specifie password of SOCKS server.
-                            Length of SOCKS password must between 1 - 255 bytes.
    -buf size                Specifie receive buffer size.
                             Buffer size must between 512 - 4096 bytes.
    -dv                      Disable packets validated.
    -show type               Show result or hex data of responses.
                             Type: Result|Hex
    -of file_name            Output result to file.
-                            FileName must less than 260 bytes.
    -6                       Using IPv6.
    -4                       Using IPv4.
    domain                   A domain name which will make request to send
@@ -127,12 +120,14 @@
 
 
 ### Usage and options(FileHash)
-       FileHash -option/-algorithm [Filename]
+       FileHash -option -algorithm [Filename]
   e.g. FileHash -SHA3 filename
 
 Supported options:
-   -v/--version:     Print current version on screen.
-   -?/-h/--help      Print description.
+   -v/--version:         Print current version on screen.
+   -?/-h/--help          Print description.
+   --lowercase           Output lowercase hash.
+   --output [Filename]   Output hash result to file.
 
 Supported hash algorithms:
    * BLAKE family:   -BLAKE                      = -BLAKE_256
@@ -239,12 +234,12 @@ Supported hash algorithms:
 
 ### Release hash[SHA-3(256)]
 * Windows
-  * DNSPing.exe: A97A4B60B1D228EB6707302CDC2AB7D78ABB6D8667201DDB10396CD295D61E6F
-  * DNSPing_x86.exe: F11B22FF241D3A05A038B28B094D7A295993C672534134B48EF1E2683B9778B3
-  * DNSPing_XP.exe: 888F22C2E014F68C849789E167752DA987B94E91D816CB848375580C7B761BBF
-  * FileHash.exe: C89869502986D5A42FD00C46A07C7ED5E7AF545094D0DB00B30E3F8FBB8DCB37
-  * FileHash_x86.exe: 94B439E7A2187FADE3A11AED96E99CC0A072A5191F94A5C21E6A931DA8A8FE11
-  * FileHash_XP.exe: 8A8A806DB34D2660A0B7B86999E0A3A643D2720C1E5201862A70D9CA7BE3DAEE
-* Mac
-  * DNSPing: BE749E2676582862592428ED0D31FD204662A03824F68D77D078D51CCD0E9E61
-  * FileHash: F99DBBC16AF6C4F2D6EDABB1C9C86D764961E705A7B4B533748272926461F1C5
+  * DNSPing.exe: A3E4DC44BBF8B0E4457D601E48B62CB4D2D942B834C2E9EA96FF0AA71EE83FFA
+  * DNSPing_x86.exe: A306E400B152D8C1B2E94F60086732A79ACE7A8A5D70DA4ACD9DEB83639D842F
+  * DNSPing_XP.exe: 51B71EC569AF03FB95CDD89B56ADD6296B7844DD8A8EFDD45BE1DDE177F9A0C9
+  * FileHash.exe: 564BBA9814D8CF4BE3F0D8B1E04695529634347280A65D21E804A13314C82BE8
+  * FileHash_x86.exe: 785ADCBB3330EF00D73C9615D631872CED9A0EFC863B711D10DCDCB1EB0A76E9
+  * FileHash_XP.exe: CB7692B560D04D786E9F6DC1DF935E675A6CEE92B43F6F3678E511505E497566
+* macOS
+  * DNSPing: BFDE0F6DFE8296B9AE28294542BE4354D89D4A33CA127A2B5C2242CD126DB52F
+  * FileHash: 28E3BD6E969B180763E234CC6E0D9BFEFF1C25D4A7C8C0C9B9BF27F349EE291B

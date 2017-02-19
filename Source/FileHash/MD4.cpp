@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -47,27 +47,54 @@ void MD4_BlockDataOrder(
 	B = c->B;
 	C = c->C;
 	D = c->D;
-
 	for (;num--;)
 	{
 		(void)HOST_c2l(data, l); X(0) = l;
 		(void)HOST_c2l(data, l); X(1) = l;
 
 	//Round 0
-		R0(A, B, C, D, X(0), 3, 0); (void)HOST_c2l(data, l); X(2) = l;
-		R0(D, A, B, C, X(1), 7, 0); (void)HOST_c2l(data, l); X(3) = l;
-		R0(C, D, A, B, X(2), 11, 0); (void)HOST_c2l(data, l); X(4) = l;
-		R0(B, C, D, A, X(3), 19, 0); (void)HOST_c2l(data, l); X(5) = l;
-		R0(A, B, C, D, X(4), 3, 0); (void)HOST_c2l(data, l); X(6) = l;
-		R0(D, A, B, C, X(5), 7, 0); (void)HOST_c2l(data, l); X(7) = l;
-		R0(C, D, A, B, X(6), 11, 0); (void)HOST_c2l(data, l); X(8) = l;
-		R0(B, C, D, A, X(7), 19, 0); (void)HOST_c2l(data, l); X(9) = l;
-		R0(A, B, C, D, X(8), 3, 0); (void)HOST_c2l(data, l); X(10) = l;
-		R0(D, A, B, C, X(9), 7, 0); (void)HOST_c2l(data, l); X(11) = l;
-		R0(C, D, A, B, X(10), 11, 0); (void)HOST_c2l(data, l); X(12) = l;
-		R0(B, C, D, A, X(11), 19, 0); (void)HOST_c2l(data, l); X(13) = l;
-		R0(A, B, C, D, X(12), 3, 0); (void)HOST_c2l(data, l); X(14) = l;
-		R0(D, A, B, C, X(13), 7, 0); (void)HOST_c2l(data, l); X(15) = l;
+		R0(A, B, C, D, X(0), 3, 0);
+		(void)HOST_c2l(data, l);
+		X(2) = l;
+		R0(D, A, B, C, X(1), 7, 0);
+		(void)HOST_c2l(data, l);
+		X(3) = l;
+		R0(C, D, A, B, X(2), 11, 0);
+		(void)HOST_c2l(data, l);
+		X(4) = l;
+		R0(B, C, D, A, X(3), 19, 0);
+		(void)HOST_c2l(data, l);
+		X(5) = l;
+		R0(A, B, C, D, X(4), 3, 0);
+		(void)HOST_c2l(data, l);
+		X(6) = l;
+		R0(D, A, B, C, X(5), 7, 0);
+		(void)HOST_c2l(data, l);
+		X(7) = l;
+		R0(C, D, A, B, X(6), 11, 0);
+		(void)HOST_c2l(data, l);
+		X(8) = l;
+		R0(B, C, D, A, X(7), 19, 0);
+		(void)HOST_c2l(data, l);
+		X(9) = l;
+		R0(A, B, C, D, X(8), 3, 0);
+		(void)HOST_c2l(data, l);
+		X(10) = l;
+		R0(D, A, B, C, X(9), 7, 0);
+		(void)HOST_c2l(data, l);
+		X(11) = l;
+		R0(C, D, A, B, X(10), 11, 0);
+		(void)HOST_c2l(data, l);
+		X(12) = l;
+		R0(B, C, D, A, X(11), 19, 0);
+		(void)HOST_c2l(data, l);
+		X(13) = l;
+		R0(A, B, C, D, X(12), 3, 0);
+		(void)HOST_c2l(data, l);
+		X(14) = l;
+		R0(D, A, B, C, X(13), 7, 0);
+		(void)HOST_c2l(data, l);
+		X(15) = l;
 		R0(C, D, A, B, X(14), 11, 0);
 		R0(B, C, D, A, X(15), 19, 0);
 
@@ -211,7 +238,8 @@ void MD4_Final(
 // 
 //MD4 hash function
 bool MD4_Hash(
-	FILE * const FileHandle)
+	FILE * const FileHandle, 
+	FILE * const OutputFile)
 {
 //Parameters check
 	if ((HashFamilyID != HASH_ID_MD4 && HashFamilyID != HASH_ID_ED2K) || FileHandle == nullptr)
@@ -224,7 +252,9 @@ bool MD4_Hash(
 	size_t ReadBlockSize = FILE_BUFFER_SIZE, ReadLength = 0, RoundCount = 0;
 	if (HashFamilyID == HASH_ID_ED2K)
 		ReadBlockSize = ED2K_SIZE_BLOCK;
-	std::shared_ptr<uint8_t> Buffer(new uint8_t[ReadBlockSize]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]()), BufferED2K(new uint8_t[MD4_DIGEST_SIZE]());
+	std::shared_ptr<uint8_t> Buffer(new uint8_t[ReadBlockSize](), std::default_delete<uint8_t[]>());
+	std::shared_ptr<uint8_t> StringBuffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
+	std::shared_ptr<uint8_t> BufferED2K(new uint8_t[MD4_DIGEST_SIZE](), std::default_delete<uint8_t[]>());
 	memset(Buffer.get(), 0, ReadBlockSize);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(BufferED2K.get(), 0, MD4_DIGEST_SIZE);
@@ -287,13 +317,21 @@ bool MD4_Hash(
 	}
 
 //Binary to hex
-	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), MD4_DIGEST_SIZE) == nullptr)
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, Buffer.get(), MD4_DIGEST_SIZE) == nullptr)
 	{
 		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;
 	}
 	else {
-		PrintToScreen(StringBuffer.get());
+	//Lowercase convert.
+		std::string Hex(reinterpret_cast<const char *>(StringBuffer.get()));
+		if (!IsLowerCase)
+			CaseConvert(Hex, true);
+
+	//Print to screen and file.
+		WriteMessage_ScreenFile(stderr, reinterpret_cast<const uint8_t *>(Hex.c_str()));
+		if (OutputFile != nullptr)
+			WriteMessage_ScreenFile(OutputFile, reinterpret_cast<const uint8_t *>(Hex.c_str()));
 	}
 
 	return true;

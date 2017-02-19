@@ -1,6 +1,6 @@
 # This code is part of Toolkit(DNSPing)
 # A useful and powerful toolkit(DNSPing)
-# Copyright (C) 2014-2016 Chengr28
+# Copyright (C) 2014-2017 Chengr28
 # 
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -39,7 +39,7 @@ set(MAIN_SRC_FILES
 		"DNSPing.cpp"
 		"Process.cpp"
 		"Protocol.cpp"
-		"ReadCommands.cpp"
+		"ReadCommand.cpp"
 		"Resolver.cpp"
 		"Terminal.cpp")
 

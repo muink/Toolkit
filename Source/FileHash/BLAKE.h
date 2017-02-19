@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,6 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+
+#ifndef TOOLKIT_FILEHASH_BLAKE_H
+#define TOOLKIT_FILEHASH_BLAKE_H
 
 #include "Base.h"
 
@@ -38,7 +41,7 @@
 	#define COMMAND_BLAKE_256           L"-BLAKE_256"
 	#define COMMAND_BLAKE_384           L"-BLAKE_384"
 	#define COMMAND_BLAKE_512           L"-BLAKE_512"
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	#define COMMAND_BLAKE_224           ("-BLAKE_224")
 	#define COMMAND_BLAKE_256           ("-BLAKE_256")
 	#define COMMAND_BLAKE_384           ("-BLAKE_384")
@@ -47,6 +50,7 @@
 
 //Global variables
 extern size_t HashFamilyID;
+extern bool IsLowerCase;
 size_t BLAKE_HashFunctionID = DEFAULT_HASH_FUNCTION_ID;
 
 //BLAKE definitions
@@ -67,16 +71,16 @@ size_t BLAKE_HashFunctionID = DEFAULT_HASH_FUNCTION_ID;
 
 typedef struct state256
 {
-	uint32_t h[8U], s[4U], t[2U];
-	int buflen, nullt;
-	uint8_t buf[64U];
+	uint32_t   h[8U], s[4U], t[2U];
+	int        buflen, nullt;
+	uint8_t    buf[64U];
 }state224;
 
 typedef struct state512
 {
-	uint64_t h[8U], s[4U], t[2U];
-	int buflen, nullt;
-	uint8_t buf[128U];
+	uint64_t   h[8U], s[4U], t[2U];
+	int        buflen, nullt;
+	uint8_t    buf[128U];
 }state384;
 
 const uint8_t sigma[][16U] = 
@@ -121,12 +125,13 @@ const uint64_t u512[16U] =
 
 static const uint8_t padding[129U] = 
 {
-  0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
+#endif

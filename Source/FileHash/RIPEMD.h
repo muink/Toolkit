@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,6 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+
+#ifndef TOOLKIT_FILEHASH_RIPEMD_H
+#define TOOLKIT_FILEHASH_RIPEMD_H
 
 #include "Base.h"
 
@@ -39,7 +42,7 @@
 	#define COMMAND_RIPEMD_160          L"-RIPEMD_160"
 	#define COMMAND_RIPEMD_256          L"-RIPEMD_256"
 	#define COMMAND_RIPEMD_320          L"-RIPEMD_320"
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	#define COMMAND_RIPEMD_128          ("-RIPEMD_128")
 	#define COMMAND_RIPEMD_160          ("-RIPEMD_160")
 	#define COMMAND_RIPEMD_256          ("-RIPEMD_256")
@@ -48,6 +51,7 @@
 
 //Global variables
 extern size_t HashFamilyID;
+extern bool IsLowerCase;
 size_t RIPEMD_HashFunctionID = DEFAULT_HASH_FUNCTION_ID;
 
 //RIPEMD definitions
@@ -55,10 +59,10 @@ typedef uint32_t dword;
 typedef int the_correct_size_was_chosen[sizeof(dword) == 4 ? 1 : -1]; //If this line causes a compiler error, adapt the defintion of dword above
 
 //Macro definitions
-#define BYTES_TO_DWORD(strptr)            \
-	(((dword) *((strptr) + 3) << 24U) |   \
-	((dword) *((strptr) + 2) << 16U) |    \
-	((dword) *((strptr) + 1) << 8U) |     \
+#define BYTES_TO_DWORD(strptr)                            \
+	(((dword) *((strptr) + 3) << 24U) |                   \
+	((dword) *((strptr) + 2) << 16U) |                    \
+	((dword) *((strptr) + 1) << 8U) |                     \
 	((dword) *(strptr)))
 
 //ROL(x, n) cyclically rotates x over n bits to the left
@@ -162,3 +166,4 @@ typedef int the_correct_size_was_chosen[sizeof(dword) == 4 ? 1 : -1]; //If this 
 	(a) = ROL((a), (s)) + (e);                          \
 	(c) = ROL((c), 10);                                 \
 }
+#endif

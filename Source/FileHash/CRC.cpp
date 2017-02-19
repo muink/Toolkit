@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -1893,10 +1893,10 @@ uint64_t CRC64_Final(
 // Hash function
 // 
 //Read commands(CRC)
-bool ReadCommands_CRC(
+bool ReadCommand_CRC(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command)
 #endif
 {
@@ -2115,7 +2115,8 @@ bool ReadCommands_CRC(
 
 //CRC hash process 
 bool CRC_Hash(
-	FILE * const FileHandle)
+	FILE * const FileHandle, 
+	FILE * const OutputFile)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_CRC || FileHandle == nullptr)
@@ -2125,8 +2126,8 @@ bool CRC_Hash(
 	}
 
 //Initialization
-	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]());
-	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
+	std::shared_ptr<uint8_t> StringBuffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
+	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	size_t ReadLength = 0;
 
 //CRC initialization
@@ -2176,9 +2177,9 @@ bool CRC_Hash(
 //Hash process
 	while (!feof(FileHandle))
 	{
-		memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
+		memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 		_set_errno(0);
-		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(uint8_t), FILE_BUFFER_SIZE, FileHandle);
+		ReadLength = fread_s(StringBuffer.get(), FILE_BUFFER_SIZE, sizeof(uint8_t), FILE_BUFFER_SIZE, FileHandle);
 		if (ReadLength == 0 && errno != 0)
 		{
 			std::wstring Message(L"[Error] Read file error");
@@ -2196,7 +2197,7 @@ bool CRC_Hash(
 				CRC_HashFunctionID == HASH_ID_CRC_8_J1850 || CRC_HashFunctionID == HASH_ID_CRC_8_WCDMA || CRC_HashFunctionID == HASH_ID_CRC_8_ROHC || 
 				CRC_HashFunctionID == HASH_ID_CRC_8_DARC)
 			{
-				ResultCRC8 = CRC8_Calculate(ResultCRC8, CRC_HashFunctionID, Buffer.get(), ReadLength);
+				ResultCRC8 = CRC8_Calculate(ResultCRC8, CRC_HashFunctionID, StringBuffer.get(), ReadLength);
 			}
 			else if (CRC_HashFunctionID == HASH_ID_CRC_16 || CRC_HashFunctionID == HASH_ID_CRC_16_BUYPASS || CRC_HashFunctionID == HASH_ID_CRC_16_DDS_110 || 
 				CRC_HashFunctionID == HASH_ID_CRC_16_EN_13757 || CRC_HashFunctionID == HASH_ID_CRC_16_TELEDISK || CRC_HashFunctionID == HASH_ID_CRC_16_MODBUS || 
@@ -2207,27 +2208,27 @@ bool CRC_Hash(
 				CRC_HashFunctionID == HASH_ID_CRC_16_X25 || CRC_HashFunctionID == HASH_ID_CRC_16_MCRF4XX || CRC_HashFunctionID == HASH_ID_CRC_16_RIELLO || 
 				CRC_HashFunctionID == HASH_ID_CRC_16_FLETCHER)
 			{
-				ResultCRC16 = CRC16_Calculate(ResultCRC16, &ParameterA, &ParameterB, CRC_HashFunctionID, Buffer.get(), ReadLength);
+				ResultCRC16 = CRC16_Calculate(ResultCRC16, &ParameterA, &ParameterB, CRC_HashFunctionID, StringBuffer.get(), ReadLength);
 			}
 			else if (CRC_HashFunctionID == HASH_ID_CRC_24_FLEXRAY_A || CRC_HashFunctionID == HASH_ID_CRC_24_FLEXRAY_B || CRC_HashFunctionID == HASH_ID_CRC_24_R64)
 			{
-				ResultCRC32 = CRC24_Calculate(ResultCRC32, CRC_HashFunctionID, Buffer.get(), ReadLength);
+				ResultCRC32 = CRC24_Calculate(ResultCRC32, CRC_HashFunctionID, StringBuffer.get(), ReadLength);
 			}
 			else if (CRC_HashFunctionID == HASH_ID_CRC_32 || CRC_HashFunctionID == HASH_ID_CRC_32_JAM || CRC_HashFunctionID == HASH_ID_CRC_32_C || 
 				CRC_HashFunctionID == HASH_ID_CRC_32_D || CRC_HashFunctionID == HASH_ID_CRC_32_BZIP2 || CRC_HashFunctionID == HASH_ID_CRC_32_MPEG2 || 
 				CRC_HashFunctionID == HASH_ID_CRC_32_POSIX || CRC_HashFunctionID == HASH_ID_CRC_32_K || CRC_HashFunctionID == HASH_ID_CRC_32_Q || 
 				CRC_HashFunctionID == HASH_ID_CRC_32_XFER)
 			{
-				ResultCRC32 = CRC32_Calculate(ResultCRC32, CRC_HashFunctionID, Buffer.get(), ReadLength);
+				ResultCRC32 = CRC32_Calculate(ResultCRC32, CRC_HashFunctionID, StringBuffer.get(), ReadLength);
 			}
 			else if (CRC_HashFunctionID == HASH_ID_CRC_40)
 			{
-				ResultCRC64 = CRC40_Calculate(ResultCRC64, Buffer.get(), ReadLength);
+				ResultCRC64 = CRC40_Calculate(ResultCRC64, StringBuffer.get(), ReadLength);
 			}
 			else if (CRC_HashFunctionID == HASH_ID_CRC_64 || CRC_HashFunctionID == HASH_ID_CRC_64_1B || CRC_HashFunctionID == HASH_ID_CRC_64_WE || 
 				CRC_HashFunctionID == HASH_ID_CRC_64_JONES)
 			{
-				ResultCRC64 = CRC64_Calculate(ResultCRC64, CRC_HashFunctionID, Buffer.get(), ReadLength);
+				ResultCRC64 = CRC64_Calculate(ResultCRC64, CRC_HashFunctionID, StringBuffer.get(), ReadLength);
 			}
 			else {
 				fwprintf_s(stderr, L"[Error] Parameters error.\n");
@@ -2299,14 +2300,22 @@ bool CRC_Hash(
 	}
 
 //Binary to hex
-	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
-	if (sodium_bin2hex(Buffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Result, DigestSize) == nullptr)
+	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, reinterpret_cast<uint8_t *>(Result), DigestSize) == nullptr)
 	{
 		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;
 	}
 	else {
-		PrintToScreen(Buffer.get());
+	//Lowercase convert.
+		std::string Hex(reinterpret_cast<const char *>(StringBuffer.get()));
+		if (!IsLowerCase)
+			CaseConvert(Hex, true);
+
+	//Print to screen and file.
+		WriteMessage_ScreenFile(stderr, reinterpret_cast<const uint8_t *>(Hex.c_str()));
+		if (OutputFile != nullptr)
+			WriteMessage_ScreenFile(OutputFile, reinterpret_cast<const uint8_t *>(Hex.c_str()));
 	}
 
 	return true;

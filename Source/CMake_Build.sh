@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # 
 # This code is part of Toolkit
 # A useful and powerful toolkit
-# Copyright (C) 2012-2016 Chengr28
+# Copyright (C) 2012-2017 Chengr28
 # 
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-# Create a release directory.
+# Create release directories.
 if (uname -s | grep -iq "Darwin"); then
 	ThreadNum=`sysctl -n hw.ncpu`
 else

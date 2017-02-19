@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -23,10 +23,10 @@
 // Hash function
 // 
 //Read commands(SHA-3)
-bool ReadCommands_SHA3(
+bool ReadCommand_SHA3(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command)
 #endif
 {
@@ -68,13 +68,13 @@ bool ReadCommands_SHA3(
 			if (Command.find(COMMAND_SHA3_SHAKE_SIZE) == 0)
 			#if defined(PLATFORM_WIN)
 				Offset = wcslen(COMMAND_SHA3_SHAKE_SIZE);
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				Offset = strlen(COMMAND_SHA3_SHAKE_SIZE);
 			#endif
 			else 
 			#if defined(PLATFORM_WIN)
 				Offset = wcslen(COMMAND_SHA3_SHAKE_128);
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				Offset = strlen(COMMAND_SHA3_SHAKE_128);
 			#endif
 			SHA3_HashFunctionID = HASH_ID_SHA3_SHAKE_128;
@@ -83,7 +83,7 @@ bool ReadCommands_SHA3(
 			_set_errno(0);
 		#if defined(PLATFORM_WIN)
 			auto Result = wcstoul(Command.c_str() + Offset, nullptr, 0);
-		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 			auto Result = strtoul(Command.c_str() + Offset, nullptr, 0);
 		#endif
 			if (Result >= FILE_BUFFER_SIZE)
@@ -104,7 +104,7 @@ bool ReadCommands_SHA3(
 			_set_errno(0);
 		#if defined(PLATFORM_WIN)
 			auto Result = wcstoul(Command.c_str() + wcslen(COMMAND_SHA3_SHAKE_256), nullptr, 0);
-		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 			auto Result = strtoul(Command.c_str() + strlen(COMMAND_SHA3_SHAKE_256), nullptr, 0);
 		#endif
 			if (Result >= FILE_BUFFER_SIZE)
@@ -132,7 +132,8 @@ bool ReadCommands_SHA3(
 
 //SHA-3 hash function
 bool SHA3_Hash(
-	FILE * const FileHandle)
+	FILE * const FileHandle, 
+	FILE * const OutputFile)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_SHA3 || FileHandle == nullptr)
@@ -142,7 +143,8 @@ bool SHA3_Hash(
 	}
 
 //Initialization
-	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
+	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
+	std::shared_ptr<uint8_t> StringBuffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	size_t ReadLength = 0, DigestSize = 0;
@@ -202,7 +204,7 @@ bool SHA3_Hash(
 
 			return false;
 		}
-		else if (Keccak_HashUpdate(&HashInstance, (BitSequence *)Buffer.get(), ReadLength * BYTES_TO_BITS) != SUCCESS)
+		else if (Keccak_HashUpdate(&HashInstance, reinterpret_cast<const BitSequence *>(Buffer.get()), ReadLength * BYTES_TO_BITS) != SUCCESS)
 		{
 			fwprintf_s(stderr, L"[Error] Hash process error");
 			return false;
@@ -211,27 +213,34 @@ bool SHA3_Hash(
 
 //Finish hash process.
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
-	if (Keccak_HashFinal(&HashInstance, (BitSequence *)Buffer.get()) != SUCCESS)
+	if (Keccak_HashFinal(&HashInstance, reinterpret_cast<BitSequence *>(Buffer.get())) != SUCCESS)
 	{
 		fwprintf_s(stderr, L"[Error] Hash process error");
 		return false;
 	}
 	else if ((SHA3_HashFunctionID == HASH_ID_SHA3_SHAKE_128 || SHA3_HashFunctionID == HASH_ID_SHA3_SHAKE_256) && 
-		Keccak_HashSqueeze(&HashInstance, (BitSequence *)Buffer.get(), SHA3_SHAKE_Length) != SUCCESS)
+		Keccak_HashSqueeze(&HashInstance, reinterpret_cast<BitSequence *>(Buffer.get()), SHA3_SHAKE_Length) != SUCCESS)
 	{
 		fwprintf_s(stderr, L"[Error] Hash squeeze error.\n");
 		return false;
 	}
 	
 //Binary to hex
-	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), DigestSize / BYTES_TO_BITS) == nullptr)
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, Buffer.get(), DigestSize / BYTES_TO_BITS) == nullptr)
 	{
 		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;
 	}
 	else {
-	//Print to screen.
-		PrintToScreen(StringBuffer.get());
+	//Lowercase convert.
+		std::string Hex(reinterpret_cast<const char *>(StringBuffer.get()));
+		if (!IsLowerCase)
+			CaseConvert(Hex, true);
+
+	//Print to screen and file.
+		WriteMessage_ScreenFile(stderr, reinterpret_cast<const uint8_t *>(Hex.c_str()));
+		if (OutputFile != nullptr)
+			WriteMessage_ScreenFile(OutputFile, reinterpret_cast<const uint8_t *>(Hex.c_str()));
 	}
 
 	return true;

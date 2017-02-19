@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -21,6 +21,7 @@
 
 //Global variables
 extern size_t HashFamilyID;
+extern bool IsLowerCase;
 
 //Checksum update process
 uint32_t Checksum_Update(
@@ -45,19 +46,20 @@ uint16_t Checksum_Final(
 	const size_t Length)
 {
 	if (Length)
-		Checksum += *(uint8_t *)Buffer;
+		Checksum += *reinterpret_cast<const uint8_t *>(Buffer);
 	Checksum = (Checksum >> (sizeof(uint16_t) * BYTES_TO_BITS)) + (Checksum & UINT16_MAX);
 	Checksum += (Checksum >> (sizeof(uint16_t) * BYTES_TO_BITS));
 
-	return (uint16_t)(~Checksum);
+	return static_cast<uint16_t>(~Checksum);
 }
 
 //////////////////////////////////////////////////
 // Hash function
 // 
-//Internet protocol checksum hash function
+//Internet Protocol checksum hash function
 bool Checksum_Hash(
-	FILE * const FileHandle)
+	FILE * const FileHandle, 
+	FILE * const OutputFile)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_CHECKSUM || FileHandle == nullptr)
@@ -67,8 +69,8 @@ bool Checksum_Hash(
 	}
 
 //Initialization
-	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]());
-	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
+	std::shared_ptr<uint8_t> StringBuffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
+	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	size_t ReadLength = 0;
 
 //Checksum initialization
@@ -78,9 +80,9 @@ bool Checksum_Hash(
 //Hash process
 	while (!feof(FileHandle))
 	{
-		memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
+		memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 		_set_errno(0);
-		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(uint8_t), FILE_BUFFER_SIZE, FileHandle);
+		ReadLength = fread_s(StringBuffer.get(), FILE_BUFFER_SIZE, sizeof(uint8_t), FILE_BUFFER_SIZE, FileHandle);
 		if (ReadLength == 0 && errno != 0)
 		{
 			std::wstring Message(L"[Error] Read file error");
@@ -93,20 +95,28 @@ bool Checksum_Hash(
 			return false;
 		}
 		else {
-			Checksum32 = Checksum_Update(Checksum32, (uint16_t *)Buffer.get(), ReadLength);
+			Checksum32 = Checksum_Update(Checksum32, reinterpret_cast<const uint16_t *>(StringBuffer.get()), ReadLength);
 		}
 	}
 
 //Finish hash process and binary to hex.
-	Checksum16 = Checksum_Final(Checksum32, (uint16_t *)(Buffer.get() + ReadLength - ReadLength % sizeof(uint16_t)), ReadLength % sizeof(uint16_t));
-	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
-	if (sodium_bin2hex(Buffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)&Checksum16, sizeof(uint16_t)) == nullptr)
+	Checksum16 = Checksum_Final(Checksum32, reinterpret_cast<const uint16_t *>(StringBuffer.get() + ReadLength - ReadLength % sizeof(uint16_t)), ReadLength % sizeof(uint16_t));
+	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, reinterpret_cast<const uint8_t *>(&Checksum16), sizeof(uint16_t)) == nullptr)
 	{
 		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;
 	}
 	else {
-		PrintToScreen(Buffer.get());
+	//Lowercase convert.
+		std::string Hex(reinterpret_cast<const char *>(StringBuffer.get()));
+		if (!IsLowerCase)
+			CaseConvert(Hex, true);
+
+	//Print to screen and file.
+		WriteMessage_ScreenFile(stderr, reinterpret_cast<const uint8_t *>(Hex.c_str()));
+		if (OutputFile != nullptr)
+			WriteMessage_ScreenFile(OutputFile, reinterpret_cast<const uint8_t *>(Hex.c_str()));
 	}
 
 	return true;

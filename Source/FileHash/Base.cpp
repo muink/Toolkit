@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -33,7 +33,7 @@ bool CheckEmptyBuffer(
 	//Scan all data.
 		for (size_t Index = 0;Index < Length;++Index)
 		{
-			if (*(((uint8_t *)Buffer) + Index) != 0)
+			if (*(static_cast<const uint8_t *>(Buffer) + Index) != 0)
 				return false;
 		}
 	}
@@ -42,7 +42,7 @@ bool CheckEmptyBuffer(
 }
 
 //Convert multiple bytes to wide char string
-bool MBSToWCSString(
+bool MBS_To_WCS_String(
 	const uint8_t * const Buffer, 
 	const size_t MaxLen, 
 	std::wstring &Target)
@@ -51,32 +51,32 @@ bool MBSToWCSString(
 	Target.clear();
 	if (Buffer == nullptr || MaxLen == 0)
 		return false;
-	size_t Length = strnlen_s((const char *)Buffer, MaxLen);
+	const auto Length = strnlen_s(reinterpret_cast<const char *>(Buffer), MaxLen);
 	if (Length == 0 || CheckEmptyBuffer(Buffer, Length))
 		return false;
 
 //Convert string.
-	std::shared_ptr<wchar_t> TargetPTR(new wchar_t[Length + PADDING_RESERVED_BYTES]());
-	wmemset(TargetPTR.get(), 0, Length + PADDING_RESERVED_BYTES);
+	std::shared_ptr<wchar_t> TargetBuffer(new wchar_t[Length + PADDING_RESERVED_BYTES](), std::default_delete<wchar_t[]>());
+	wmemset(TargetBuffer.get(), 0, Length + PADDING_RESERVED_BYTES);
 #if defined(PLATFORM_WIN)
 	if (MultiByteToWideChar(
 			CP_ACP, 
 			0, 
-			(LPCCH)Buffer, 
-			MBSTOWCS_NULLTERMINATE, 
-			TargetPTR.get(), 
-			(int)(Length + PADDING_RESERVED_BYTES)) == 0)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-	if (mbstowcs(TargetPTR.get(), (const char *)Buffer, Length + PADDING_RESERVED_BYTES) == (size_t)RETURN_ERROR)
+			reinterpret_cast<LPCCH>(Buffer), 
+			MBSTOWCS_NULL_TERMINATE, 
+			TargetBuffer.get(), 
+			static_cast<int>(Length + PADDING_RESERVED_BYTES)) == 0)
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	if (mbstowcs(TargetBuffer.get(), reinterpret_cast<const char *>(Buffer), Length + PADDING_RESERVED_BYTES) == static_cast<size_t>(RETURN_ERROR))
 #endif
 	{
 		return false;
 	}
 	else {
-		if (wcsnlen_s(TargetPTR.get(), Length + PADDING_RESERVED_BYTES) == 0)
+		if (wcsnlen_s(TargetBuffer.get(), Length + PADDING_RESERVED_BYTES) == 0)
 			return false;
 		else 
-			Target = TargetPTR.get();
+			Target = TargetBuffer.get();
 	}
 
 	return true;
@@ -91,10 +91,10 @@ void CaseConvert(
 	{
 	//Lowercase to uppercase
 		if (IsLowerToUpper)
-			StringIter = (char)toupper(StringIter);
+			StringIter = static_cast<char>(toupper(StringIter));
 	//Uppercase to lowercase
 		else 
-			StringIter = (char)tolower(StringIter);
+			StringIter = static_cast<char>(tolower(StringIter));
 	}
 
 	return;
@@ -109,10 +109,10 @@ void CaseConvert(
 	{
 	//Lowercase to uppercase
 		if (IsLowerToUpper)
-			StringIter = (wchar_t)toupper(StringIter);
+			StringIter = static_cast<wchar_t>(toupper(StringIter));
 	//Uppercase to lowercase
 		else 
-			StringIter = (wchar_t)tolower(StringIter);
+			StringIter = static_cast<wchar_t>(tolower(StringIter));
 	}
 
 	return;
@@ -161,33 +161,38 @@ void ErrorCodeToMessage(
 
 //Convert error code to error message.
 #if defined(PLATFORM_WIN)
-	const wchar_t *InnerMessage = nullptr;
+	wchar_t *InnerMessage = nullptr;
 	if (FormatMessageW(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS|FORMAT_MESSAGE_MAX_WIDTH_MASK, 
-		nullptr, 
-		(DWORD)ErrorCode, 
-		MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), 
-		(LPWSTR)&InnerMessage, 
-		0, 
-		nullptr) == 0)
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_MAX_WIDTH_MASK, 
+			nullptr, 
+			static_cast<DWORD>(ErrorCode), 
+			MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), 
+			reinterpret_cast<const LPWSTR>(&InnerMessage), 
+			0, 
+			nullptr) == 0)
 	{
 		Message.append(L", error code is %d");
+
+	//Free pointer.
+		if (InnerMessage != nullptr)
+			LocalFree(InnerMessage);
 	}
 	else {
 		Message.append(L": ");
 		Message.append(InnerMessage);
-		Message.pop_back(); //Delete space.
-		Message.pop_back(); //Delete period.
+		if (Message.back() == ASCII_SPACE)
+			Message.pop_back(); //Delete space.
+		if (Message.back() == ASCII_PERIOD)
+			Message.pop_back(); //Delete period.
 		Message.append(L"[%d]");
+		
+	//Free pointer.
+		LocalFree(InnerMessage);
 	}
-
-//Free pointer.
-	if (InnerMessage != nullptr)
-		LocalFree((HLOCAL)InnerMessage);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::wstring InnerMessage;
-	auto ErrorMessage = strerror((int)ErrorCode);
-	if (ErrorMessage == nullptr || !MBSToWCSString((const uint8_t *)ErrorMessage, strnlen(ErrorMessage, FILE_BUFFER_SIZE), InnerMessage))
+	auto ErrorMessage = strerror(static_cast<int>(ErrorCode));
+	if (ErrorMessage == nullptr || !MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(ErrorMessage), strnlen(ErrorMessage, FILE_BUFFER_SIZE), InnerMessage))
 	{
 		Message.append(L", error code is %d");
 	}
@@ -203,14 +208,18 @@ void ErrorCodeToMessage(
 }
 
 //Print to screen
-void PrintToScreen(
+void WriteMessage_ScreenFile(
+	const FILE * const FileHandle, 
 	const uint8_t * const Message)
 {
-	std::string InnerMessage((const char *)Message);
-	CaseConvert(InnerMessage, true);
-	for (size_t Index = 0;Index < InnerMessage.length();++Index)
-		fwprintf_s(stderr, L"%c", InnerMessage.c_str()[Index]);
-	fwprintf_s(stderr, L"\n");
+//Handle check
+	if (FileHandle == nullptr)
+		return;
+
+//Print process.
+	for (size_t Index = 0;Index < strnlen_s(reinterpret_cast<const char *>(Message), FILE_BUFFER_SIZE);++Index)
+		fwprintf_s(const_cast<FILE *>(FileHandle), L"%c", Message[Index]);
+	fwprintf_s(const_cast<FILE *>(FileHandle), L"\n");
 
 	return;
 }
@@ -229,21 +238,23 @@ void PrintDescription(
 	fwprintf(stderr, L"(OpenWrt)\n");
 #elif defined(PLATFORM_LINUX)
 	fwprintf(stderr, L"(Linux)\n");
-#elif defined(PLATFORM_MACX)
-	fwprintf(stderr, L"(Mac)\n");
+#elif defined(PLATFORM_MACOS)
+	fwprintf(stderr, L"(macOS)\n");
 #endif
 	fwprintf_s(stderr, L"A useful and powerful toolkit(FileHash)\n");
 	fwprintf_s(stderr, COPYRIGHT_MESSAGE);
 	fwprintf_s(stderr, L"\n--------------------------------------------------\n");
 
 //Usage
-	fwprintf_s(stderr, L"       FileHash -options/-algorithm [Filename]\n");
+	fwprintf_s(stderr, L"       FileHash -options -algorithm [Filename]\n");
 	fwprintf_s(stderr, L"  e.g. FileHash -SHA3 Filename\n");
 
 //Supported options
 	fwprintf_s(stderr, L"\nSupported options:\n");
-	fwprintf_s(stderr, L"   -v/--version:     Print current version on screen.\n");
-	fwprintf_s(stderr, L"   -?/-h/--help      Print description.\n");
+	fwprintf_s(stderr, L"   -v/--version:         Print current version on screen.\n");
+	fwprintf_s(stderr, L"   -?/-h/--help          Print description.\n");
+	fwprintf_s(stderr, L"   --lowercase           Output lowercase hash.\n");
+	fwprintf_s(stderr, L"   --output [Filename]   Output hash result to file.\n");
 
 //Supported hash algorithm list
 	fwprintf_s(stderr, L"\nSupported hash algorithms:\n");
@@ -346,7 +357,7 @@ void PrintDescription(
 	fwprintf_s(stderr, L"                     -SHA3_SHAKE_256=Size        SHA-3 SHAKE 256 bits\n");
 	fwprintf_s(stderr, L"                                                 Size = Digest output length\n");
 
-#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	fwprintf_s(stderr, L"\n");
 #endif
 	return;

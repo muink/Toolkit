@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // A useful and powerful toolkit(DNSPing)
-// Copyright (C) 2014-2016 Chengr28
+// Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,13 +17,16 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+#ifndef TOOLKIT_DNSPING_PROTOCOL_H
+#define TOOLKIT_DNSPING_PROTOCOL_H
+
 #include "Base.h"
 
 //Global variables
 extern ConfigurationTable ConfigurationParameter;
 
 //Internet Protocol Numbers
-//About this list, see http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
+//About this list, visit IANA Assigned Internet Protocol Numbers(https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)
 #ifndef IPPROTO_HOPOPTS
 	#define IPPROTO_HOPOPTS           0                    //IPv6 Hop-by-Hop Option
 #endif
@@ -461,7 +464,7 @@ extern ConfigurationTable ConfigurationParameter;
 #endif
 
 //Port definitions(1 - 1024, well-known ports)
-//About this list, see https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
+//About this list, visit IANA Service Name and Transport Protocol Port Number Registry(https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml)
 #ifndef IPPORT_TCPMUX
 	#define IPPORT_TCPMUX               1U
 #endif
@@ -714,6 +717,9 @@ extern ConfigurationTable ConfigurationParameter;
 #ifndef IPPORT_AODV
 	#define IPPORT_AODV                 654U
 #endif
+#ifndef IPPORT_DNS_TLS
+	#define IPPORT_DNS_TLS              853U
+#endif
 #ifndef IPPORT_FTPSDATA
 	#define IPPORT_FTPSDATA             989U
 #endif
@@ -725,4 +731,5 @@ extern ConfigurationTable ConfigurationParameter;
 #endif
 #ifndef IPPORT_TELNETS
 	#define IPPORT_TELNETS              992U
+#endif
 #endif

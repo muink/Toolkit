@@ -13,7 +13,7 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="SHA-3">
+    <Filter Include="源文件\SHA-3">
       <UniqueIdentifier>{cdd85133-712b-4cfc-9387-2b86d945e8c9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -43,28 +43,28 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="SHA3\brg_endian.h">
-      <Filter>SHA-3</Filter>
+      <Filter>源文件\SHA-3</Filter>
     </ClInclude>
     <ClInclude Include="SHA3\KeccakF-1600-interface.h">
-      <Filter>SHA-3</Filter>
+      <Filter>源文件\SHA-3</Filter>
     </ClInclude>
     <ClInclude Include="SHA3\KeccakHash.h">
-      <Filter>SHA-3</Filter>
+      <Filter>源文件\SHA-3</Filter>
     </ClInclude>
     <ClInclude Include="SHA3\KeccakSponge.h">
-      <Filter>SHA-3</Filter>
+      <Filter>源文件\SHA-3</Filter>
     </ClInclude>
     <ClInclude Include="SHA3\SnP.h">
-      <Filter>SHA-3</Filter>
+      <Filter>源文件\SHA-3</Filter>
     </ClInclude>
     <ClInclude Include="SHA3\SnP-FBWL-default.h">
-      <Filter>SHA-3</Filter>
+      <Filter>源文件\SHA-3</Filter>
     </ClInclude>
     <ClInclude Include="SHA3\SnP-interface.h">
-      <Filter>SHA-3</Filter>
+      <Filter>源文件\SHA-3</Filter>
     </ClInclude>
     <ClInclude Include="SHA3\SnP-Relaned.h">
-      <Filter>SHA-3</Filter>
+      <Filter>源文件\SHA-3</Filter>
     </ClInclude>
     <ClInclude Include="Base.h">
       <Filter>头文件</Filter>
@@ -81,7 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="SHA3\CMakeLists.txt">
-      <Filter>SHA-3</Filter>
+      <Filter>源文件\SHA-3</Filter>
     </Text>
     <Text Include="CMakeLists.txt">
       <Filter>资源文件</Filter>
@@ -89,21 +89,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SHA3\KeccakF-1600-compact64.cpp">
-      <Filter>SHA-3</Filter>
+      <Filter>源文件\SHA-3</Filter>
     </ClCompile>
     <ClCompile Include="SHA3\KeccakHash.cpp">
-      <Filter>SHA-3</Filter>
+      <Filter>源文件\SHA-3</Filter>
     </ClCompile>
     <ClCompile Include="SHA3\KeccakSponge.cpp">
-      <Filter>SHA-3</Filter>
+      <Filter>源文件\SHA-3</Filter>
     </ClCompile>
     <ClCompile Include="SHA3\SnP-FBWL-default.cpp">
-      <Filter>SHA-3</Filter>
-    </ClCompile>
-    <ClCompile Include="SHA-3.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\SHA-3</Filter>
     </ClCompile>
     <ClCompile Include="Base.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BLAKE.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BLAKE2.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Checksum.cpp">
@@ -124,19 +127,16 @@
     <ClCompile Include="MD5.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="RIPEMD.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="SHA-1.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="SHA-2.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="BLAKE.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="BLAKE2.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="RIPEMD.cpp">
+    <ClCompile Include="SHA-3.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

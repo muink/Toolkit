@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,7 +20,8 @@
 #include "Base.h"
 
 //Global variables
-size_t HashFamilyID = DEFAULT_HASH_ID;
+size_t HashFamilyID = 0;
+bool IsLowerCase = false;
 
 //Main function of program
 #if defined(PLATFORM_WIN)
@@ -28,43 +29,61 @@ int wmain(
 	int argc, 
 	wchar_t *argv[])
 {
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 int main(
 	int argc, 
 	char *argv[])
 {
 #endif
-
 //Initialization(Part 1)
 #if defined(PLATFORM_WIN)
-	std::wstring FileName;
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-	std::string FileName;
+	std::wstring FileName, OutputFile;
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	std::string FileName, OutputFile;
 #endif
 
 //Read commands.
-	if (argc < 2)
+	if (argc < COMMAND_MIN_COUNT)
 	{
 		PrintDescription();
 		return EXIT_SUCCESS;
 	}
-	else if (argc == 2) //File name only, use default hash function.
+	else if (argc > COMMAND_MAX_COUNT)
 	{
-		if (!ReadCommands(argv[1U], true))
-			return EXIT_FAILURE;
-		else //Mark filename.
-			FileName = argv[1U];
-	}
-	else if (argc == 3) //File name with hash function command
-	{
-		if (!ReadCommands(argv[1U], false))
-			return EXIT_FAILURE;
-		else //Mark filename.
-			FileName = argv[2U];
-	}
-	else {
 		fwprintf_s(stderr, L"[Error] Commands error.\n");
 		return EXIT_FAILURE;
+	}
+	else {
+	//List all commands.
+	#if defined(PLATFORM_WIN)
+		std::vector<std::wstring> CommandList;
+	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+		std::vector<std::string> CommandList;
+	#endif
+		for (size_t Index = 1U;static_cast<int>(Index) < argc;++Index)
+		{
+			CommandList.push_back(argv[Index]);
+			if (CommandList.at(Index - 1U).empty())
+			{
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
+				return EXIT_FAILURE;
+			}
+		}
+
+	//Read command process
+		if (!ReadCommand(CommandList, FileName, OutputFile))
+		{
+			return EXIT_FAILURE;
+		}
+		else if (FileName.empty())
+		{
+			fwprintf_s(stderr, L"[Error] Commands error.\n");
+			return EXIT_FAILURE;
+		}
+		else if (HashFamilyID == 0)
+		{
+			HashFamilyID = DEFAULT_HASH_ID;
+		}
 	}
 
 //Open file.
@@ -72,13 +91,13 @@ int main(
 	ssize_t Result = 0;
 #if defined(PLATFORM_WIN)
 	Result = _wfopen_s(&FileHandle, FileName.c_str(), L"rb");
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	errno = 0;
 	FileHandle = fopen(FileName.c_str(), "rb");
 #endif
 	if (FileHandle == nullptr)
 	{
-	#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+	#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		Result = errno;
 	#endif
 		std::wstring Message(L"[Error] Read file error");
@@ -90,42 +109,70 @@ int main(
 
 		return EXIT_FAILURE;
 	}
-	else if (!MainHashProcess(FileHandle))
+
+//Open output file.
+	FILE *OutputFileHandle = nullptr;
+	if (!OutputFile.empty())
 	{
-		return EXIT_FAILURE;
-	}
-	else {
-	//Close all file and network handles.
 	#if defined(PLATFORM_WIN)
-		_fcloseall();
-	#elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
-		fcloseall();
+		Result = _wfopen_s(&OutputFileHandle, OutputFile.c_str(), L"a,ccs=UTF-8");
+	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+		errno = 0;
+		OutputFileHandle = fopen(OutputFile.c_str(), "a");
 	#endif
+		if (OutputFileHandle == nullptr)
+		{
+		#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			Result = errno;
+		#endif
+			std::wstring Message(L"[Error] Read file error");
+			ErrorCodeToMessage(Result, Message);
+			if (Result == 0)
+				fwprintf_s(stderr, Message.c_str());
+			else 
+				fwprintf_s(stderr, Message.c_str(), Result);
+
+		//Close all file and network handles.
+			fclose(FileHandle);
+		#if defined(PLATFORM_WIN)
+			_fcloseall();
+		#elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
+			fcloseall();
+		#endif
+
+			return EXIT_FAILURE;
+		}
 	}
+
+//Main hash process
+	if (!MainHashProcess(FileHandle, OutputFileHandle))
+		return EXIT_FAILURE;
 
 	return EXIT_SUCCESS;
 }
 
 //Read commands
-bool ReadCommands(
+bool ReadCommand(
 #if defined(PLATFORM_WIN)
-	const wchar_t * const Command, 
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-	const char * const Command, 
+	std::vector<std::wstring> CommandList, 
+	std::wstring &FileName, 
+	std::wstring &OutputFile)
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	std::vector<std::string> CommandList, 
+	std::string &FileName, 
+	std::string &OutputFile)
 #endif
-	const bool IsFileNameOnly)
 {
-//Initialization
-#if defined(PLATFORM_WIN)
-	std::wstring InnerCommand(Command);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-	std::string InnerCommand(Command);
-#endif
-	CaseConvert(InnerCommand, true);
-
-//Commands check
-	if (IsFileNameOnly)
+//Command list check
+	for (size_t Index = 0;Index < CommandList.size();++Index)
 	{
+	#if defined(PLATFORM_WIN)
+		std::wstring InnerCommand(CommandList.at(Index));
+	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+		std::string InnerCommand(CommandList.at(Index));
+	#endif
+		CaseConvert(InnerCommand, true);
+
 	//Print version.
 		if (InnerCommand == COMMAND_LONG_PRINT_VERSION || InnerCommand == COMMAND_SHORT_PRINT_VERSION)
 		{
@@ -141,92 +188,198 @@ bool ReadCommands(
 			PrintDescription();
 			return false;
 		}
-	}
-	else {
-	//Command length check
-		if (InnerCommand.length() < 3U)
+	//Options check
+		else if (InnerCommand == COMMAND_LOWERCASE) //Lowercase command
 		{
-			fwprintf_s(stderr, L"[Error] Commands error.\n");
-			return false;
+			IsLowerCase = true;
 		}
+		else if (InnerCommand == COMMAND_OUTPUT_FILE) //Output hash result to file command
+		{
+		//Output command check
+			if (Index + 1U >= CommandList.size())
+			{
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
+				return false;
+			}
+		//Mark output file name.
+			else {
+				++Index;
+				
+			//Path and file name check.
+			#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+				if (CommandList.at(Index).length() >= PATH_MAX)
+				{
+					fwprintf_s(stderr, L"[Error] Commands error.\n");
+					return false;
+				}
+			#endif
 
-	//BLAKE2 family
-		if (InnerCommand.find(HASH_COMMAND_BLAKE2) == 0)
+				OutputFile = CommandList.at(Index);
+			}
+		}
+	//Algorithms check
+		else if (InnerCommand.find(HASH_COMMAND_BLAKE2) == 0) //BLAKE2 family
 		{
+		//Hash family check
+			if (HashFamilyID > 0)
+			{
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
+				return false;
+			}
+
+		//Main process
 			HashFamilyID = HASH_ID_BLAKE2;
-			if (!ReadCommands_BLAKE2(InnerCommand))
+			if (!ReadCommand_BLAKE2(InnerCommand))
 				return false;
 		}
-	//BLAKE family
-		else if (InnerCommand.find(HASH_COMMAND_BLAKE) == 0)
+		else if (InnerCommand.find(HASH_COMMAND_BLAKE) == 0) //BLAKE family
 		{
+		//Hash family check
+			if (HashFamilyID > 0)
+			{
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
+				return false;
+			}
+
+		//Main process
 			HashFamilyID = HASH_ID_BLAKE;
-			if (!ReadCommands_BLAKE(InnerCommand))
+			if (!ReadCommand_BLAKE(InnerCommand))
 				return false;
 		}
-	//CRC family
-		else if (InnerCommand.find(HASH_COMMAND_CRC) == 0)
+		else if (InnerCommand.find(HASH_COMMAND_CRC) == 0) //CRC family
 		{
+		//Hash family check
+			if (HashFamilyID > 0)
+			{
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
+				return false;
+			}
+
+		//Main process
 			HashFamilyID = HASH_ID_CRC;
-			if (!ReadCommands_CRC(InnerCommand))
+			if (!ReadCommand_CRC(InnerCommand))
 				return false;
 		}
-	//Internet Protocol Checksum
-		else if (InnerCommand == HASH_COMMAND_CHECKSUM)
+		else if (InnerCommand == HASH_COMMAND_CHECKSUM) //Internet Protocol Checksum
 		{
+		//Hash family check
+			if (HashFamilyID > 0)
+			{
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
+				return false;
+			}
+
+		//Main process
 			HashFamilyID = HASH_ID_CHECKSUM;
 		}
-	//MD2
-		else if (InnerCommand == HASH_COMMAND_MD2)
+		else if (InnerCommand == HASH_COMMAND_MD2) //MD2
 		{
+		//Hash family check
+			if (HashFamilyID > 0)
+			{
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
+				return false;
+			}
+
+		//Main process
 			HashFamilyID = HASH_ID_MD2;
 		}
-	//MD4 family
-		else if (InnerCommand == HASH_COMMAND_MD4)
+		else if (InnerCommand == HASH_COMMAND_MD4) //MD4 family
 		{
+		//Hash family check
+			if (HashFamilyID > 0)
+			{
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
+				return false;
+			}
+
+		//Main process
 			HashFamilyID = HASH_ID_MD4;
 		}
-		else if (InnerCommand == HASH_COMMAND_ED2K)
+		else if (InnerCommand == HASH_COMMAND_ED2K) //MD4 family
 		{
+		//Hash family check
+			if (HashFamilyID > 0)
+			{
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
+				return false;
+			}
+
+		//Main process
 			HashFamilyID = HASH_ID_ED2K;
 		}
-	//MD5
-		else if (InnerCommand == HASH_COMMAND_MD || InnerCommand == HASH_COMMAND_MD5)
+		else if (InnerCommand == HASH_COMMAND_MD || InnerCommand == HASH_COMMAND_MD5) //MD5
 		{
+		//Hash family check
+			if (HashFamilyID > 0)
+			{
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
+				return false;
+			}
+
+		//Main process
 			HashFamilyID = HASH_ID_MD5;
 		}
-	//RIPEMD family
-		else if (InnerCommand.find(HASH_COMMAND_RIPEMD) == 0)
+		else if (InnerCommand.find(HASH_COMMAND_RIPEMD) == 0) //RIPEMD family
 		{
+		//Hash family check
+			if (HashFamilyID > 0)
+			{
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
+				return false;
+			}
+
+		//Main process
 			HashFamilyID = HASH_ID_RIPEMD;
-			if (!ReadCommands_RIPEMD(InnerCommand))
+			if (!ReadCommand_RIPEMD(InnerCommand))
 				return false;
 		}
-	//SHA-1
-		else if (InnerCommand == HASH_COMMAND_SHA1_UNDERLINE || InnerCommand.find(HASH_COMMAND_SHA1) == 0)
+		else if (InnerCommand == HASH_COMMAND_SHA1_UNDERLINE || InnerCommand.find(HASH_COMMAND_SHA1) == 0) //SHA-1
 		{
+		//Hash family check
+			if (HashFamilyID > 0)
+			{
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
+				return false;
+			}
+
+		//Main process
 			HashFamilyID = HASH_ID_SHA1;
 		}
-	//SHA-2 family
 		else if (InnerCommand == HASH_COMMAND_SHA2_384 || InnerCommand.find(HASH_COMMAND_SHA2_512) == 0 || 
-			InnerCommand == HASH_COMMAND_SHA2_UNDERLINE || InnerCommand.find(HASH_COMMAND_SHA2) == 0)
+			InnerCommand == HASH_COMMAND_SHA2_UNDERLINE || InnerCommand.find(HASH_COMMAND_SHA2) == 0) //SHA-2 family
 		{
+		//Hash family check
+			if (HashFamilyID > 0)
+			{
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
+				return false;
+			}
+
+		//Main process
 			HashFamilyID = HASH_ID_SHA2;
-			if (!ReadCommands_SHA2(InnerCommand))
+			if (!ReadCommand_SHA2(InnerCommand))
 				return false;
 		}
-	//SHA-3 family
 		else if (InnerCommand == HASH_COMMAND_SHA || InnerCommand == HASH_COMMAND_SHA3_UNDERLINE || 
-			InnerCommand.find(HASH_COMMAND_SHA3) == 0)
+			InnerCommand.find(HASH_COMMAND_SHA3) == 0) //SHA-3 family
 		{
+		//Hash family check
+			if (HashFamilyID > 0)
+			{
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
+				return false;
+			}
+
+		//Main process
 			HashFamilyID = HASH_ID_SHA3;
-			if (!ReadCommands_SHA3(InnerCommand))
+			if (!ReadCommand_SHA3(InnerCommand))
 				return false;
 		}
-	//Commands error
-		else {
-			fwprintf_s(stderr, L"[Error] Commands error.\n");
-			return false;
+	//Mark file name.
+		else if (Index + 1U == CommandList.size())
+		{
+			FileName = CommandList.at(Index);
 		}
 	}
 
@@ -235,25 +388,43 @@ bool ReadCommands(
 
 //Main hash process
 bool MainHashProcess(
-	FILE * const FileHandle)
+	FILE * const FileHandle, 
+	FILE * const OutputFile)
 {
-	if ((HashFamilyID == HASH_ID_BLAKE && !BLAKE_Hash(FileHandle)) ||                                 //BLAKE family
-		(HashFamilyID == HASH_ID_BLAKE2 && !BLAKE2_Hash(FileHandle)) ||                               //BLAKE2 family
-		(HashFamilyID == HASH_ID_CRC && !CRC_Hash(FileHandle)) ||                                     //CRC family
-		(HashFamilyID == HASH_ID_CHECKSUM && !Checksum_Hash(FileHandle)) ||                           //Internet Protocol Checksum
-		(HashFamilyID == HASH_ID_MD2 && !MD2_Hash(FileHandle)) ||                                     //MD2
-		((HashFamilyID == HASH_ID_MD4 || HashFamilyID == HASH_ID_ED2K) && !MD4_Hash(FileHandle)) ||   //MD4 family
-		(HashFamilyID == HASH_ID_MD5 && !MD5_Hash(FileHandle)) ||                                     //MD5
-		(HashFamilyID == HASH_ID_RIPEMD && !RIPEMD_Hash(FileHandle)) ||                               //RIPEMD family
-		(HashFamilyID == HASH_ID_SHA1 && !SHA1_Hash(FileHandle)) ||                                   //SHA-1
-		(HashFamilyID == HASH_ID_SHA2 && !SHA2_Hash(FileHandle)) ||                                   //SHA-2 family
-		(HashFamilyID == HASH_ID_SHA3 && !SHA3_Hash(FileHandle)))                                     //SHA-3 family
+	if ((HashFamilyID == HASH_ID_BLAKE && !BLAKE_Hash(FileHandle, OutputFile)) ||                                 //BLAKE family
+		(HashFamilyID == HASH_ID_BLAKE2 && !BLAKE2_Hash(FileHandle, OutputFile)) ||                               //BLAKE2 family
+		(HashFamilyID == HASH_ID_CRC && !CRC_Hash(FileHandle, OutputFile)) ||                                     //CRC family
+		(HashFamilyID == HASH_ID_CHECKSUM && !Checksum_Hash(FileHandle, OutputFile)) ||                           //Internet Protocol Checksum
+		(HashFamilyID == HASH_ID_MD2 && !MD2_Hash(FileHandle, OutputFile)) ||                                     //MD2
+		((HashFamilyID == HASH_ID_MD4 || HashFamilyID == HASH_ID_ED2K) && !MD4_Hash(FileHandle, OutputFile)) ||   //MD4 family
+		(HashFamilyID == HASH_ID_MD5 && !MD5_Hash(FileHandle, OutputFile)) ||                                     //MD5
+		(HashFamilyID == HASH_ID_RIPEMD && !RIPEMD_Hash(FileHandle, OutputFile)) ||                               //RIPEMD family
+		(HashFamilyID == HASH_ID_SHA1 && !SHA1_Hash(FileHandle, OutputFile)) ||                                   //SHA-1
+		(HashFamilyID == HASH_ID_SHA2 && !SHA2_Hash(FileHandle, OutputFile)) ||                                   //SHA-2 family
+		(HashFamilyID == HASH_ID_SHA3 && !SHA3_Hash(FileHandle, OutputFile)))                                     //SHA-3 family
 	{
+	//Close all file and network handles.
 		fclose(FileHandle);
+		if (OutputFile != nullptr)
+			fclose(OutputFile);
+	#if defined(PLATFORM_WIN)
+		_fcloseall();
+	#elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
+		fcloseall();
+	#endif
+
 		return false;
 	}
 	else {
+	//Close all file and network handles.
 		fclose(FileHandle);
+		if (OutputFile != nullptr)
+			fclose(OutputFile);
+	#if defined(PLATFORM_WIN)
+		_fcloseall();
+	#elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
+		fcloseall();
+	#endif
 	}
 
 	return true;

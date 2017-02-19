@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // A useful and powerful toolkit(DNSPing)
-// Copyright (C) 2014-2016 Chengr28
+// Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,7 +19,6 @@
 
 #include "Protocol.h"
 
-//Minimum supported system of Windows Version Helpers is Windows Vista.
 #if defined(PLATFORM_WIN_XP)
 //Check current operation system which higher than Windows 7.
 bool IsLowerThanWin8(
@@ -28,9 +27,11 @@ bool IsLowerThanWin8(
 	OSVERSIONINFOEX OSVI;
 	memset(&OSVI, 0, sizeof(OSVI));
 	OSVI.dwOSVersionInfoSize = sizeof(OSVI);
-	const BOOL bOsVersionInfoEx = GetVersionExW((OSVERSIONINFO *)&OSVI);
 
-	if (bOsVersionInfoEx && OSVI.dwPlatformId == VER_PLATFORM_WIN32_NT && 
+//Get system info.
+	const auto SystemVersionInfoEx = GetVersionExW(
+		reinterpret_cast<OSVERSIONINFO *>(&OSVI));
+	if (SystemVersionInfoEx && OSVI.dwPlatformId == VER_PLATFORM_WIN32_NT && 
 		(OSVI.dwMajorVersion < 6U || (OSVI.dwMajorVersion == 6U && OSVI.dwMinorVersion < 2U)))
 			return true;
 
@@ -52,7 +53,7 @@ bool CheckEmptyBuffer(
 	//Scan all data.
 		for (size_t Index = 0;Index < Length;++Index)
 		{
-			if (*(((uint8_t *)Buffer) + Index) != 0)
+			if (*(static_cast<const uint8_t *>(Buffer) + Index) != 0)
 				return false;
 		}
 	}
@@ -61,7 +62,7 @@ bool CheckEmptyBuffer(
 }
 
 //Convert multiple bytes to wide char string
-bool MBSToWCSString(
+bool MBS_To_WCS_String(
 	const uint8_t * const Buffer, 
 	const size_t MaxLen, 
 	std::wstring &Target)
@@ -70,39 +71,39 @@ bool MBSToWCSString(
 	Target.clear();
 	if (Buffer == nullptr || MaxLen == 0)
 		return false;
-	size_t Length = strnlen_s((const char *)Buffer, MaxLen);
+	const auto Length = strnlen_s(reinterpret_cast<const char *>(Buffer), MaxLen);
 	if (Length == 0 || CheckEmptyBuffer(Buffer, Length))
 		return false;
 
 //Convert string.
-	std::shared_ptr<wchar_t> TargetPTR(new wchar_t[Length + PADDING_RESERVED_BYTES]());
-	wmemset(TargetPTR.get(), 0, Length + PADDING_RESERVED_BYTES);
+	std::shared_ptr<wchar_t> TargetBuffer(new wchar_t[Length + PADDING_RESERVED_BYTES](), std::default_delete<wchar_t[]>());
+	wmemset(TargetBuffer.get(), 0, Length + PADDING_RESERVED_BYTES);
 #if defined(PLATFORM_WIN)
 	if (MultiByteToWideChar(
 			CP_ACP, 
 			0, 
-			(LPCCH)Buffer, 
-			MBSTOWCS_NULLTERMINATE, 
-			TargetPTR.get(), 
-			(int)(Length + PADDING_RESERVED_BYTES)) == 0)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-	if (mbstowcs(TargetPTR.get(), (const char *)Buffer, Length + PADDING_RESERVED_BYTES) == (size_t)RETURN_ERROR)
+			reinterpret_cast<LPCCH>(Buffer), 
+			MBSTOWCS_NULL_TERMINATE, 
+			TargetBuffer.get(), 
+			static_cast<int>(Length + PADDING_RESERVED_BYTES)) == 0)
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	if (mbstowcs(TargetBuffer.get(), reinterpret_cast<const char *>(Buffer), Length + PADDING_RESERVED_BYTES) == static_cast<size_t>(RETURN_ERROR))
 #endif
 	{
 		return false;
 	}
 	else {
-		if (wcsnlen_s(TargetPTR.get(), Length + PADDING_RESERVED_BYTES) == 0)
+		if (wcsnlen_s(TargetBuffer.get(), Length + PADDING_RESERVED_BYTES) == 0)
 			return false;
 		else 
-			Target = TargetPTR.get();
+			Target = TargetBuffer.get();
 	}
 
 	return true;
 }
 
 //Convert wide char string to multiple bytes
-bool WCSToMBSString(
+bool WCS_To_MBS_String(
 	const wchar_t * const Buffer, 
 	const size_t MaxLen, 
 	std::string &Target)
@@ -111,34 +112,34 @@ bool WCSToMBSString(
 	Target.clear();
 	if (Buffer == nullptr || MaxLen == 0)
 		return false;
-	size_t Length = wcsnlen_s(Buffer, MaxLen);
+	const size_t Length = wcsnlen_s(Buffer, MaxLen);
 	if (Length == 0 || CheckEmptyBuffer(Buffer, sizeof(wchar_t) * Length))
 		return false;
 
 //Convert string.
-	std::shared_ptr<uint8_t> TargetPTR(new uint8_t[Length + PADDING_RESERVED_BYTES]());
-	memset(TargetPTR.get(), 0, Length + PADDING_RESERVED_BYTES);
+	std::shared_ptr<uint8_t> TargetBuffer(new uint8_t[Length + PADDING_RESERVED_BYTES](), std::default_delete<uint8_t[]>());
+	memset(TargetBuffer.get(), 0, Length + PADDING_RESERVED_BYTES);
 #if defined(PLATFORM_WIN)
 	if (WideCharToMultiByte(
 			CP_ACP, 
 			0, 
 			Buffer, 
-			MBSTOWCS_NULLTERMINATE, 
-			(LPSTR)TargetPTR.get(), 
-			(int)(Length + PADDING_RESERVED_BYTES), 
+			WCSTOMBS_NULL_TERMINATE, 
+			reinterpret_cast<LPSTR>(TargetBuffer.get()), 
+			static_cast<int>(Length + PADDING_RESERVED_BYTES), 
 			nullptr, 
 			nullptr) == 0)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
-	if (wcstombs((char *)TargetPTR.get(), Buffer, Length + PADDING_RESERVED_BYTES) == (size_t)RETURN_ERROR)
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	if (wcstombs(reinterpret_cast<char *>(TargetBuffer.get()), Buffer, Length + PADDING_RESERVED_BYTES) == static_cast<size_t>(RETURN_ERROR))
 #endif
 	{
 		return false;
 	}
 	else {
-		if (strnlen_s((const char *)TargetPTR.get(), Length + PADDING_RESERVED_BYTES) == 0)
+		if (strnlen_s(reinterpret_cast<const char *>(TargetBuffer.get()), Length + PADDING_RESERVED_BYTES) == 0)
 			return false;
 		else 
-			Target = (const char *)TargetPTR.get();
+			Target = reinterpret_cast<const char *>(TargetBuffer.get());
 	}
 
 	return true;
@@ -154,10 +155,10 @@ void CaseConvert(
 	{
 	//Lowercase to uppercase
 		if (IsLowerUpper)
-			Buffer[Index] = (uint8_t)toupper(Buffer[Index]);
+			Buffer[Index] = static_cast<uint8_t>(toupper(Buffer[Index]));
 	//Uppercase to lowercase
 		else 
-			Buffer[Index] = (uint8_t)tolower(Buffer[Index]);
+			Buffer[Index] = static_cast<uint8_t>(tolower(Buffer[Index]));
 	}
 
 	return;
@@ -172,129 +173,173 @@ void CaseConvert(
 	{
 	//Lowercase to uppercase
 		if (IsLowerToUpper)
-			StringIter = (wchar_t)toupper(StringIter);
+			StringIter = static_cast<wchar_t>(toupper(StringIter));
 	//Uppercase to lowercase
 		else 
-			StringIter = (wchar_t)tolower(StringIter);
+			StringIter = static_cast<wchar_t>(tolower(StringIter));
 	}
 
 	return;
 }
 
-//Convert address strings to binary.
+//Convert address strings to binary
 bool AddressStringToBinary(
 	const uint16_t Protocol, 
-	const uint8_t * const AddrString, 
+	const uint8_t * const AddrBuffer, 
 	void * const OriginalAddr, 
-	ssize_t &ErrorCode)
+	ssize_t * const ErrorCode)
 {
-	size_t UnsignedResult = 0;
+//Protocol check
+	if (Protocol == AF_INET6)
+		memset(OriginalAddr, 0, sizeof(in6_addr));
+	else if (Protocol == AF_INET)
+		memset(OriginalAddr, 0, sizeof(in_addr));
+	else 
+		return false;
+	
+//Initialization
+	std::string AddrString(reinterpret_cast<const char *>(AddrBuffer));
+	if (ErrorCode != nullptr)
+		*ErrorCode = 0;
 
-//Minimum supported system of inet_ntop and inet_pton functions is Windows Vista. [Roy Tam]
+//Convert address.
 #if defined(PLATFORM_WIN_XP)
 	sockaddr_storage SockAddr;
 	memset(&SockAddr, 0, sizeof(SockAddr));
 	socklen_t SockLength = 0;
+#else
+	ssize_t Result = 0;
 #endif
-
-//IPv6
 	if (Protocol == AF_INET6)
 	{
-	//Check IPv6 addresses
-		for (UnsignedResult = 0;UnsignedResult < strnlen_s((const char *)AddrString, ADDRESS_STRING_MAXSIZE);++UnsignedResult)
+	//Check address.
+		if (AddrString.find(ASCII_COLON) == std::string::npos || AddrString.find(ASCII_PERIOD) != std::string::npos || 
+			AddrString.find("::") != AddrString.rfind("::"))
+				return false;
+		for (const auto &StringIter:AddrString)
 		{
-			if (AddrString[UnsignedResult] < ASCII_ZERO || (AddrString[UnsignedResult] > ASCII_COLON && 
-				AddrString[UnsignedResult] < ASCII_UPPERCASE_A) || (AddrString[UnsignedResult] > ASCII_UPPERCASE_F && 
-				AddrString[UnsignedResult] < ASCII_LOWERCASE_A) || AddrString[UnsignedResult] > ASCII_LOWERCASE_F)
-					break;
+			if (StringIter < ASCII_ZERO || 
+				(StringIter > ASCII_COLON && StringIter < ASCII_UPPERCASE_A) || 
+				(StringIter > ASCII_UPPERCASE_F && StringIter < ASCII_LOWERCASE_A) || 
+				StringIter > ASCII_LOWERCASE_F)
+					return false;
 		}
 
-		std::string sAddrString((const char *)AddrString);
 	//Check abbreviation format.
-		if (sAddrString.find(ASCII_COLON) == std::string::npos)
+		if (AddrString.find(ASCII_COLON) == std::string::npos)
 		{
-			sAddrString.clear();
-			sAddrString.append("::");
-			sAddrString.append((const char *)AddrString);
+			AddrString = ("::");
+			AddrString.append(reinterpret_cast<const char *>(AddrBuffer));
 		}
-		else if (sAddrString.find(ASCII_COLON) == sAddrString.rfind(ASCII_COLON))
+		else if (AddrString.find(ASCII_COLON) == AddrString.rfind(ASCII_COLON))
 		{
-			sAddrString.replace(sAddrString.find(ASCII_COLON), 1U, ("::"));
+			AddrString.replace(AddrString.find(ASCII_COLON), 1U, ("::"));
 		}
 
 	//Convert to binary.
 	#if defined(PLATFORM_WIN_XP)
 		SockLength = sizeof(sockaddr_in6);
-		if (WSAStringToAddressA((char *)sAddrString.c_str(), AF_INET6, nullptr, (PSOCKADDR)&SockAddr, &SockLength) == SOCKET_ERROR)
-	#else
-		ssize_t SignedResult = inet_pton(AF_INET6, sAddrString.c_str(), OriginalAddr);
-		if (SignedResult == SOCKET_ERROR || SignedResult == FALSE)
-	#endif
+		if (WSAStringToAddressA(
+				const_cast<LPSTR>(AddrString.c_str()), 
+				AF_INET6, 
+				nullptr, 
+				reinterpret_cast<PSOCKADDR>(&SockAddr), 
+				&SockLength) == SOCKET_ERROR)
 		{
-			ErrorCode = WSAGetLastError();
+			if (ErrorCode != nullptr)
+				*ErrorCode = WSAGetLastError();
+
 			return false;
 		}
-	#if defined(PLATFORM_WIN_XP)
-		memcpy_s(OriginalAddr, sizeof(in6_addr), &((PSOCKADDR_IN6)&SockAddr)->sin6_addr, sizeof(((PSOCKADDR_IN6)&SockAddr)->sin6_addr));
+
+		memcpy_s(OriginalAddr, sizeof((reinterpret_cast<PSOCKADDR_IN6>(&SockAddr))->sin6_addr), &(reinterpret_cast<PSOCKADDR_IN6>(&SockAddr))->sin6_addr, sizeof((reinterpret_cast<PSOCKADDR_IN6>(&SockAddr))->sin6_addr));
+	#else
+		Result = inet_pton(AF_INET6, AddrString.c_str(), OriginalAddr);
+		if (Result == SOCKET_ERROR || Result == 0)
+		{
+			if (Result != 0 && ErrorCode != nullptr)
+				*ErrorCode = WSAGetLastError();
+
+			return false;
+		}
 	#endif
 	}
-//IPv4
-	else {
+	else if (Protocol == AF_INET)
+	{
+	//Check address.
+		if (AddrString.find(ASCII_PERIOD) == std::string::npos || AddrString.find(ASCII_COLON) != std::string::npos)
+			return false;
 		size_t CommaNum = 0;
-		for (UnsignedResult = 0;UnsignedResult < strnlen_s((const char *)AddrString, ADDRESS_STRING_MAXSIZE);++UnsignedResult)
+		for (const auto &StringIter:AddrString)
 		{
-			if ((AddrString[UnsignedResult] != ASCII_PERIOD && AddrString[UnsignedResult] < ASCII_ZERO) || AddrString[UnsignedResult] > ASCII_NINE)
+			if ((StringIter != ASCII_PERIOD && StringIter < ASCII_ZERO) || StringIter > ASCII_NINE)
 				return false;
-			else if (AddrString[UnsignedResult] == ASCII_PERIOD)
+			else if (StringIter == ASCII_PERIOD)
 				++CommaNum;
 		}
 
-		std::string sAddrString((const char *)AddrString);
-	//Delete zero(s) before whole data.
-		while (sAddrString.length() > 1U && sAddrString[0] == ASCII_ZERO && sAddrString[1U] != ASCII_PERIOD)
-			sAddrString.erase(0, 1U);
+	//Delete zeros before whole data.
+		while (AddrString.length() > 1U && AddrString.front() == ASCII_ZERO && AddrString.at(1U) != ASCII_PERIOD)
+			AddrString.erase(0, 1U);
 
 	//Check abbreviation format.
-		if (CommaNum == 0)
+		switch (CommaNum)
 		{
-			sAddrString.clear();
-			sAddrString.append("0.0.0.");
-			sAddrString.append((const char *)AddrString);
-		}
-		else if (CommaNum == 1U)
-		{
-			sAddrString.replace(sAddrString.find(ASCII_PERIOD), 1U, (".0.0."));
-		}
-		else if (CommaNum == 2U)
-		{
-			sAddrString.replace(sAddrString.find(ASCII_PERIOD), 1U, (".0."));
+			case 0:
+			{
+				AddrString = ("0.0.0.");
+				AddrString.append(reinterpret_cast<const char *>(AddrBuffer));
+			}break;
+			case 1U:
+			{
+				AddrString.replace(AddrString.find(ASCII_PERIOD), 1U, (".0.0."));
+			}break;
+			case 2U:
+			{
+				AddrString.replace(AddrString.find(ASCII_PERIOD), 1U, (".0."));
+			}break;
 		}
 
-	//Delete zero(s) before data.
-		while (sAddrString.find(".00") != std::string::npos)
-			sAddrString.replace(sAddrString.find(".00"), 3U, ("."));
-		while (sAddrString.find(".0") != std::string::npos)
-			sAddrString.replace(sAddrString.find(".0"), 2U, ("."));
-		while (sAddrString.find("..") != std::string::npos)
-			sAddrString.replace(sAddrString.find(".."), 2U, (".0."));
-		if (sAddrString[sAddrString.length() - 1U] == ASCII_PERIOD)
-			sAddrString.append("0");
+	//Delete zeros before data.
+		while (AddrString.find(".00") != std::string::npos)
+			AddrString.replace(AddrString.find(".00"), 3U, ("."));
+		while (AddrString.find(".0") != std::string::npos)
+			AddrString.replace(AddrString.find(".0"), 2U, ("."));
+		while (AddrString.find("..") != std::string::npos)
+			AddrString.replace(AddrString.find(".."), 2U, (".0."));
+		if (AddrString.at(AddrString.length() - 1U) == ASCII_PERIOD)
+			AddrString.append("0");
 
 	//Convert to binary.
 	#if defined(PLATFORM_WIN_XP)
 		SockLength = sizeof(sockaddr_in);
-		if (WSAStringToAddressA((char *)sAddrString.c_str(), AF_INET, nullptr, (PSOCKADDR)&SockAddr, &SockLength) == SOCKET_ERROR)
-	#else
-		ssize_t SignedResult = inet_pton(AF_INET, sAddrString.c_str(), OriginalAddr);
-		if (SignedResult == SOCKET_ERROR || SignedResult == FALSE)
-	#endif
+		if (WSAStringToAddressA(
+				const_cast<LPSTR>(AddrString.c_str()), 
+				AF_INET, 
+				nullptr, 
+				reinterpret_cast<PSOCKADDR>(&SockAddr), 
+				&SockLength) == SOCKET_ERROR)
 		{
-			ErrorCode = WSAGetLastError();
+			if (ErrorCode != nullptr)
+				*ErrorCode = WSAGetLastError();
+
 			return false;
 		}
-	#if defined(PLATFORM_WIN_XP)
-		memcpy_s(OriginalAddr, sizeof(in_addr), &((PSOCKADDR_IN)&SockAddr)->sin_addr, sizeof(((PSOCKADDR_IN)&SockAddr)->sin_addr));
+
+		memcpy_s(OriginalAddr, sizeof((reinterpret_cast<PSOCKADDR_IN>(&SockAddr))->sin_addr), &(reinterpret_cast<PSOCKADDR_IN>(&SockAddr))->sin_addr, sizeof((reinterpret_cast<PSOCKADDR_IN>(&SockAddr))->sin_addr));
+	#else
+		Result = inet_pton(AF_INET, AddrString.c_str(), OriginalAddr);
+		if (Result == SOCKET_ERROR || Result == 0)
+		{
+			if (Result != 0 && ErrorCode != nullptr)
+				*ErrorCode = WSAGetLastError();
+
+			return false;
+		}
 	#endif
+	}
+	else {
+		return false;
 	}
 
 	return true;
@@ -313,19 +358,18 @@ bool BinaryToAddressString(
 		*ErrorCode = 0;
 
 //Convert address.
-//Minimum supported system of inet_ntop function and inet_pton function is Windows Vista. [Roy Tam]
 #if defined(PLATFORM_WIN_XP)
 	sockaddr_storage SockAddr;
 	memset(&SockAddr, 0, sizeof(SockAddr));
 	if (Protocol == AF_INET6)
 	{
 		SockAddr.ss_family = AF_INET6;
-		((PSOCKADDR_IN6)&SockAddr)->sin6_addr = *(in6_addr *)OriginalAddr;
+		(reinterpret_cast<PSOCKADDR_IN6>(&SockAddr))->sin6_addr = *reinterpret_cast<const in6_addr *>(OriginalAddr);
 	}
 	else if (Protocol == AF_INET)
 	{
 		SockAddr.ss_family = AF_INET;
-		((PSOCKADDR_IN)&SockAddr)->sin_addr = *(in_addr *)OriginalAddr;
+		(reinterpret_cast<PSOCKADDR_IN>(&SockAddr))->sin_addr = *reinterpret_cast<const in_addr *>(OriginalAddr);
 	}
 	else {
 		return false;
@@ -333,13 +377,13 @@ bool BinaryToAddressString(
 
 	DWORD BufferLength = StringSize;
 	if (WSAAddressToStringA(
-		(PSOCKADDR)&SockAddr, 
+		reinterpret_cast<PSOCKADDR>(&SockAddr), 
 		sizeof(sockaddr_in6), 
 		nullptr, 
-		(LPSTR)AddressString, 
+		static_cast<LPSTR>(AddressString), 
 		&BufferLength) == SOCKET_ERROR)
 #else
-	if (inet_ntop(Protocol, (void *)OriginalAddr, (char *)AddressString, (socklen_t)StringSize) == nullptr)
+	if (inet_ntop(Protocol, const_cast<void *>(OriginalAddr), static_cast<char *>(AddressString), static_cast<const socklen_t>(StringSize)) == nullptr)
 #endif
 	{
 		if (ErrorCode != nullptr)
@@ -1056,12 +1100,16 @@ uint16_t DNSTypeNameToBinary(
 }
 
 //Convert data from string to DNS query
-size_t CharToDNSQuery(
+size_t StringToPacketQuery(
 	const uint8_t * const FName, 
 	uint8_t * const TName)
 {
 //Initialization
-	int Index[]{(int)strnlen_s((const char *)FName, DOMAIN_MAXSIZE) - 1, 0, 0};
+	int Index[]{static_cast<int>(strnlen_s(reinterpret_cast<const char *>(FName), DOMAIN_MAXSIZE)), 0, 0};
+	if (Index[0] > 0)
+		--Index[0];
+	else 
+		return 0;
 	Index[2U] = Index[0] + 1;
 	*(TName + Index[0] + 2) = 0;
 
@@ -1070,7 +1118,7 @@ size_t CharToDNSQuery(
 	{
 		if (FName[Index[0]] == ASCII_PERIOD)
 		{
-			*(TName + Index[2U]) = (uint8_t)Index[1U];
+			*(TName + Index[2U]) = static_cast<uint8_t>(Index[1U]);
 			Index[1U] = 0;
 		}
 		else {
@@ -1079,51 +1127,51 @@ size_t CharToDNSQuery(
 		}
 	}
 
-	*(TName + Index[2U]) = (uint8_t)Index[1U];
-	return strnlen_s((const char *)TName, DOMAIN_MAXSIZE - 1U) + 1U;
+	*(TName + Index[2U]) = static_cast<uint8_t>(Index[1U]);
+	return strnlen_s(reinterpret_cast<const char *>(TName), DOMAIN_MAXSIZE - 1U) + 1U;
 }
 
-//Convert data from DNS query to char(s)
-size_t DNSQueryToChar(
+//Convert data from DNS query to string
+size_t PacketQueryToString(
 	const uint8_t * const TName, 
 	uint8_t * const FName, 
 	uint16_t &Truncated)
 {
 //Initialization
-	size_t uIndex = 0;
-	int Index[]{0, 0};
+	size_t LocateIndex = 0;
+	int MarkIndex[]{0, 0};
 
 //Convert domain.
-	for (uIndex = 0;uIndex < DOMAIN_MAXSIZE;++uIndex)
+	for (LocateIndex = 0;LocateIndex < DOMAIN_MAXSIZE;++LocateIndex)
 	{
 	//Pointer
-		if (TName[uIndex] >= 0xC0)
+		if (TName[LocateIndex] >= DNS_POINTER_8_BITS)
 		{
-			Truncated = (uint8_t)(TName[uIndex] & 0x3F);
+			Truncated = static_cast<uint8_t>(TName[LocateIndex] & 0x3F);
 			Truncated = Truncated << sizeof(uint8_t) * BYTES_TO_BITS;
-			Truncated += (uint8_t)TName[uIndex + 1U];
-			return uIndex + sizeof(uint16_t);
+			Truncated += static_cast<uint8_t>(TName[LocateIndex + 1U]);
+			return LocateIndex + sizeof(uint16_t);
 		}
-		else if (uIndex == 0)
+		else if (LocateIndex == 0)
 		{
-			Index[0] = TName[uIndex];
+			MarkIndex[0] = TName[LocateIndex];
 		}
-		else if (uIndex == Index[0] + Index[1U] + 1U)
+		else if (LocateIndex == MarkIndex[0] + MarkIndex[1U] + 1U)
 		{
-			Index[0] = TName[uIndex];
-			if (Index[0] == 0)
+			MarkIndex[0] = TName[LocateIndex];
+			if (MarkIndex[0] == 0)
 				break;
-			Index[1U] = (int)uIndex;
+			MarkIndex[1U] = static_cast<int>(LocateIndex);
 
-			FName[uIndex - 1U] = ASCII_PERIOD;
+			FName[LocateIndex - 1U] = ASCII_PERIOD;
 		}
 		else {
-			FName[uIndex - 1U] = TName[uIndex];
+			FName[LocateIndex - 1U] = TName[LocateIndex];
 		}
 	}
 
 	Truncated = 0;
-	return uIndex;
+	return LocateIndex;
 }
 
 //Validate packets
@@ -1132,27 +1180,27 @@ bool ValidatePacket(
 	const size_t Length, 
 	const uint16_t DNS_ID)
 {
-	auto pdns_hdr = (dns_hdr *)Buffer;
+	const auto DNS_Header = reinterpret_cast<const dns_hdr *>(Buffer);
 
 //DNS ID and Questions check
-	if (pdns_hdr->ID != DNS_ID || pdns_hdr->Questions == 0)
+	if (DNS_Header->ID != DNS_ID || DNS_Header->Question == 0)
 		return false;
 
 //EDNS Label check
 	if (ConfigurationParameter.IsEDNS)
 	{
-		if (pdns_hdr->Additional == 0)
+		if (DNS_Header->Additional == 0)
 		{
 			return false;
 		}
-		else if (pdns_hdr->Additional == 1U)
+		else if (DNS_Header->Additional == 1U)
 		{
-			if (Length > sizeof(dns_opt_record))
+			if (Length > sizeof(dns_record_opt))
 			{
-				auto pdns_opt_record = (dns_opt_record *)(Buffer + Length - sizeof(dns_opt_record));
+				const auto DNS_OPT_RECORD = reinterpret_cast<const dns_record_opt *>(Buffer + Length - sizeof(dns_record_opt));
 
 			//UDP Payload Size and Z Field of DNSSEC check
-				if (pdns_opt_record->UDPPayloadSize == 0 || (ConfigurationParameter.IsDNSSEC && pdns_opt_record->Z_Field == 0))
+				if (DNS_OPT_RECORD->UDPPayloadSize == 0 || (ConfigurationParameter.IsDNSSEC && DNS_OPT_RECORD->Z_Field == 0))
 					return false;
 			}
 			else {
@@ -1174,69 +1222,69 @@ void PrintSecondsInDateTime(
 		return;
 
 //Initialization
-	auto Before = false;
+	auto IsBefore = false;
 	auto DateTime = Seconds;
 	fwprintf_s(FileHandle, L"(");
 
 //Years
 	if (DateTime / SECONDS_IN_YEAR > 0)
 	{
-		fwprintf_s(FileHandle, L"%u year", (unsigned int)(DateTime / SECONDS_IN_YEAR));
+		fwprintf_s(FileHandle, L"%u year", static_cast<unsigned int>(DateTime / SECONDS_IN_YEAR));
 		if (DateTime / SECONDS_IN_YEAR > 1U)
 			fwprintf_s(FileHandle, L"s");
 		DateTime %= SECONDS_IN_YEAR;
-		Before = true;
+		IsBefore = true;
 	}
 //Months
 	if (DateTime / SECONDS_IN_MONTH > 0)
 	{
-		if (Before)
+		if (IsBefore)
 			fwprintf_s(FileHandle, L" ");
-		fwprintf_s(FileHandle, L"%u month", (unsigned int)(DateTime / SECONDS_IN_MONTH));
+		fwprintf_s(FileHandle, L"%u month", static_cast<unsigned int>(DateTime / SECONDS_IN_MONTH));
 		if (DateTime / SECONDS_IN_MONTH > 1U)
 			fwprintf_s(FileHandle, L"s");
 		DateTime %= SECONDS_IN_MONTH;
-		Before = true;
+		IsBefore = true;
 	}
 //Days
 	if (DateTime / SECONDS_IN_DAY > 0)
 	{
-		if (Before)
+		if (IsBefore)
 			fwprintf_s(FileHandle, L" ");
-		fwprintf_s(FileHandle, L"%u day", (unsigned int)(DateTime / SECONDS_IN_DAY));
+		fwprintf_s(FileHandle, L"%u day", static_cast<unsigned int>(DateTime / SECONDS_IN_DAY));
 		if (DateTime / SECONDS_IN_DAY > 1U)
 			fwprintf_s(FileHandle, L"s");
 		DateTime %= SECONDS_IN_DAY;
-		Before = true;
+		IsBefore = true;
 	}
 //Hours
 	if (DateTime / SECONDS_IN_HOUR > 0)
 	{
-		if (Before)
+		if (IsBefore)
 			fwprintf_s(FileHandle, L" ");
-		fwprintf_s(FileHandle, L"%u hour", (unsigned int)(DateTime / SECONDS_IN_HOUR));
+		fwprintf_s(FileHandle, L"%u hour", static_cast<unsigned int>(DateTime / SECONDS_IN_HOUR));
 		if (DateTime / SECONDS_IN_HOUR > 1U)
 			fwprintf_s(FileHandle, L"s");
 		DateTime %= SECONDS_IN_HOUR;
-		Before = true;
+		IsBefore = true;
 	}
 //Minutes
 	if (DateTime / SECONDS_IN_MINUTE > 0)
 	{
-		if (Before)
+		if (IsBefore)
 			fwprintf_s(FileHandle, L" ");
-		fwprintf_s(FileHandle, L"%u minute", (unsigned int)(DateTime / SECONDS_IN_MINUTE));
+		fwprintf_s(FileHandle, L"%u minute", static_cast<unsigned int>(DateTime / SECONDS_IN_MINUTE));
 		if (DateTime / SECONDS_IN_MINUTE > 1U)
 			fwprintf_s(FileHandle, L"s");
 		DateTime %= SECONDS_IN_MINUTE;
-		Before = true;
+		IsBefore = true;
 	}
 //Seconds
 	if (DateTime > 0)
 	{
-		if (Before)
+		if (IsBefore)
 			fwprintf_s(FileHandle, L" ");
-		fwprintf_s(FileHandle, L"%u second", (unsigned int)(DateTime));
+		fwprintf_s(FileHandle, L"%u second", static_cast<unsigned int>(DateTime));
 		if (DateTime > 1U)
 			fwprintf_s(FileHandle, L"s");
 	}

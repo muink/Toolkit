@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // A useful and powerful toolkit(DNSPing)
-// Copyright (C) 2014-2016 Chengr28
+// Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,6 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+
+#ifndef TOOLKIT_DNSPING_RESOLVER_H
+#define TOOLKIT_DNSPING_RESOLVER_H
 
 #include "Base.h"
 
@@ -38,3 +41,4 @@ void PrintResourseData(
 	const uint8_t * const Buffer, 
 	const size_t Location, 
 	const uint16_t Length);
+#endif

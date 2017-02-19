@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,14 +17,18 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+#ifndef TOOLKIT_FILEHASH_MD2_H
+#define TOOLKIT_FILEHASH_MD2_H
+
 #include "Base.h"
 
 //Global variables
 extern size_t HashFamilyID;
+extern bool IsLowerCase;
 
 //The MD2 block size and message digest size
 enum {
-	MD2 = 6,                //Hash type unique
+	MD2 = 6,                             //Hash type unique
 	MD2_BLOCK_SIZE = 16, 
 	MD2_DIGEST_SIZE = 16, 
 	MD2_PAD_SIZE = 16, 
@@ -38,8 +42,9 @@ enum {
 //The structure for storing MD2 info
 typedef struct _md2_info_
 {
-	uint32_t   Count;       //Bytes % PAD_SIZE
+	uint32_t   Count;                    //Bytes % PAD_SIZE
 	uint8_t    X[MD2_X_SIZE];
 	uint8_t    C[MD2_BLOCK_SIZE];
 	uint8_t    Buffer[MD2_BLOCK_SIZE];
 }MD2_CTX;
+#endif

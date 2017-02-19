@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,6 +17,9 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+#ifndef TOOLKIT_FILEHASH_MD5_H
+#define TOOLKIT_FILEHASH_MD5_H
+
 #include "Base.h"
 
 //The MD5 block size and message digest size
@@ -25,6 +28,7 @@
 
 //Global variables
 extern size_t HashFamilyID;
+extern bool IsLowerCase;
 
 //The structure for storing MD5 info
 typedef struct _md5_ctx_
@@ -40,27 +44,28 @@ typedef struct _md5_ctx_
 #define H(x, y, z) (x ^ y ^ z)
 #define I(x, y, z) (y ^ (x | ~z))
 #define ROTATE_LEFT(x, n) ((x << n) | (x >> (32 - n)))
-#define FF(a, b, c, d, x, s, ac)   \
-{                                  \
-	a += F(b, c, d) + x + ac;      \
-	a = ROTATE_LEFT(a, s);         \
-	a += b;                        \
+#define FF(a, b, c, d, x, s, ac)                         \
+{                                                        \
+	a += F(b, c, d) + x + ac;                            \
+	a = ROTATE_LEFT(a, s);                               \
+	a += b;                                              \
 }  
-#define GG(a, b, c, d, x, s, ac)   \
-{                                  \
-	a += G(b, c, d) + x + ac;      \
-	a = ROTATE_LEFT(a, s);         \
-	a += b;                        \
+#define GG(a, b, c, d, x, s, ac)                         \
+{                                                        \
+	a += G(b, c, d) + x + ac;                            \
+	a = ROTATE_LEFT(a, s);                               \
+	a += b;                                              \
 }  
-#define HH(a, b, c, d, x, s, ac)   \
-{                                  \
-	a += H(b, c, d) + x + ac;      \
-	a = ROTATE_LEFT(a, s);         \
-	a += b; \
+#define HH(a, b, c, d, x, s, ac)                         \
+{                                                        \
+	a += H(b, c, d) + x + ac;                            \
+	a = ROTATE_LEFT(a, s);                               \
+	a += b;                                              \
 }  
-#define II(a, b, c, d, x, s, ac)   \
-{                                  \
-	a += I(b, c, d) + x + ac;      \
-	a = ROTATE_LEFT(a, s);         \
-	a += b;                        \
+#define II(a, b, c, d, x, s, ac)                         \
+{                                                        \
+	a += I(b, c, d) + x + ac;                            \
+	a = ROTATE_LEFT(a, s);                               \
+	a += b;                                              \
 }
+#endif

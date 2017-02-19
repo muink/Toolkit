@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // A useful and powerful toolkit(DNSPing)
-// Copyright (C) 2014-2016 Chengr28
+// Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,71 +17,115 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+#ifndef TOOLKIT_DNSPING_STRUCTURE_H
+#define TOOLKIT_DNSPING_STRUCTURE_H
+
 //////////////////////////////////////////////////
-// Operating system
+// Operating system selection
 // 
-/* This code is from Qt source, which is in qglobal.h header file.
-// See https://www.qt.io/developers
+/* This code is from Qt source, which in /src/corelib/global/qsystemdetection.h header file, please visit https://www.qt.io/developers.
 
-	The operating system, must be one of: (PLATFORM_x)
+   The operating system, must be one of: (PLATFOEM_x)
 
-	MACX       - Mac OS X
-	MAC9       - Mac OS 9
-	DARWIN     - Darwin OS (Without Mac OS X)
-	MSDOS      - MS-DOS and Windows
-	OS2        - OS/2
-	OS2EMX     - XFree86 on OS/2 (not PM)
-	WIN32      - Win32 (Windows 95/98/ME and Windows NT/2000/XP or newer versions)
-	CYGWIN     - Cygwin
-	SOLARIS    - Sun Solaris
-	HPUX       - HP-UX
-	ULTRIX     - DEC Ultrix
-	LINUX      - Linux
-	FREEBSD    - FreeBSD
-	NETBSD     - NetBSD
-	OPENBSD    - OpenBSD
-	BSDI       - BSD/OS
-	IRIX       - SGI Irix
-	OSF        - HP Tru64 UNIX
-	SCO        - SCO OpenServer 5
-	UNIXWARE   - UnixWare 7, Open UNIX 8
-	AIX        - AIX
-	HURD       - GNU Hurd
-	DGUX       - DG/UX
-	RELIANT    - Reliant UNIX
-	DYNIX      - DYNIX/ptx
-	QNX        - QNX
-	QNX6       - QNX RTP 6.1
-	LYNX       - LynxOS
-	BSD4       - Any BSD 4.4 system
-	UNIX       - Any UNIX BSD/SYSV system
+     DARWIN   - Any Darwin system (macOS, iOS, watchOS, tvOS)
+     MACOS    - macOS
+     IOS      - iOS
+     WATCHOS  - watchOS
+     TVOS     - tvOS
+     MSDOS    - MS-DOS and Windows
+     OS2      - OS/2
+     OS2EMX   - XFree86 on OS/2 (not PM)
+     WIN32    - Win32 (Windows 2000/XP/Vista/7 and Windows Server 2003/2008)
+     WINRT    - WinRT (Windows 8 Runtime)
+     CYGWIN   - Cygwin
+     SOLARIS  - Sun Solaris
+     HPUX     - HP-UX
+     ULTRIX   - DEC Ultrix
+     LINUX    - Linux [has variants]
+     FREEBSD  - FreeBSD [has variants]
+     NETBSD   - NetBSD
+     OPENBSD  - OpenBSD
+     BSDI     - BSD/OS
+     INTERIX  - Interix
+     IRIX     - SGI Irix
+     OSF      - HP Tru64 UNIX
+     SCO      - SCO OpenServer 5
+     UNIXWARE - UnixWare 7, Open UNIX 8
+     AIX      - AIX
+     HURD     - GNU Hurd
+     DGUX     - DG/UX
+     RELIANT  - Reliant UNIX
+     DYNIX    - DYNIX/ptx
+     QNX      - QNX [has variants]
+     QNX6     - QNX RTP 6.1
+     LYNX     - LynxOS
+     BSD4     - Any BSD 4.4 system
+     UNIX     - Any UNIX BSD/SYSV system
+     ANDROID  - Android platform
+     HAIKU    - Haiku
+
+   The following operating systems have variants:
+     LINUX    - both PLATFORM_LINUX and PLATFORM_ANDROID are defined when building for Android
+              - only PLATFORM_LINUX is defined if building for other Linux systems
+     FREEBSD  - PLATFORM_FREEBSD is defined only when building for FreeBSD with a BSD userland
+              - PLATFORM_FREEBSD_KERNEL is always defined on FreeBSD, even if the userland is from GNU
 */
 
-#if defined(__DARWIN_X11__)
-#  define PLATFORM_DARWIN
-#elif defined(__APPLE__) && (defined(__GNUC__) || defined(__xlC__))
-#  define PLATFORM_MACX
-#elif defined(__MACOSX__)
-#  define PLATFORM_MACX
-#elif defined(macintosh)
-#  define PLATFORM_MAC9
+#if defined(__APPLE__) && (defined(__GNUC__) || defined(__xlC__) || defined(__xlc__))
+#  include <TargetConditionals.h>
+#  if defined(TARGET_OS_MAC) && TARGET_OS_MAC
+#    define PLATFORM_DARWIN
+#    define PLATFORM_BSD4
+#    ifdef __LP64__
+#      define PLATFORM_DARWIN64
+#    else
+#      define PLATFORM_DARWIN32
+#    endif
+#    if defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
+#      if defined(TARGET_OS_WATCH) && TARGET_OS_WATCH
+#        define PLATFORM_WATCHOS
+#      else
+#        define QT_PLATFORM_UIKIT
+#        if defined(TARGET_OS_TV) && TARGET_OS_TV
+#          define PLATFORM_TVOS
+#        else
+#          // TARGET_OS_IOS is only available in newer SDKs, 
+#          // so assume any other iOS-based platform is iOS for now
+#          define PLATFORM_IOS
+#        endif
+#      endif
+#    else
+#      // TARGET_OS_OSX is only available in newer SDKs, 
+#      // so assume any non iOS-based platform is macOS for now
+#      define PLATFORM_MACOS
+#    endif
+#  else
+#    error "Qt has not been ported to this Apple platform - see https://www.qt.io/developers"
+#  endif
+#elif defined(__ANDROID__) || defined(ANDROID)
+#  define PLATFORM_ANDROID
+#  define PLATFORM_LINUX
 #elif defined(__CYGWIN__)
 #  define PLATFORM_CYGWIN
-#elif defined(MSDOS) || defined(_MSDOS)
-#  define PLATFORM_MSDOS
-#elif defined(__OS2__)
-#  if defined(__EMX__)
-#    define PLATFORM_OS2EMX
-#  else
-#    define PLATFORM_OS2
-#  endif
-#elif !defined(SAG_COM) && (defined(WIN64) || defined(_WIN64) || defined(__WIN64__))
+#elif !defined(SAG_COM) && (!defined(WINAPI_FAMILY) || WINAPI_FAMILY==WINAPI_FAMILY_DESKTOP_APP) && (defined(WIN64) || defined(_WIN64) || defined(__WIN64__))
 #  define PLATFORM_WIN32
 #  define PLATFORM_WIN64
 #elif !defined(SAG_COM) && (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__))
-#  define PLATFORM_WIN32
-#elif defined(__MWERKS__) && defined(__INTEL__)
-#  define PLATFORM_WIN32
+#  if defined(WINAPI_FAMILY)
+#    ifndef WINAPI_FAMILY_PC_APP
+#      define WINAPI_FAMILY_PC_APP WINAPI_FAMILY_APP
+#    endif
+#    if defined(WINAPI_FAMILY_PHONE_APP) && WINAPI_FAMILY==WINAPI_FAMILY_PHONE_APP
+#      define PLATFORM_WINPHONE
+#      define PLATFORM_WINRT
+#    elif WINAPI_FAMILY==WINAPI_FAMILY_PC_APP
+#      define PLATFORM_WINRT
+#    else
+#      define PLATFORM_WIN32
+#    endif
+#  else
+#    define PLATFORM_WIN32
+#  endif
 #elif defined(__sun) || defined(sun)
 #  define PLATFORM_SOLARIS
 #elif defined(hpux) || defined(__hpux)
@@ -90,10 +134,15 @@
 #  define PLATFORM_ULTRIX
 #elif defined(sinix)
 #  define PLATFORM_RELIANT
+#elif defined(__native_client__)
+#  define PLATFORM_NACL
 #elif defined(__linux__) || defined(__linux)
 #  define PLATFORM_LINUX
-#elif defined(__FreeBSD__) || defined(__DragonFly__)
-#  define PLATFORM_FREEBSD
+#elif defined(__FreeBSD__) || defined(__DragonFly__) || defined(__FreeBSD_kernel__)
+#  ifndef __FreeBSD_kernel__
+#    define PLATFORM_FREEBSD
+#  endif
+#  define PLATFORM_FREEBSD_KERNEL
 #  define PLATFORM_BSD4
 #elif defined(__NetBSD__)
 #  define PLATFORM_NETBSD
@@ -104,6 +153,9 @@
 #elif defined(__bsdi__)
 #  define PLATFORM_BSDI
 #  define PLATFORM_BSD4
+#elif defined(__INTERIX)
+#  define PLATFORM_INTERIX
+#  define PLATFORM_BSD4
 #elif defined(__sgi)
 #  define PLATFORM_IRIX
 #elif defined(__osf__)
@@ -112,73 +164,194 @@
 #  define PLATFORM_AIX
 #elif defined(__Lynx__)
 #  define PLATFORM_LYNX
-#elif defined(__GNU_HURD__)
+#elif defined(__GNU__)
 #  define PLATFORM_HURD
 #elif defined(__DGUX__)
 #  define PLATFORM_DGUX
 #elif defined(__QNXNTO__)
-#  define PLATFORM_QNX6
-#elif defined(__QNX__)
 #  define PLATFORM_QNX
 #elif defined(_SEQUENT_)
 #  define PLATFORM_DYNIX
-#elif defined(_SCO_DS)                   /* SCO OpenServer 5 + GCC */
+#elif defined(_SCO_DS) /* SCO OpenServer 5 + GCC */
 #  define PLATFORM_SCO
-#elif defined(__USLC__)                  /* all SCO platforms + UDK or OUDK */
+#elif defined(__USLC__) /* all SCO platforms + UDK or OUDK */
 #  define PLATFORM_UNIXWARE
-#  define PLATFORM_UNIXWARE7
 #elif defined(__svr4__) && defined(i386) /* Open UNIX 8 + GCC */
 #  define PLATFORM_UNIXWARE
-#  define PLATFORM_UNIXWARE7
+#elif defined(__INTEGRITY)
+#  define PLATFORM_INTEGRITY
+#elif defined(VXWORKS) /* there is no "real" VxWorks define - this has to be set in the mkspec! */
+#  define PLATFORM_VXWORKS
+#elif defined(__HAIKU__)
+#  define PLATFORM_HAIKU
 #elif defined(__MAKEDEPEND__)
 #else
-#  error "Qt has not been ported to this OS - talk to qt-bugs@trolltech.com"
+#  error "Qt has not been ported to this OS - see https://www.qt-project.org/"
 #endif
 
-//System series defines
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_WIN64)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_WIN64) || defined(PLATFORM_WINRT)
 #  define PLATFORM_WIN
 #endif
-#if defined(PLATFORM_MAC9) || defined(PLATFORM_MACX)
-#  define PLATFORM_MAC
-#endif
-#if defined(PLATFORM_MAC9) || defined(PLATFORM_MSDOS) || defined(PLATFORM_OS2) || defined(PLATFORM_WIN)
+
+#if defined(PLATFORM_WIN)
 #  undef PLATFORM_UNIX
 #elif !defined(PLATFORM_UNIX)
 #  define PLATFORM_UNIX
 #endif
-/* Xcode support
-#if defined(PLATFORM_MACX)
-#  ifdef MAC_OS_X_VERSION_MIN_REQUIRED
-#    undef MAC_OS_X_VERSION_MIN_REQUIRED
-#  endif
-#  define MAC_OS_X_VERSION_MIN_REQUIRED MAC_OS_X_VERSION_10_2
+
+//Compatibility synonyms
+#ifdef PLATFORM_DARWIN
+#define PLATFORM_MAC
+#endif
+#ifdef PLATFORM_DARWIN32
+#define PLATFORM_MAC32
+#endif
+#ifdef PLATFORM_DARWIN64
+#define PLATFORM_MAC64
+#endif
+#ifdef PLATFORM_MACOS
+#define PLATFORM_MACOS
+#define PLATFORM_OSX
+#endif
+
+#ifdef PLATFORM_DARWIN
+#  include <Availability.h>
 #  include <AvailabilityMacros.h>
-#  if !defined(MAC_OS_X_VERSION_10_3)
-#     define MAC_OS_X_VERSION_10_3 MAC_OS_X_VERSION_10_2 + 1
+#
+#  ifdef PLATFORM_MACOS
+#    if !defined(__MAC_OS_X_VERSION_MIN_REQUIRED) || __MAC_OS_X_VERSION_MIN_REQUIRED < __MAC_10_6
+#       undef __MAC_OS_X_VERSION_MIN_REQUIRED
+#       define __MAC_OS_X_VERSION_MIN_REQUIRED __MAC_10_6
+#    endif
+#    if !defined(MAC_OS_X_VERSION_MIN_REQUIRED) || MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_6
+#       undef MAC_OS_X_VERSION_MIN_REQUIRED
+#       define MAC_OS_X_VERSION_MIN_REQUIRED MAC_OS_X_VERSION_10_6
+#    endif
 #  endif
-#  if !defined(MAC_OS_X_VERSION_10_4)
-#       define MAC_OS_X_VERSION_10_4 MAC_OS_X_VERSION_10_3 + 1
+#
+#  // Numerical checks are preferred to named checks, but to be safe
+#  // we define the missing version names in case Qt uses them.
+#
+#  if !defined(__MAC_10_7)
+#       define __MAC_10_7 1070
 #  endif
-#  if (MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4)
-#    error "This version of Mac OS X is unsupported"
+#  if !defined(__MAC_10_8)
+#       define __MAC_10_8 1080
+#  endif
+#  if !defined(__MAC_10_9)
+#       define __MAC_10_9 1090
+#  endif
+#  if !defined(__MAC_10_10)
+#       define __MAC_10_10 101000
+#  endif
+#  if !defined(__MAC_10_11)
+#       define __MAC_10_11 101100
+#  endif
+#  if !defined(__MAC_10_12)
+#       define __MAC_10_12 101200
+#  endif
+#  if !defined(MAC_OS_X_VERSION_10_7)
+#       define MAC_OS_X_VERSION_10_7 1070
+#  endif
+#  if !defined(MAC_OS_X_VERSION_10_8)
+#       define MAC_OS_X_VERSION_10_8 1080
+#  endif
+#  if !defined(MAC_OS_X_VERSION_10_9)
+#       define MAC_OS_X_VERSION_10_9 1090
+#  endif
+#  if !defined(MAC_OS_X_VERSION_10_10)
+#       define MAC_OS_X_VERSION_10_10 101000
+#  endif
+#  if !defined(MAC_OS_X_VERSION_10_11)
+#       define MAC_OS_X_VERSION_10_11 101100
+#  endif
+#  if !defined(MAC_OS_X_VERSION_10_12)
+#       define MAC_OS_X_VERSION_10_12 101200
+#  endif
+#
+#  if !defined(__IPHONE_4_3)
+#       define __IPHONE_4_3 40300
+#  endif
+#  if !defined(__IPHONE_5_0)
+#       define __IPHONE_5_0 50000
+#  endif
+#  if !defined(__IPHONE_5_1)
+#       define __IPHONE_5_1 50100
+#  endif
+#  if !defined(__IPHONE_6_0)
+#       define __IPHONE_6_0 60000
+#  endif
+#  if !defined(__IPHONE_6_1)
+#       define __IPHONE_6_1 60100
+#  endif
+#  if !defined(__IPHONE_7_0)
+#       define __IPHONE_7_0 70000
+#  endif
+#  if !defined(__IPHONE_7_1)
+#       define __IPHONE_7_1 70100
+#  endif
+#  if !defined(__IPHONE_8_0)
+#       define __IPHONE_8_0 80000
+#  endif
+#  if !defined(__IPHONE_8_1)
+#       define __IPHONE_8_1 80100
+#  endif
+#  if !defined(__IPHONE_8_2)
+#       define __IPHONE_8_2 80200
+#  endif
+#  if !defined(__IPHONE_8_3)
+#       define __IPHONE_8_3 80300
+#  endif
+#  if !defined(__IPHONE_8_4)
+#       define __IPHONE_8_4 80400
+#  endif
+#  if !defined(__IPHONE_9_0)
+#       define __IPHONE_9_0 90000
+#  endif
+#  if !defined(__IPHONE_9_1)
+#       define __IPHONE_9_1 90100
+#  endif
+#  if !defined(__IPHONE_9_2)
+#       define __IPHONE_9_2 90200
+#  endif
+#  if !defined(__IPHONE_9_3)
+#       define __IPHONE_9_3 90300
+#  endif
+#  if !defined(__IPHONE_10_0)
+#       define __IPHONE_10_0 100000
 #  endif
 #endif
-*/
+
+#ifdef __LSB_VERSION__
+#  if __LSB_VERSION__ < 40
+#    error "This version of the Linux Standard Base is unsupported"
+#  endif
+#ifndef QT_LINUXBASE
+#  define QT_LINUXBASE
+#endif
+#endif
+
+
+//////////////////////////////////////////////////
+// Platform check
+//Toolkit now support Windows, Linux and macOS.
+#if !(defined(PLATFORM_WIN) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	#error "This platform is unsupported."
+#endif
 
 
 //////////////////////////////////////////////////
 // Base header
 // 
 //C Standard Library and C++ Standard Template Library/STL Headers
-#include <cstring>
-#include <ctime>
-#include <memory>
-#include <string>
+#include <cstring>                 //C-Style String support
+#include <ctime>                   //Get and manipulate date and time information support
+#include <memory>                  //Manage dynamic memory support
+#include <string>                  //STL String support
 
 #if defined(PLATFORM_WIN)
 //Part 1 including files
-	#include <winsock2.h>                //WinSock 2.0+
+	#include <winsock2.h>                //WinSock 2.0+ support
 
 //Part 2 including files(MUST be including after Part 1)
 	#include <windns.h>                  //Windows DNS definitions and DNS API
@@ -189,9 +362,11 @@
 
 //Part 4 including files(MUST be including after Part 3)
 	#if !defined(PLATFORM_WIN_XP)
-		#include <versionhelpers.h>          //Windows Version Helpers, minimum supported system of Windows Version Helpers is Windows Vista.
+		#include <versionhelpers.h>          //Version Helper functions
 	#endif
-	#pragma comment(lib, "ws2_32.lib")   //WinSock 2.0+
+
+//Library linking
+	#pragma comment(lib, "ws2_32.lib")   //Windows WinSock 2.0+ support
 
 //Endian definitions
 	#define __LITTLE_ENDIAN            1234                         //Little Endian
@@ -201,63 +376,50 @@
 	#define BIG_ENDIAN                 __BIG_ENDIAN
 	#define BYTE_ORDER                 __BYTE_ORDER
 
+//Winsock definitions
+	#define WINSOCK_VERSION_LOW_BYTE    2                           //Low byte of Winsock version 2.2
+	#define WINSOCK_VERSION_HIGH_BYTE   2                           //High byte of Winsock version 2.2
+
 //Windows compatible definitions
 	typedef SSIZE_T                   ssize_t;
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 //Portable Operating System Interface/POSIX and Unix system header
-	#include <cerrno>                 //Error report
-	#include <cstdio>                 //File Input/Output
-	#include <cstdlib>                //C Standard Library
-	#include <climits>                //Limits
-	#include <netdb.h>                //Network database operations
-	#include <pthread.h>              //Threads
-	#include <signal.h>               //Signals
-	#include <unistd.h>               //Standard library API
-	#include <arpa/inet.h>            //Internet operations
-	#include <sys/time.h>             //Date and time
+	#include <cerrno>                 //Error report support
+	#include <cstdio>                 //File Input/Output support
+	#include <cstdlib>                //C Standard Library support
+	#include <climits>                //Limits support
+	#include <netdb.h>                //Network database operations support
+	#include <pthread.h>              //Threads support
+	#include <signal.h>               //Signals support
+	#include <unistd.h>               //Standard library API support
+	#include <arpa/inet.h>            //Internet operations support
+	#include <sys/time.h>             //Date and time support
+
+//Portable Operating System Interface/POSIX and Unix system header
+	#if defined(PLATFORM_LINUX)
+		#include <endian.h>                    //Endian support
+	#elif defined(PLATFORM_MACOS)
+		#define __LITTLE_ENDIAN                1234                         //Little Endian
+		#define __BIG_ENDIAN                   4321                         //Big Endian
+		#define __BYTE_ORDER                   __LITTLE_ENDIAN              //x86 and x86-64/x64 is Little Endian in macOS.
+	#endif
 
 //Windows compatible
 	#define FALSE                    0
 	#define INVALID_SOCKET           (-1)
 	#define SOCKET_ERROR             (-1)
 	#define RETURN_ERROR             (-1)
-	#define MAX_PATH                 PATH_MAX
-	#define in_addr                  in_addr_Windows
 	typedef int                      SOCKET;
 	typedef sockaddr                 *PSOCKADDR;
 	typedef sockaddr_in              *PSOCKADDR_IN;
 	typedef sockaddr_in6             *PSOCKADDR_IN6;
-
-//Internet Protocol version 4/IPv4 Address(Linux, from Microsoft Windows)
-	typedef struct _in_addr_windows_
-	{
-		union {
-			union {
-				struct {
-					uint8_t    s_b1, s_b2, s_b3, s_b4;
-				}S_un_b;
-				struct {
-					uint16_t   s_w1, s_w2;
-				}S_un_w;
-				uint32_t       S_addr;
-			}S_un;
-			uint32_t           s_addr;
-		};
-	}in_addr_Windows;
-	#define s_host                                  S_un.S_un_b.s_b2
-	#define s_net                                   S_un.S_un_b.s_b1
-	#define s_imp                                   S_un.S_un_w.s_w2
-	#define s_impno                                 S_un.S_un_b.s_b4
-	#define s_lh                                    S_un.S_un_b.s_b3
 #endif
 
 
 //////////////////////////////////////////////////
 // Base defines
 // 
-#pragma pack(1)                                        //Memory alignment: 1 bytes/8 bits
-
-//ASCII values definitions
+//Character value definitions
 #define ASCII_SPACE               32                   //" "
 #define ASCII_PERIOD              46                   //"."
 #define ASCII_SLASH               47                   //"/"
@@ -280,102 +442,125 @@
 //////////////////////////////////////////////////
 // Protocol header structures
 // 
-//Domain Name System/DNS Part
+//Memory alignment settings(Part 1)
+#pragma pack(push) //Push current alignment to stack.
+#pragma pack(1) //Set alignment to 1 byte boundary.
+
+//Domain Name System/DNS part
 /* About RFC standards
-RFC 920(https://tools.ietf.org/html/rfc920), Domain Requirements – Specified original top-level domains
-RFC 1032(https://tools.ietf.org/html/rfc1032), Domain Administrators Guide
-RFC 1033(https://tools.ietf.org/html/rfc1033), Domain Administrators Operations Guide
-RFC 1034(https://tools.ietf.org/html/rfc1034), Domain Names - Concepts and Facilities
-RFC 1035(https://tools.ietf.org/html/rfc1035), Domain Names - Implementation and Specification
-RFC 1101(https://tools.ietf.org/html/rfc1101), DNS Encodings of Network Names and Other Types
-RFC 1123(https://tools.ietf.org/html/rfc1123), Requirements for Internet Hosts—Application and Support
-RFC 1178(https://tools.ietf.org/html/rfc1178), Choosing a Name for Your Computer (FYI 5)
-RFC 1183(https://tools.ietf.org/html/rfc1183), New DNS RR Definitions
-RFC 1348(https://tools.ietf.org/html/rfc1348), DNS NSAP RRs
-RFC 1591(https://tools.ietf.org/html/rfc1591), Domain Name System Structure and Delegation (Informational)
-RFC 1664(https://tools.ietf.org/html/rfc1664), Using the Internet DNS to Distribute RFC1327 Mail Address Mapping Tables
-RFC 1706(https://tools.ietf.org/html/rfc1706), DNS NSAP Resource Records
-RFC 1712(https://tools.ietf.org/html/rfc1712), DNS Encoding of Geographical Location
-RFC 1876(https://tools.ietf.org/html/rfc1876), A Means for Expressing Location Information in the Domain Name System
-RFC 1886(https://tools.ietf.org/html/rfc1886), DNS Extensions to support IP version 6
-RFC 1912(https://tools.ietf.org/html/rfc1912), Common DNS Operational and Configuration Errors
-RFC 1995(https://tools.ietf.org/html/rfc1995), Incremental Zone Transfer in DNS
-RFC 1996(https://tools.ietf.org/html/rfc1996), A Mechanism for Prompt Notification of Zone Changes (DNS NOTIFY)
-RFC 2052(https://tools.ietf.org/html/rfc2052), A DNS RR for specifying the location of services (DNS SRV)
-RFC 2100(https://tools.ietf.org/html/rfc2100), The Naming of Hosts (Informational)
-RFC 2136(https://tools.ietf.org/html/rfc2136), Dynamic Updates in the domain name system (DNS UPDATE)
-RFC 2181(https://tools.ietf.org/html/rfc2181), Clarifications to the DNS Specification
-RFC 2182(https://tools.ietf.org/html/rfc2182), Selection and Operation of Secondary DNS Servers
-RFC 2230(https://tools.ietf.org/html/rfc2230), Key Exchange Delegation Record for the DNS
-RFC 2308(https://tools.ietf.org/html/rfc2308), Negative Caching of DNS Queries (DNS NCACHE)
-RFC 2317(https://tools.ietf.org/html/rfc2317), Classless IN-ADDR.ARPA delegation (BCP 20)
-RFC 2535(https://tools.ietf.org/html/rfc2535), Domain Name System Security Extensions
-RFC 2536(https://tools.ietf.org/html/rfc2536), DSA KEYs and SIGs in the Domain Name System (DNS)
-RFC 2537(https://tools.ietf.org/html/rfc2537), RSA/MD5 KEYs and SIGs in the Domain Name System (DNS)
-RFC 2539(https://tools.ietf.org/html/rfc2539), Storage of Diffie-Hellman Keys in the Domain Name System (DNS)
-RFC 2671(https://tools.ietf.org/html/rfc2671), Extension Mechanisms for DNS (EDNS0)
-RFC 2672(https://tools.ietf.org/html/rfc2672), Non-Terminal DNS Name Redirection
-RFC 2845(https://tools.ietf.org/html/rfc2845), Secret Key Transaction Authentication for DNS (TSIG)
-RFC 2874(https://tools.ietf.org/html/rfc2874), DNS Extensions to Support IPv6 Address Aggregation and Renumbering
-RFC 2930(https://tools.ietf.org/html/rfc2930), Secret Key Establishment for DNS (TKEY RR)
-RFC 3110(https://tools.ietf.org/html/rfc3110), RSA/SHA-1 SIGs and RSA KEYs in the Domain Name System (DNS)
-RFC 3123(https://tools.ietf.org/html/rfc3123), A DNS RR Type for Lists of Address Prefixes (APL RR)
-RFC 3225(https://tools.ietf.org/html/rfc3225), Indicating Resolver Support of DNSSEC
-RFC 3226(https://tools.ietf.org/html/rfc3226), DNSSEC and IPv6 A6 aware server/resolver message size requirements
-RFC 3403(https://tools.ietf.org/html/rfc3403), Dynamic Delegation Discovery System (DDDS) Part Three: The Domain Name System (DNS) Database
-RFC 3597(https://tools.ietf.org/html/rfc3597), Handling of Unknown DNS Resource Record (RR) Types
-RFC 3696(https://tools.ietf.org/html/rfc3696), Application Techniques for Checking and Transformation of Names (Informational)
-RFC 4025(https://tools.ietf.org/html/rfc4025), A Method for Storing IPsec Keying Material in DNS
-RFC 4034(https://tools.ietf.org/html/rfc4034), Resource Records for the DNS Security Extensions
-RFC 4255(https://tools.ietf.org/html/rfc4255), Using DNS to Securely Publish Secure Shell (SSH) Key Fingerprints
-RFC 4343(https://tools.ietf.org/html/rfc4343), Domain Name System (DNS) Case Insensitivity Clarification
-RFC 4398(https://tools.ietf.org/html/rfc4398), Storing Certificates in the Domain Name System (DNS)
-RFC 4408(https://tools.ietf.org/html/rfc4408), Sender Policy Framework (SPF) for Authorizing Use of Domains in E-Mail, Version 1
-RFC 4431(https://tools.ietf.org/html/rfc4431), The DNSSEC Lookaside Validation (DLV) DNS Resource Record
-RFC 4592(https://tools.ietf.org/html/rfc4592), The Role of Wildcards in the Domain Name System
-RFC 4635(https://tools.ietf.org/html/rfc4635), HMAC SHA TSIG Algorithm Identifiers
-RFC 4701(https://tools.ietf.org/html/rfc4701), A DNS Resource Record (RR) for Encoding Dynamic Host Configuration Protocol (DHCP) Information (DHCID RR)
-RFC 4892(https://tools.ietf.org/html/rfc4892), Requirements for a Mechanism Identifying a Name Server Instance (Informational)
-RFC 5001(https://tools.ietf.org/html/rfc5001), DNS Name Server Identifier (NSID) Option
-RFC 5155(https://tools.ietf.org/html/rfc5155), DNS Security (DNSSEC) Hashed Authenticated Denial of Existence
-RFC 5205(https://tools.ietf.org/html/rfc5205), Host Identity Protocol (HIP) Domain Name System (DNS) Extension
-RFC 5452(https://tools.ietf.org/html/rfc5452), Measures for Making DNS More Resilient against Forged Answers
-RFC 5625(https://tools.ietf.org/html/rfc5625), DNS Proxy Implementation Guidelines (BCP 152)
-RFC 5890(https://tools.ietf.org/html/rfc5890), Internationalized Domain Names for Applications (IDNA):Definitions and Document Framework
-RFC 5891(https://tools.ietf.org/html/rfc5891), Internationalized Domain Names in Applications (IDNA): Protocol
-RFC 5892(https://tools.ietf.org/html/rfc5892), The Unicode Code Points and Internationalized Domain Names for Applications (IDNA)
-RFC 5893(https://tools.ietf.org/html/rfc5893), Right-to-Left Scripts for Internationalized Domain Names for Applications (IDNA)
-RFC 5894(https://tools.ietf.org/html/rfc5894), Internationalized Domain Names for Applications (IDNA):Background, Explanation, and Rationale (Informational)
-RFC 5895(https://tools.ietf.org/html/rfc5895), Mapping Characters for Internationalized Domain Names in Applications (IDNA) 2008 (Informational)
-RFC 5936(https://tools.ietf.org/html/rfc5936), DNS Zone Transfer Protocol (AXFR)
-RFC 5966(https://tools.ietf.org/html/rfc5966), DNS Transport over TCP - Implementation Requirements
-RFC 6195(https://tools.ietf.org/html/rfc6195), Domain Name System (DNS) IANA Considerations (BCP 42)
-RFC 6698(https://tools.ietf.org/html/rfc6698), The DNS-Based Authentication of Named Entities (DANE) Transport Layer Security (TLS) Protocol: TLSA
-RFC 6742(https://tools.ietf.org/html/rfc6742), DNS Resource Records for the Identifier-Locator Network Protocol (ILNP)
-RFC 6844(https://tools.ietf.org/html/rfc6844), DNS Certification Authority Authorization (CAA) Resource Record
-RFC 6975(https://tools.ietf.org/html/rfc6975), Signaling Cryptographic Algorithm Understanding in DNS Security Extensions (DNSSEC)
-RFC 7043(https://tools.ietf.org/html/rfc7043), Resource Records for EUI-48 and EUI-64 Addresses in the DNS
-RFC 7314(https://tools.ietf.org/html/rfc7314), Extension Mechanisms for DNS (EDNS) EXPIRE Option
+* RFC 920, Domain Requirements – Specified original top-level domains(https://tools.ietf.org/html/rfc920)
+* RFC 1032, Domain Administrators Guide(https://tools.ietf.org/html/rfc1032)
+* RFC 1033, Domain Administrators Operations Guide(https://tools.ietf.org/html/rfc1033)
+* RFC 1034, Domain Names - Concepts and Facilities(https://tools.ietf.org/html/rfc1034)
+* RFC 1035, Domain Names - Implementation and Specification(https://tools.ietf.org/html/rfc1035)
+* RFC 1101, DNS Encodings of Network Names and Other Types(https://tools.ietf.org/html/rfc1101)
+* RFC 1123, Requirements for Internet Hosts—Application and Support(https://tools.ietf.org/html/rfc1123)
+* RFC 1178, Choosing a Name for Your Computer (FYI 5)(https://tools.ietf.org/html/rfc1178)
+* RFC 1183, New DNS RR Definitions(https://tools.ietf.org/html/rfc1183)
+* RFC 1348, DNS NSAP RRs(https://tools.ietf.org/html/rfc1348)
+* RFC 1591, Domain Name System Structure and Delegation (Informational)(https://tools.ietf.org/html/rfc1591)
+* RFC 1664, Using the Internet DNS to Distribute RFC1327 Mail Address Mapping Tables(https://tools.ietf.org/html/rfc1664)
+* RFC 1706, DNS NSAP Resource Records(https://tools.ietf.org/html/rfc1706)
+* RFC 1712, DNS Encoding of Geographical Location(https://tools.ietf.org/html/rfc1712)
+* RFC 1876, A Means for Expressing Location Information in the Domain Name System(https://tools.ietf.org/html/rfc1876)
+* RFC 1886, DNS Extensions to support IP version 6(https://tools.ietf.org/html/rfc1886)
+* RFC 1912, Common DNS Operational and Configuration Errors(https://tools.ietf.org/html/rfc1912)
+* RFC 1995, Incremental Zone Transfer in DNS(https://tools.ietf.org/html/rfc1995)
+* RFC 1996, A Mechanism for Prompt Notification of Zone Changes (DNS NOTIFY)(https://tools.ietf.org/html/rfc1996)
+* RFC 2052, A DNS RR for specifying the location of services (DNS SRV)(https://tools.ietf.org/html/rfc2052)
+* RFC 2100, The Naming of Hosts (Informational)(https://tools.ietf.org/html/rfc2100)
+* RFC 2136, Dynamic Updates in the domain name system (DNS UPDATE)(https://tools.ietf.org/html/rfc2136)
+* RFC 2181, Clarifications to the DNS Specification(https://tools.ietf.org/html/rfc2181)
+* RFC 2182, Selection and Operation of Secondary DNS Servers(https://tools.ietf.org/html/rfc2182)
+* RFC 2230, Key Exchange Delegation Record for the DNS(https://tools.ietf.org/html/rfc2230)
+* RFC 2308, Negative Caching of DNS Queries (DNS NCACHE)(https://tools.ietf.org/html/rfc2308)
+* RFC 2317, Classless IN-ADDR.ARPA delegation (BCP 20)(https://tools.ietf.org/html/rfc2317)
+* RFC 2535, Domain Name System Security Extensions(https://tools.ietf.org/html/rfc2535)
+* RFC 2536, DSA KEYs and SIGs in the Domain Name System (DNS)(https://tools.ietf.org/html/rfc2536)
+* RFC 2537, RSA/MD5 KEYs and SIGs in the Domain Name System (DNS)(https://tools.ietf.org/html/rfc2537)
+* RFC 2539, Storage of Diffie-Hellman Keys in the Domain Name System (DNS)(https://tools.ietf.org/html/rfc2539)
+* RFC 2671, Extension Mechanisms for DNS (EDNS)(https://tools.ietf.org/html/rfc2671)
+* RFC 2672, Non-Terminal DNS Name Redirection(https://tools.ietf.org/html/rfc2672)
+* RFC 2845, Secret Key Transaction Authentication for DNS (TSIG)(https://tools.ietf.org/html/rfc2845)
+* RFC 2874, DNS Extensions to Support IPv6 Address Aggregation and Renumbering(https://tools.ietf.org/html/rfc2874)
+* RFC 2930, Secret Key Establishment for DNS (TKEY RR)(https://tools.ietf.org/html/rfc2930)
+* RFC 3110, RSA/SHA-1 SIGs and RSA KEYs in the Domain Name System (DNS)(https://tools.ietf.org/html/rfc3110)
+* RFC 3123, A DNS RR Type for Lists of Address Prefixes (APL RR)(https://tools.ietf.org/html/rfc3123)
+* RFC 3225, Indicating Resolver Support of DNSSEC(https://tools.ietf.org/html/rfc3225)
+* RFC 3226, DNSSEC and IPv6 A6 aware server/resolver message size requirements(https://tools.ietf.org/html/rfc3226)
+* RFC 3403, Dynamic Delegation Discovery System (DDDS) Part Three: The Domain Name System (DNS Database)(https://tools.ietf.org/html/rfc3403)
+* RFC 3597, Handling of Unknown DNS Resource Record (RR Types)(https://tools.ietf.org/html/rfc3597)
+* RFC 3696, Application Techniques for Checking and Transformation of Names (Informational)(https://tools.ietf.org/html/rfc3696)
+* RFC 4025, A Method for Storing IPsec Keying Material in DNS(https://tools.ietf.org/html/rfc4025)
+* RFC 4034, Resource Records for the DNS Security Extensions(https://tools.ietf.org/html/rfc4034)
+* RFC 4255, Using DNS to Securely Publish Secure Shell (SSH Key Fingerprints)(https://tools.ietf.org/html/rfc4225)
+* RFC 4343, Domain Name System (DNS) Case Insensitivity Clarification(https://tools.ietf.org/html/rfc4343)
+* RFC 4398, Storing Certificates in the Domain Name System (DNS)(https://tools.ietf.org/html/rfc4398)
+* RFC 4408, Sender Policy Framework (SPF) for Authorizing Use of Domains in E-Mail, Version 1(https://tools.ietf.org/html/rfc4408)
+* RFC 4431, The DNSSEC Lookaside Validation (DLV) DNS Resource Record(https://tools.ietf.org/html/rfc4431)
+* RFC 4592, The Role of Wildcards in the Domain Name System(https://tools.ietf.org/html/rfc4592)
+* RFC 4635, HMAC SHA TSIG Algorithm Identifiers(https://tools.ietf.org/html/rfc4635)
+* RFC 4701, A DNS Resource Record (RR) for Encoding Dynamic Host Configuration Protocol (DHCP Information)(DHCID RR)(https://tools.ietf.org/html/rfc4701)
+* RFC 4892, Requirements for a Mechanism Identifying a Name Server Instance (Informational)(https://tools.ietf.org/html/rfc4892)
+* RFC 5001, DNS Name Server Identifier (NSID) Option(https://tools.ietf.org/html/rfc5001)
+* RFC 5155, DNS Security (DNSSEC) Hashed Authenticated Denial of Existence(https://tools.ietf.org/html/rfc5155)
+* RFC 5205, Host Identity Protocol (HIP Domain Name System (DNS Extension(https://tools.ietf.org/html/rfc5205)
+* RFC 5452, Measures for Making DNS More Resilient against Forged Answers(https://tools.ietf.org/html/rfc5452)
+* RFC 5625, DNS Proxy Implementation Guidelines (BCP 152)(https://tools.ietf.org/html/rfc5625)
+* RFC 5890, Internationalized Domain Names for Applications (IDNA):Definitions and Document Framework(https://tools.ietf.org/html/rfc5890)
+* RFC 5891, Internationalized Domain Names in Applications (IDNA): Protocol(https://tools.ietf.org/html/rfc5891)
+* RFC 5892, The Unicode Code Points and Internationalized Domain Names for Applications (IDNA)(https://tools.ietf.org/html/rfc5892)
+* RFC 5893, Right-to-Left Scripts for Internationalized Domain Names for Applications (IDNA)(https://tools.ietf.org/html/rfc5893)
+* RFC 5894, Internationalized Domain Names for Applications (IDNA):Background, Explanation, and Rationale (Informational)(https://tools.ietf.org/html/rfc594)
+* RFC 5895, Mapping Characters for Internationalized Domain Names in Applications (IDNA) 2008 (Informational)(https://tools.ietf.org/html/rfc5895)
+* RFC 5936, DNS Zone Transfer Protocol (AXFR)(https://tools.ietf.org/html/rfc5936)
+* RFC 5966, DNS Transport over TCP - Implementation Requirements(https://tools.ietf.org/html/rfc5966)
+* RFC 6195, Domain Name System (DNS) IANA Considerations (BCP 42)(https://tools.ietf.org/html/rfc6495)
+* RFC 6698, The DNS-Based Authentication of Named Entities (DANE) Transport Layer Security (TLS) Protocol: TLSA(https://tools.ietf.org/html/rfc6698)
+* RFC 6742, DNS Resource Records for the Identifier-Locator Network Protocol (ILNP)(https://tools.ietf.org/html/rfc6742)
+* RFC 6844, DNS Certification Authority Authorization (CAA) Resource Record(https://tools.ietf.org/html/rfc6844)
+* RFC 6975, Signaling Cryptographic Algorithm Understanding in DNS Security Extensions (DNSSEC)(https://tools.ietf.org/html/rfc6975)
+* RFC 7043, Resource Records for EUI-48 and EUI-64 Addresses in the DNS(https://tools.ietf.org/html/rfc7043)
+* RFC 7314, Extension Mechanisms for DNS (EDNS) EXPIRE Option(https://tools.ietf.org/html/rfc7314)
 */
 
-//About this list, see https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml
+//About this list, visit IANA Domain Name System (DNS) Parameters(https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml)
 //Port and Flags definitions
 #ifndef IPPORT_DNS
-	#define IPPORT_DNS              53U        //Standard DNS(TCP and UDP) Port
+	#define IPPORT_DNS                    53U        //Standard DNS(TCP and UDP) Port
 #endif
 #ifndef IPPORT_MDNS
-	#define IPPORT_MDNS             5353U      //Multicast Domain Name System/mDNS Port
+	#define IPPORT_MDNS                   5353U      //Multicast Domain Name System/mDNS Port
 #endif
 #ifndef IPPORT_LLMNR
-	#define IPPORT_LLMNR            5355U      //Link-Local Multicast Name Resolution/LLMNR Port
+	#define IPPORT_LLMNR                  5355U      //Link-Local Multicast Name Resolution/LLMNR Port
 #endif
-#define DNS_STANDARD            0x0100   //System Standard query
-#define DNS_SQR_NE              0x8180   //Standard query response and no error.
-#define DNS_SQR_NETC            0x8380   //Standard query response and no error, but Truncated.
-#define DNS_SQR_FE              0x8181   //Standard query response, Format Error
-#define DNS_SQR_SF              0x8182   //Standard query response, Server failure
-#define DNS_SQR_SNH             0x8183   //Standard query response, but No Such Name.
-#define DNS_QUERY_PTR           0xC00C   //Pointer of first query
+#define DNS_STANDARD                  0x0100     //System Standard query flag
+#define DNS_SQR_NE                    0x8180     //Standard query response and No Error.
+#define DNS_SQR_NEA                   0x8580     //Standard query response, No Error and Authoritative.
+#define DNS_SQR_NETC                  0x8380     //Standard query response and No Error, but Truncated.
+#define DNS_SQR_FE                    0x8181     //Standard query response, Format Error
+#define DNS_SQR_SF                    0x8182     //Standard query response, Server failure
+#define DNS_SQR_SNH                   0x8183     //Standard query response, No Such Name
+#define DNS_GET_BIT_RESPONSE          0x8000     //Get Response bit in DNS flags.
+#define DNS_GET_BIT_OPCODE            0x7800     //Get OPCode in DNS flags.
+#define DNS_GET_BIT_AA                0x0400     //Get Authoritative bit in DNS flags.
+#define DNS_GET_BIT_TC                0x0200     //Get Truncated bit in DNS flags.
+#define DNS_GET_BIT_RD                0x0100     //Get Recursion Desired bit in DNS flags.
+#define DNS_GET_BIT_Z                 0x0040     //Get Reserved bit in DNS flags.
+#define DNS_GET_BIT_AD                0x0020     //Get Authentic Data bit in DNS flags.
+#define DNS_GET_BIT_CD                0x0010     //Get Checking Disabled bit in DNS flags.
+#define DNS_GET_BIT_RCODE             0x000F     //Get RCode in DNS flags.
+#define DNS_SET_R                     0x8000     //Set Response bit.
+#define DNS_SET_R_TC                  0x8200     //Set Response bit and Truncated bit.
+#define DNS_SER_R_A                   0x8580     //Set Response bit and Authoritative bit.
+#define DNS_SET_R_FE                  0x8001     //Set Response bit and Format Error RCode.
+#define DNS_SET_R_SNH                 0x8003     //Set Response bit and No Such Name RCode.
+#define DNS_POINTER_8_BITS            0xC0       //DNS compression pointer(11000000)
+#define DNS_POINTER_16_BITS           0xC000     //DNS compression pointer(1100000000000000)
+#define DNS_POINTER_8_BITS_STRING     ('\xC0')   //DNS compression pointer string
+#define DNS_POINTER_BITS_GET_LOCATE   0x3FFF     //Get location of DNS compression pointer(00111111111111111)
+#define DNS_POINTER_QUERY             0xC00C     //Pointer of first query
 
 //OPCode definitions
 #ifndef DNS_OPCODE_QUERY
@@ -421,27 +606,6 @@ RFC 7314(https://tools.ietf.org/html/rfc7314), Extension Mechanisms for DNS (EDN
 #endif
 #ifndef DNS_CLASS_ANY
 	#define DNS_CLASS_ANY           0x00FF           //DNS ANY Classes is 255.
-#endif
-#ifndef DNS_RCLASS_INTERNET
-	#define DNS_RCLASS_INTERNET     0x0100           //DNS INTERNET Classes is 1.
-#endif
-#ifndef DNS_RCLASS_CSNET
-	#define DNS_RCLASS_CSNET        0x0200           //DNS CSNET Classes is 2.
-#endif
-#ifndef DNS_RCLASS_CHAOS
-	#define DNS_RCLASS_CHAOS        0x0300           //DNS CHAOS Classes is 3.
-#endif
-#ifndef DNS_RCLASS_HESIOD
-	#define DNS_RCLASS_HESIOD       0x0400           //DNS HESIOD Classes is 4.
-#endif
-#ifndef DNS_RCLASS_NONE
-	#define DNS_RCLASS_NONE         0xFE00           //DNS NONE Classes is 254.
-#endif
-#ifndef DNS_RCLASS_ALL
-	#define DNS_RCLASS_ALL          0xFF00           //DNS ALL Classes is 255.
-#endif
-#ifndef DNS_RCLASS_ANY
-	#define DNS_RCLASS_ANY          0xFF00           //DNS ANY Classes is 255.
 #endif
 
 //RCode definitions
@@ -754,20 +918,20 @@ RFC 7314(https://tools.ietf.org/html/rfc7314), Extension Mechanisms for DNS (EDN
 	#define DNS_TYPE_DLV          0x8001             //DNS Type DLVS is 32769.
 #endif
 #ifndef DNS_TYPE_PRIVATE_A
-	#define DNS_TYPE_PRIVATE_A    0xFF00           //DNS Reserved Private use records is begin at 65280.
+	#define DNS_TYPE_PRIVATE_A    0xFF00             //DNS Reserved Private use records is begin at 65280.
 #endif
 #ifndef DNS_TYPE_PRIVATE_B
-	#define DNS_TYPE_PRIVATE_B    0xFFFE           //DNS Reserved Private use records is end at 65534.
+	#define DNS_TYPE_PRIVATE_B    0xFFFE             //DNS Reserved Private use records is end at 65534.
 #endif
 #ifndef DNS_TYPE_RESERVED
-	#define DNS_TYPE_RESERVED     0xFFFF           //DNS Reserved records is 65535.
+	#define DNS_TYPE_RESERVED     0xFFFF             //DNS Reserved records is 65535.
 #endif
 
 
-/* Domain Name System/DNS Header
-// With User Datagram Protocol/UDP
+/* Domain Name System/DNS header
+//With User Datagram Protocol/UDP
 
-                    1                   2                   3
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |        Identification         |Q|OPCode |A|T|R|R|Z|A|C| RCode |  QR/Query and Response, AA/Authoritative Answer, TC/Truncated, RD/Recursion Desired, RA/Recursion Available
@@ -779,7 +943,7 @@ RFC 7314(https://tools.ietf.org/html/rfc7314), Extension Mechanisms for DNS (EDN
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 */
-#define OLD_DNS_MAXSIZE 512U
+#define DNS_PACKET_MAXSIZE_TRADITIONAL   512U   //Traditional DNS packet maximum size(512 bytes)
 typedef struct _dns_hdr_
 {
 	uint16_t              ID;
@@ -812,19 +976,75 @@ typedef struct _dns_hdr_
 		#endif
 		}FlagsBits;
 	};
-	uint16_t              Questions;
+	uint16_t              Question;
 	uint16_t              Answer;
 	uint16_t              Authority;
 	uint16_t              Additional;
-}dns_hdr;
+}dns_hdr, *pdns_hdr;
+
+/* Domain Name System/DNS header
+//With Transmission Control Protocol/TCP
+
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|            Length             |        Identification         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|Q|OPCode |A|T|R|R|Z|A|C| RCode |        Total Questions        |  QR/Query and Response, AA/Authoritative Answer, TC/Truncated, RD/Recursion Desired, RA/Recursion Available
+|R|       |A|C|D|A| |D|D|       |                               |  Z/Zero, AD/Authenticated Data, CD/Checking Disabled, RCode/Return Code
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|       Total Answer RRs        |      Total Authority RRs      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|     Total Additional RRs      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+*/
+typedef struct _dns_tcp_hdr_
+{
+	uint16_t              Length;
+	uint16_t              ID;
+	union {
+		uint16_t          Flags;
+		struct {
+		#if BYTE_ORDER == LITTLE_ENDIAN
+			uint8_t       RD:1;
+			uint8_t       TC:1;
+			uint8_t       AA:1;
+			uint8_t       OPCode_Second:1;
+			uint8_t       OPCode_First:3;
+			uint8_t       QR:1;
+			uint8_t       RCode:4;
+			uint8_t       CD:1;
+			uint8_t       AD:1;
+			uint8_t       Zero:1;
+			uint8_t       RA:1;
+		#else //BIG_ENDIAN
+			uint8_t       QR:1;
+			uint8_t       OPCode:4;
+			uint8_t       AA:1;
+			uint8_t       TC:1;
+			uint8_t       RD:1;
+			uint8_t       RA:1;
+			uint8_t       Zero:1;
+			uint8_t       AD:1;
+			uint8_t       CD:1;
+			uint8_t       RCode:4;
+		#endif
+		}FlagsBits;
+	};
+	uint16_t              Question;
+	uint16_t              Answer;
+	uint16_t              Authority;
+	uint16_t              Additional;
+}dns_tcp_hdr, *pdns_tcp_hdr;
 
 /* Domain Name System/DNS Query
 
-                    1                   2                   3
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /                                                               /
-/                             Name                              /
+/                            Domain                             /
 /                                                               /
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |             Type              |            Classes            |
@@ -836,11 +1056,11 @@ typedef struct _dns_qry_
 //	uint8_t               *Name;
 	uint16_t              Type;
 	uint16_t              Classes;
-}dns_qry;
+}dns_qry, *pdns_qry;
 
-/* Domain Name System/DNS Standard Resource Record
+/* Domain Name System/DNS Standard Resource Records
 
-                    1                   2                   3
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /                                                               /
@@ -857,7 +1077,7 @@ typedef struct _dns_qry_
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 */
-typedef struct _dns_standard_
+typedef struct _dns_record_standard_
 {
 //	uint8_t               *Name;
 	uint16_t              Type;
@@ -865,11 +1085,71 @@ typedef struct _dns_standard_
 	uint32_t              TTL;
 	uint16_t              Length;
 //	uint8_t               *Data;
-}dns_standard_record;
+}dns_record_standard, *pdns_record_standard;
 
-/* Start Of a zone of Authority/SOA Resource Record
+/* Domain Name System/DNS A(IPv4) Records
 
-                    1                   2                   3
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+/                                                               /
+/                            Domain                             /
+/                                                               /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|             Type              |            Classes            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         Time To Live                          |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|            Length             |            Address            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|            Address            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+*/
+typedef struct _dns_record_a_
+{
+	uint16_t              Name;
+	uint16_t              Type;
+	uint16_t              Classes;
+	uint32_t              TTL;
+	uint16_t              Length;
+	in_addr               Address;
+}dns_record_a, *pdns_record_a;
+
+/* Domain Name System/DNS Canonical Name/CNAME Records
+
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+/                                                               /
+/                            Domain                             /
+/                                                               /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|             Type              |            Classes            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         Time To Live                          |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|            Length             |                               /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               /
+/                                                               /
+/                         Primary Name                          /
+/                                                               /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+*/
+typedef struct _dns_record_cname_
+{
+	uint16_t              Name;
+	uint16_t              Type;
+	uint16_t              Classes;
+	uint32_t              TTL;
+	uint16_t              Length;
+//	uint8_t               *PrimaryName;
+}dns_record_cname, *pdns_record_cname;
+
+/* Domain Name System/DNS Start Of a zone of Authority/SOA Resource Records
+
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /                                                               /
@@ -892,7 +1172,7 @@ typedef struct _dns_standard_
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 */
-typedef struct _dns_soa_
+typedef struct _dns_record_soa_
 {
 //	uint8_t               *PrimaryName;
 //	uint8_t               *MailboxName;
@@ -901,11 +1181,38 @@ typedef struct _dns_soa_
 	uint32_t              RetryInterval;
 	uint32_t              ExpireLimit;
 	uint32_t              MinimumTTL;
-}dns_soa_record;
+}dns_record_soa, *pdns_record_soa;
 
-/* Mail eXchange/MX Resource Record
+/* Domain Name System/DNS Pointer/PTR Records
 
-                    1                   2                   3
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|            Pointer            |             Type              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|            Classes            |         Time To Live          |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Time To Live          |            Length             |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+/                                                               /
+/                            Domain                             /
+/                                                               /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+*/
+typedef struct _dns_record_ptr_
+{
+	uint16_t              Pointer;
+	uint16_t              Type;
+	uint16_t              Classes;
+	uint32_t              TTL;
+	uint16_t              Length;
+//	uint8_t               *Name;
+}dns_record_ptr, *pdns_record_ptr;
+
+/* Domain Name System/DNS Mail eXchange/MX Resource Records
+
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |          Preference           |                               /
@@ -916,35 +1223,72 @@ typedef struct _dns_soa_
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 */
-typedef struct _dns_mx_
+typedef struct _dns_record_mx_
 {
 	uint16_t              Preference;
-//	uint8_t               *MailExchangeName;
-}dns_mx_record;
+//	uint8_t               MailExchangeName;
+}dns_record_mx, *pdns_record_mx;
 
-/* Text strings/TXT Resource Record
+/* Domain Name System/DNS Test Strings/TXT Records
 
-                    1                   2                   3
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|    Length     |                                               /
-+-+-+-+-+-+-+-+-+                                               /
-/                              TXT                              /
+|             Name              |             Type              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|            Classes            |         Time To Live          |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Time To Live          |            Length             |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|          TXT Length           |                               /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               /
 /                                                               /
+/                           TXT Data                            /
 /                                                               /
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 */
-typedef struct _dns_txt_
+typedef struct _dns_record_txt_
 {
-	uint8_t              Length;
-//	uint8_t              *TXT;
+	uint16_t              Name;
+	uint16_t              Type;
+	uint16_t              Classes;
+	uint32_t              TTL;
+	uint16_t              Length;
+	uint8_t               TXT_Length;
+//	uint8_t               *TXT;
+}dns_record_txt, *pdns_record_txt;
 
-}dns_txt_record;
+/* Domain Name System/DNS AAAA(IPv6) Records
 
-/* Server Selection/SRV Resource Record
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|            Pointer            |             Type              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|            Classes            |         Time To Live          |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Time To Live          |            Length             |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+/                                                               /
+/                            Domain                             /
+/                                                               /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-                    1                   2                   3
+*/
+typedef struct _dns_record_aaaa_
+{
+	uint16_t              Name;
+	uint16_t              Type;
+	uint16_t              Classes;
+	uint32_t              TTL;
+	uint16_t              Length;
+	in6_addr              Address;
+}dns_record_aaaa, *pdns_record_aaaa;
+
+/* Domain Name System/DNS Server Selection/SRV Resource Records
+
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |           Priority            |            Weight             |
@@ -957,28 +1301,17 @@ typedef struct _dns_txt_
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 */
-typedef struct _dns_srv_
+typedef struct _dns_record_srv_
 {
 	uint16_t             Priority;
 	uint16_t             Weight;
 	uint16_t             Port;
 //	uint8_t              *Target;
-}dns_srv_record;
+}dns_record_srv, *pdns_record_srv;
 
-// Option/OPT Resource Record(Extension Mechanisms for Domain Name System/EDNS, EDNS Label)
-#define EDNS0_CODE_LLQ                 0x0001   //Long-lived query
-#define EDNS0_CODE_UL                  0x0002   //Update lease
-#define EDNS0_CODE_NSID                0x0003   //Name Server Identifier (RFC 5001)
-#define EDNS0_CODE_OWNER               0x0004   //Owner, reserved
-#define EDNS0_CODE_DAU                 0x0005   //DNSSEC Algorithm Understood (RFC6975)
-#define EDNS0_CODE_DHU                 0x0006   //DS Hash Understood (RFC6975)
-#define EDNS0_CODE_N3U                 0x0007   //DSEC3 Hash Understood (RFC6975)
-#define EDNS0_CODE_CLIENT_SUBNET       0x0008   //Client subnet as assigned by IANA
-#define EDNS0_CODE_EDNS_EXPIRE         0x0009   //EDNS Expire (RFC7314)
-#define EDNS0_CODE_CLIENT_SUBNET_EXP   0x50FA   //Client subnet, ID is 20730
+/* Extension Mechanisms for Domain Name System/DNS, EDNS Label/OPT Resource Records
 
-/*
-                    1                   2                   3
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /                                                               /
@@ -987,38 +1320,38 @@ typedef struct _dns_srv_
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |             Type              |       UDP Payload Size        |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|Extended RCode | EDNS0 Version |D|          Reserved           |  Extended RCode/Higher bits in extended Return Code, D/DO bit
+|Extended RCode |EDNS Version |D|           Reserved            |  Extended RCode/Higher bits in extended Return Code, D/DO bit
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |            Length             |\---------- Z Field -----------/
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 */
-#define EDNS0_MINSIZE 1220U
-typedef struct _dns_opt_
+#define EDNS_PACKET_MINSIZE    1220U
+#define EDNS_GET_BIT_DO        0x8000        //Get DO bit in Z field.
+typedef struct _dns_record_opt_
 {
-	uint8_t               RootName;
-	uint16_t              Type;              //Additional RRs Type
+	uint8_t               Name;
+	uint16_t              Type;
 	uint16_t              UDPPayloadSize;
 	uint8_t               Extended_RCode;
-	uint8_t               Version;           //EDNS0 Version
+	uint8_t               Version;
 	union {
 		uint16_t          Z_Field;
 		struct {
 		#if BYTE_ORDER == LITTLE_ENDIAN
 			uint8_t       Reserved_First:7;
-			uint8_t       DO:1;              //DO bit
+			uint8_t       DO:1;
 		#else //BIG_ENDIAN
-			uint8_t       DO:1;              //DO bit
+			uint8_t       DO:1;
 			uint8_t       Reserved_First:7;
 		#endif
 			uint8_t       Reserved_Second;
 		}Z_Bits;
 	};
 	uint16_t              DataLength;
-}dns_opt_record;
+}dns_record_opt, *pdns_record_opt, edns_header, *pedns_header;
 
-/* Extension Mechanisms for Domain Name System/EDNS0 Option
-
+/* Extension Mechanisms for Domain Name System/EDNS Option
                     1                   2                   3
 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1030,35 +1363,97 @@ typedef struct _dns_opt_
 /                             Data                              /
 /                                                               /
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
 */
-typedef struct _dns_edns0_option_
+typedef struct _dns_edns_option_
 {
 	uint16_t              Code;
 	uint16_t              Length;
 //	uint8_t               *Data;
-}dns_edns0_option;
+}dns_edns_option, *pdns_edns_option;
 
-// RRSIG Record(Resource Record Digital Signature)
-#define DNSSEC_AlGORITHM_RSA_MD5               1U
-#define DNSSEC_AlGORITHM_DH                    2U
-#define DNSSEC_AlGORITHM_DSA                   3U
-#define DNSSEC_AlGORITHM_ECC                   4U
-#define DNSSEC_AlGORITHM_RSA_SHA1              5U
-#define DNSSEC_AlGORITHM_DSA_NSEC3_SHA1        6U
-#define DNSSEC_AlGORITHM_RSA_SHA1_NSEC3_SHA1   7U
-#define DNSSEC_AlGORITHM_RSA_SHA256            8U
-#define DNSSEC_AlGORITHM_RSA_SHA512            10U
-#define DNSSEC_AlGORITHM_ECC_GOST              12U
-#define DNSSEC_AlGORITHM_ECDSA_P256_SHA256     13U
-#define DNSSEC_AlGORITHM_ECDSA_P386_SHA386     14U
-#define DNSSEC_AlGORITHM_HMAC_MD5              157U
-#define DNSSEC_AlGORITHM_INDIRECT              252U
-#define DNSSEC_AlGORITHM_PRIVATE_DNS           253U
-#define DNSSEC_AlGORITHM_PRIVATE_OID           254U
+/* Extension Mechanisms for Domain Name System/DNS, Client subnet in EDNS requests
+* RFC 7871, Client Subnet in DNS Queries(https://tools.ietf.org/html/rfc7871)
 
-/*
-                    1                   2                   3
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|             Code              |            Length             |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|            Family             |Source Netmask | Scope Netmask |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+/                                                               /
+/                           Address                             /
+/                                                               /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+*/
+#define EDNS_CODE_LLQ                            0x0001   //Long-lived query
+#define EDNS_CODE_UL                             0x0002   //Update lease
+#define EDNS_CODE_NSID                           0x0003   //Name Server Identifier (RFC 5001)
+#define EDNS_CODE_OWNER                          0x0004   //Owner, reserved
+#define EDNS_CODE_DAU                            0x0005   //DNSSEC Algorithm Understood (RFC 6975)
+#define EDNS_CODE_DHU                            0x0006   //DS Hash Understood (RFC 6975)
+#define EDNS_CODE_N3U                            0x0007   //DSEC3 Hash Understood (RFC 6975)
+#define EDNS_CODE_CSUBNET                        0x0008   //Client subnet as assigned by IANA
+#define EDNS_CODE_EDNS_EXPIRE                    0x0009   //EDNS Expire (RFC 7314)
+
+//About Address Family Numbers, visit https://www.iana.org/assignments/address-family-numbers/address-family-numbers.xhtml.
+#define ADDRESS_FAMILY_IPV4                      0x0001
+#define ADDRESS_FAMILY_IPV6                      0x0002
+
+//Netmask Source bits
+#define EDNS_CLIENT_SUBNET_NETMASK_SOURCE_IPV6   56U
+#define EDNS_CLIENT_SUBNET_NETMASK_SOURCE_IPV4   24U
+typedef struct _edns_client_subnet_
+{
+	uint16_t              Code;
+	uint16_t              Length;
+	uint16_t              Family;
+	uint8_t               Netmask_Source;
+	uint8_t               Netmask_Scope;
+//	uint8_t               *Address;
+}edns_client_subnet, *pedns_client_subnet;
+
+/* Domain Name System/DNS Delegation Signer/DS Resource Records
+
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|            Key Tag            |   Algorithm   |     Type      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+/                                                               /
+/                            Digest                             /
+/                                                               /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+*/
+#define DNSSEC_DS_DIGEST_RESERVED              0
+#define DNSSEC_DS_DIGEST_SHA1                  1U       //RFC 3658, Delegation Signer (DS) Resource Record (RR)(https://tools.ietf.org/html/rfc3658)
+#define DNSSEC_DS_DIGEST_SHA256                2U       //RFC 4509, Use of SHA-256 in DNSSEC Delegation Signer (DS) Resource Records (RRs)(https://tools.ietf.org/html/rfc4509)
+#define DNSSEC_DS_DIGEST_GOST                  3U       //RFC 5933, Use of GOST Signature Algorithms in DNSKEY and RRSIG Resource Records for DNSSEC(https://tools.ietf.org/html/rfc5933)
+#define DNSSEC_DS_DIGEST_SHA384                4U       //RFC 6605, Elliptic Curve Digital Signature Algorithm (DSA) for DNSSEC(https://tools.ietf.org/html/rfc6605)
+
+//About this list, visit https://www.iana.org/assignments/ds-rr-types/ds-rr-types.xhtml
+#define DNSSEC_DS_TYPE_RESERVED                0
+#define DNSSEC_DS_TYPE_SHA1                    1U
+#define DNSSEC_DS_TYPE_SHA256                  2U
+#define DNSSEC_DS_TYPE_GOST                    3U
+#define DNSSEC_DS_TYPE_SHA384                  4U
+#define SHA1_LENGTH                            20       //SHA-1 output is 160 bits/20 bytes lentgh
+#define SHA256_LENGTH                          32       //SHA-256 output is 256 bits/32 bytes lentgh
+#define GOST_LENGTH                            32       //GOST R 34.11-94 output is 256 bits/32 bytes lentgh
+#define SHA384_LENGTH                          48       //SHA-384 output is 384 bits/48 bytes lentgh
+typedef struct _dns_record_ds_
+{
+	uint16_t              KeyTag;
+	uint8_t               Algorithm;
+	uint8_t               Type;
+//	uint8_t               *Digest;
+}dns_record_ds, *pdns_record_ds;
+
+/* Domain Name System/DNS Resource Record Digital Signature/RRSIG Records
+
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |        Type Covered           |   Algorithm   |    Labels     |
@@ -1079,7 +1474,32 @@ typedef struct _dns_edns0_option_
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 */
-typedef struct _dns_rrsig_
+#define DNSSEC_AlGORITHM_RESERVED_0            0        //RFC 4034, Reserved(Resource Records for the DNS Security Extensions(https://tools.ietf.org/html/rfc4034)
+#define DNSSEC_AlGORITHM_RSA_MD5               1U       //RFC 3110, RSA-MD5(RSA/SHA-1 SIGs and RSA KEYs in the Domain Name System (DNS)(https://tools.ietf.org/html/rfc3110)
+#define DNSSEC_AlGORITHM_DH                    2U       //RFC 2539, Diffie-Hellman(Storage of Diffie-Hellman Keys in the Domain Name System (DNS)(https://tools.ietf.org/html/rfc2539)
+#define DNSSEC_AlGORITHM_DSA                   3U       //RFC 3755, DSA-SHA1(Legacy Resolver Compatibility for Delegation Signer (DS)(https://tools.ietf.org/html/rfc3755)
+#define DNSSEC_AlGORITHM_RESERVED_4            4U       //RFC 6725, Reserved(DNS Security (DNSSEC) DNSKEY Algorithm IANA Registry Updates(https://tools.ietf.org/html/rfc6725)
+#define DNSSEC_AlGORITHM_RSA_SHA1              5U       //RFC 4034, RSA-SHA-1(Resource Records for the DNS Security Extensions(https://tools.ietf.org/html/rfc4034)
+#define DNSSEC_AlGORITHM_DSA_NSEC3_SHA1        6U       //RFC 5155, DSA-NSEC3-SHA-1(DNS Security (DNSSEC) Hashed Authenticated Denial of Existence(https://tools.ietf.org/html/rfc5155)
+#define DNSSEC_AlGORITHM_RSA_SHA1_NSEC3_SHA1   7U       //RFC 5155, RSA-SHA-1-NSEC3-SHA-1(DNS Security (DNSSEC) Hashed Authenticated Denial of Existence(https://tools.ietf.org/html/rfc5155)
+#define DNSSEC_AlGORITHM_RSA_SHA256            8U       //RFC 5702, RSA-SHA-256(Use of SHA-2 Algorithms with RSA in DNSKEY and RRSIG Resource Records for DNSSEC(https://tools.ietf.org/html/rfc5702)
+#define DNSSEC_AlGORITHM_RESERVED_9            9U       //RFC 6725, Reserved(DNS Security (DNSSEC) DNSKEY Algorithm IANA Registry Updates(https://tools.ietf.org/html/rfc6725)
+#define DNSSEC_AlGORITHM_RSA_SHA512            10U      //RFC 5702, RSA-SHA-512(Use of SHA-2 Algorithms with RSA in DNSKEY and RRSIG Resource Records for DNSSEC(https://tools.ietf.org/html/rfc5702)
+#define DNSSEC_AlGORITHM_RESERVED_11           11U      //RFC 6725, Reserved(DNS Security (DNSSEC) DNSKEY Algorithm IANA Registry Updates(https://tools.ietf.org/html/rfc6725)
+#define DNSSEC_AlGORITHM_ECC_GOST              12U      //RFC 5933, GOST R 34.10-2001(Use of GOST Signature Algorithms in DNSKEY and RRSIG Resource Records for DNSSEC(https://tools.ietf.org/html/rfc5933)
+#define DNSSEC_AlGORITHM_ECDSA_P256_SHA256     13U      //RFC 6605, ECDSA Curve P-256 with SHA-256(Elliptic Curve Digital Signature Algorithm (DSA) for DNSSEC(https://tools.ietf.org/html/rfc6605)
+#define DNSSEC_AlGORITHM_ECDSA_P386_SHA386     14U      //RFC 6605, ECDSA Curve P-384 with SHA-384(Elliptic Curve Digital Signature Algorithm (DSA) for DNSSEC(https://tools.ietf.org/html/rfc6605)
+#define DNSSEC_AlGORITHM_RESERVED_123          123U     //RFC 4034, Reserved area between 123 and 251(Resource Records for the DNS Security Extensions(https://tools.ietf.org/html/rfc4034)
+#define DNSSEC_AlGORITHM_RESERVED_251          251U     //RFC 4034, Reserved area between 123 and 251(Resource Records for the DNS Security Extensions(https://tools.ietf.org/html/rfc4034)
+#define DNSSEC_AlGORITHM_INDIRECT              252U     //RFC 4034, Reserved for Indirect Keys(Resource Records for the DNS Security Extensions(https://tools.ietf.org/html/rfc4034)
+#define DNSSEC_AlGORITHM_PRIVATE_DNS           253U     //RFC 4034, Private algorithm(Resource Records for the DNS Security Extensions(https://tools.ietf.org/html/rfc4034)
+#define DNSSEC_AlGORITHM_PRIVATE_OID           254U     //RFC 4034, Private algorithm(Resource Records for the DNS Security Extensions(https://tools.ietf.org/html/rfc4034)
+#define DNSSEC_AlGORITHM_RESERVED_255          255U     //RFC 4034, Reserved(Resource Records for the DNS Security Extensions(https://tools.ietf.org/html/rfc4034)
+#define RSA_MIN_LENGTH                         64U
+#define DH_MIN_LENGTH                          96U
+#define DSA_MIN_LENGTH                         128U
+#define ECC_MIN_LENGTH                         24U
+typedef struct _dns_record_rrsig_
 {
 	uint16_t              TypeCovered;
 	uint8_t               Algorithm;
@@ -1090,11 +1510,151 @@ typedef struct _dns_rrsig_
 	uint16_t              KeyTag;
 //	uint8_t               *SignerName;
 //	uint8_t               *Signature;
-}dns_rrsig_record;
+}dns_record_rrsig, *pdns_record_rrsig;
 
-/* Certification Authority Authorization/CAA Resource Record
+/* Domain Name System/DNS DNS Key/DNSKEY Resource Records
 
-                    1                   2                   3
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|             Flags             |    Protocol   |   Algorithm   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+/                                                               /
+/                            Digest                             /
+/                                                               /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+*/
+#define DNSSEC_DNSKEY_FLAGS_ZK                 0x0100
+#define DNSSEC_DNSKEY_FLAGS_KR                 0x0080
+#define DNSSEC_DNSKEY_FLAGS_SEP                0x0001
+#define DNSSEC_DNSKEY_FLAGS_RSV                0xFE7E
+#define DNSSEC_DNSKEY_PROTOCOL                 3U
+typedef struct _dns_record_dnskey_
+{
+	union {
+		uint16_t          Flags;
+		struct {
+		#if BYTE_ORDER == LITTLE_ENDIAN
+			uint8_t       ZoneKey:1;
+			uint8_t       Zero_A:7;
+			uint8_t       KeySigningKey:1;
+			uint8_t       Zero_B:6;
+			uint8_t       KeyRevoked:1;
+		#else //BIG_ENDIAN
+			uint8_t       Zero_A:7;
+			uint8_t       ZoneKey:1;
+			uint8_t       KeyRevoked:1;
+			uint8_t       Zero_B:6;
+			uint8_t       KeySigningKey:1;
+		#endif
+		}FlagsBits;
+	};
+	uint8_t               Protocol;
+	uint8_t               Algorithm;
+//	uint8_t               *PublicKey;
+}dns_record_dnskey, *pdns_record_dnskey;
+
+/* Domain Name System/DNS Next-Secure/NSEC Resource Records
+
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+/                                                               /
+/                       Next Domain Name                        /
+/                                                               /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+/                                                               /
+/                        Type Bit Maps                          /
+/                                                               /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+typedef struct _dns_record_nsec_
+{
+//	uint8_t                NextDomainName;
+//	uint8_t                TypeBitMap;
+}dns_record_nsec, *pdns_record_nsec;
+*/
+
+/* Domain Name System/DNS NSEC version 3/NSEC3 Resource Records
+
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|     Hash      |     Flags     |          Iterations           |
+|   Algorithm   |               |                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Salt Length  |                     Salt                      /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Hash Length  |            Next Hashed Owner Name             /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+/                                                               /
+/                         Type Bit Maps                         /
+/                                                               /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+*/
+//About this list, visit IANA Domain Name System Security (DNSSEC) NextSECure3 (NSEC3) Parameters(https://www.iana.org/assignments/dnssec-nsec3-parameters/dnssec-nsec3-parameters.xhtml)
+#define DNSSEC_NSEC3_ALGORITHM_SHA1            1U
+typedef struct _dns_record_nsec3_
+{
+	uint8_t               Algorithm;
+	union {
+		uint8_t           Flags;
+		struct {
+		#if BYTE_ORDER == LITTLE_ENDIAN
+			uint8_t       OptOut:1;
+			uint8_t       Zero:7;
+		#else //BIG_ENDIAN
+			uint8_t       Zero:7;
+			uint8_t       OptOut:1;
+		#endif
+		}FlagsBits;
+	};
+	uint16_t              Iterations;
+	uint8_t               SaltLength;
+//	uint8_t               *Salt;
+//	uint8_t               HashLength;
+//	uint8_t               *NextHashedOwnerName;
+//	uint8_t               *TypeBitMap;
+}dns_record_nsec3, *pdns_record_nsec3;
+
+/* Domain Name System/DNS NSEC version 3 Parameters/NSEC3PARAM Resource Records
+
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|     Hash      |     Flags     |          Iterations           |
+|   Algorithm   |               |                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Salt Length  |                     Salt                      /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+*/
+//About this list, visit IANA Domain Name System Security (DNSSEC) NextSECure3 (NSEC3) Parameters(https://www.iana.org/assignments/dnssec-nsec3-parameters/dnssec-nsec3-parameters.xhtml)
+typedef struct _dns_record_nsec3param_
+{
+	uint8_t               Algorithm;
+	union {
+		uint8_t           Flags;
+		struct {
+		#if BYTE_ORDER == LITTLE_ENDIAN
+			uint8_t       Reserved:1;
+			uint8_t       Zero:7;
+		#else //BIG_ENDIAN
+			uint8_t       Zero:7;
+			uint8_t       Reserved:1;
+		#endif
+		}FlagsBits;
+	};
+	uint16_t              Iterations;
+	uint8_t               SaltLength;
+//	uint8_t               *Salt;
+}dns_record_nsec3param, *pdns_record_nsec3param;
+
+/* Domain Name System/DNS Certification Authority Authorization/CAA Resource Records
+
+                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |     Flags     |    Length     |                               /
@@ -1108,180 +1668,25 @@ typedef struct _dns_rrsig_
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 */
-typedef struct _dns_caa_
+typedef struct _dns_record_caa_
 {
-	uint8_t              Flags;
-	uint8_t              Length;
-//	uint8_t              *Tag;
-//	uint8_t              *Value;
-}dns_caa_record;
+	union {
+		uint8_t           Flags;
+		struct {
+		#if BYTE_ORDER == LITTLE_ENDIAN
+			uint8_t       Zero:7;
+			uint8_t       IssuerCritical:1;
+		#else //BIG_ENDIAN
+			uint8_t       IssuerCritical:1;
+			uint8_t       Zero:7;
+		#endif
+		}FlagsBits;
+	};
+	uint8_t               Length;
+//	uint8_t               *Tag;
+//	uint8_t               *Value;
+}dns_record_caa, *pdns_record_caa;
 
-
-//SOCKS protocol part
-//Version, Method, Command and Reply definitions
-#define SOCKS_VERSION_5                            5U
-#define SOCKS_METHOD_NO_AUTHENTICATION_NUM         1U
-#define SOCKS_METHOD_SUPPORT_NUM                   2U
-#define SOCKS_METHOD_NO_AUTHENTICATION_REQUIRED    0
-#define SOCKS_METHOD_GSSAPI                        1U
-#define SOCKS_METHOD_USERNAME_PASSWORD             2U
-#define SOCKS_METHOD_IANA_ASSIGNED_A               3U
-#define SOCKS_METHOD_IANA_ASSIGNED_B               0x7F
-#define SOCKS_METHOD_RESERVED_FOR_PRIVATE_A        0x80
-#define SOCKS_METHOD_RESERVED_FOR_PRIVATE_B        0xFE
-#define SOCKS_METHOD_NO_ACCEPTABLE_METHODS         0xFF
-#define SOCKS_USERNAME_PASSWORD_VERSION            1U
-#define SOCKS_USERNAME_PASSWORD_MAXNUM             255U
-#define SOCKS_USERNAME_PASSWORD_SUCCESS            0
-#define SOCKS_COMMAND_CONNECT                      1U
-#define SOCKS_COMMAND_BIND                         2U
-#define SOCKS_COMMAND_UDP_ASSOCIATE                3U
-#define SOCKS5_ADDRESS_IPV4                        1U
-#define SOCKS5_ADDRESS_DOMAIN                      3U
-#define SOCKS5_ADDRESS_IPV6                        4U
-#define SOCKS5_REPLY_SUCCESS                       0
-#define SOCKS5_REPLY_SERVER_FAILURE                1U
-#define SOCKS5_REPLY_NOT_ALLOWED                   2U
-#define SOCKS5_REPLY_NETWORK_UNREACHABLE           3U
-#define SOCKS5_REPLY_HOST_UNREACHABLE              4U
-#define SOCKS5_REPLY_REFUSED                       5U
-#define SOCKS5_REPLY_TTL_EXPORED                   6U
-#define SOCKS5_REPLY_COMMAND_NOT_SUPPORTED         7U
-#define SOCKS5_REPLY_ADDRESS_TYPE_NOT_SUPPORTED    8U
-#define SOCKS5_REPLY_UNASSIGNED_A                  9U
-#define SOCKS5_REPLY_UNASSIGNED_B                  0xFF
-
-//SOCKS client version identifier and method selection message
-/*
-                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
-0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|    Version    | Method Number |            Methods            /
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-*/
-typedef struct _socks_client_selection_message_
-{
-	uint8_t               Version;
-	uint8_t               Methods_Number;
-	uint8_t               Methods_A;               //Usually is 0(NO_AUTHENTICATION_REQUIRED)
-	uint8_t               Methods_B;               //Usually is 2(USERNAME/PASSWORD)
-}socks_client_selection, *psocks_client_selection;
-
-//SOCKS server method selection message
-/*
-                    1 1 1 1 1 1 1
-0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|    Version    |    Method     |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-*/
-typedef struct _socks_server_selection_message_
-{
-	uint8_t               Version;
-	uint8_t               Method;
-}socks_server_selection, *psocks_server_selection;
-
-//SOCKS client Username/Password authentication message
-/*
-                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
-0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|    Version    |UserName Length|           User Name           /
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|Password Length|                   Password                    /
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-typedef struct _socks_client_user_authentication_
-{
-	uint8_t               Version;
-	uint8_t               UserName_Length;
-	uint8_t               *UserName;
-	uint8_t               Password_Length;
-	uint8_t               *Password;
-}socks_client_user_authentication, *psocks_client_user_authentication;
-*/
-
-//SOCKS server Username/Password authentication message
-/*
-                    1 1 1 1 1 1 1
-0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|    Version    |    Status     |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-*/
-typedef struct _socks_server_user_authentication_
-{
-	uint8_t               Version;
-	uint8_t               Status;
-}socks_server_user_authentication, *psocks_server_user_authentication;
-
-//SOCKS version 5 client request message
-/*
-                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
-0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|    Version    |    Command    |   Reserved    | Address Type  |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-/                        Remote Address                         /
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|         Remote Port           |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-*/
-typedef struct _socks5_client_command_request_
-{
-	uint8_t               Version;
-	uint8_t               Command;
-	uint8_t               Reserved;
-	uint8_t               Address_Type;
-//	uint8_t               *Remote_Address;
-//	uint16_t              Remote_Port;
-}socks5_client_command_request, *psocks5_client_command_request;
-
-//SOCKS version 5 server reply message
-/*
-                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
-0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|    Version    |     Reply     |   Reserved    | Address Type  |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-/                         Bind Address                          /
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|           Bind Port           |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-*/
-typedef struct _socks5_server_command_reply_
-{
-	uint8_t               Version;
-	uint8_t               Reply;
-	uint8_t               Reserved;
-	uint8_t               Bind_Address_Type;
-//	uint8_t               *Bind_Address;
-//	uint16_t              Bind_Port;
-}socks5_server_command_reply, *psocks5_server_command_reply;
-
-//SOCKS UDP relay request
-/*
-                    1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
-0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|           Reserved            |Fragment Number| Address Type  |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-/                        Remote Address                         /
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|         Remote Port           |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-*/
-typedef struct _socks_udp_relay_request_
-{
-	uint16_t              Reserved;
-	uint8_t               FragmentNumber;
-	uint8_t               Address_Type;
-//	uint8_t               *Remote_Address;
-//	uint16_t              Remote_Port;
-}socks_udp_relay_request, *psocks_udp_relay_request;
+//Memory alignment settings(Part 2)
+#pragma pack(pop) //Restore original alignment from stack.
+#endif

@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,6 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+
+#ifndef TOOLKIT_FILEHASH_SHA_2_H
+#define TOOLKIT_FILEHASH_SHA_2_H
 
 #include "Base.h"
 
@@ -48,7 +51,7 @@
 	#define COMMAND_SHA2_512_UL        L"-SHA2_512"
 	#define COMMAND_SHA2_512_224_UL    L"-SHA2_512_224"
 	#define COMMAND_SHA2_512_256_UL    L"-SHA2_512_256"
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	#define COMMAND_SHA2_224           ("-SHA224")
 	#define COMMAND_SHA2_256           ("-SHA256")
 	#define COMMAND_SHA2_512_224       ("-SHA512_224")
@@ -63,12 +66,17 @@
 
 //Global variables
 extern size_t HashFamilyID;
+extern bool IsLowerCase;
 size_t SHA2_HashFunctionID = DEFAULT_HASH_FUNCTION_ID;
 
 //Endianness testing and definitions
-#define TestEndianness(variable) {int i = 1;variable = PCT_BIG_ENDIAN;if (*((uint8_t *) & i) == 1) variable = PCT_LITTLE_ENDIAN;}
-#define PCT_LITTLE_ENDIAN      1
-#define PCT_BIG_ENDIAN         0
+#define TestEndianness(variable) {                   \
+				int i = 1;variable = PCT_BIG_ENDIAN; \
+				if (*((uint8_t *) & i) == 1)         \
+				variable = PCT_LITTLE_ENDIAN;        \
+			}
+#define PCT_LITTLE_ENDIAN        1
+#define PCT_BIG_ENDIAN           0
 
 //Some useful types
 #ifndef Py_LL
@@ -107,3 +115,4 @@ typedef struct _sha2_512_object_
 	int             Local;                       //Unprocessed amount in data
 	int             DigestSize;
 }SHA2_512_Object;
+#endif

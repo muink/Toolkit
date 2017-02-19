@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // A useful and powerful toolkit(DNSPing)
-// Copyright (C) 2014-2016 Chengr28
+// Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@
 
 #include "Base.h"
 
-#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 //Global variables
 extern ConfigurationTable ConfigurationParameter;
 
@@ -32,7 +32,10 @@ void SIG_Handler(
 
 //Close file handle.
 	if (ConfigurationParameter.OutputFile != nullptr)
+	{
 		fclose(ConfigurationParameter.OutputFile);
+		ConfigurationParameter.OutputFile = nullptr;
+	}
 
 	exit(EXIT_SUCCESS);
 	return;

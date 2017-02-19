@@ -1,6 +1,6 @@
 // This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -54,7 +54,7 @@ static const uint64_t blake2b_iv[8U] =
 };
 
 //Compression function. "last" flag indicates last block
-static void blake2b_compress(
+static void BLAKE_2B_Compress(
 	blake2b_ctx * const ctx, 
 	int last)
 {
@@ -114,7 +114,7 @@ static void blake2b_compress(
 }
 
 //Add "inlen" bytes from "in" into the hash
-void blake2b_update(
+void BLAKE_2B_Update(
 	blake2b_ctx * const ctx, 
 	const void * const in, 
 	size_t inlen)                       //Data bytes
@@ -128,7 +128,7 @@ void blake2b_update(
 			ctx->t[0] += ctx->c;        //Add counters
 			if (ctx->t[0] < ctx->c)     //Carry overflow ?
 				ctx->t[1U]++;           //High word
-			blake2b_compress(ctx, 0);   //Compress (not last)
+			BLAKE_2B_Compress(ctx, 0);   //Compress (not last)
 			ctx->c = 0;                 //Counter to zero
 		}
 
@@ -139,7 +139,7 @@ void blake2b_update(
 }
 
 //Initialize the hashing context "ctx" with optional key "key"
-int blake2b_init(
+int BLAKE_2B_Init(
 	blake2b_ctx * const ctx, 
 	size_t outlen, 
 	const void * const key, 
@@ -166,7 +166,7 @@ int blake2b_init(
 		ctx->b[i] = 0;
 	if (keylen > 0)
 	{
-		blake2b_update(ctx, key, keylen);
+		BLAKE_2B_Update(ctx, key, keylen);
 		ctx->c = 128;                   //At the end
 	}
 
@@ -175,7 +175,7 @@ int blake2b_init(
 
 //Generate the message digest (size given in init)
 //Result placed in "out"
-void blake2b_final(
+void BLAKE_2B_Final(
 	blake2b_ctx * const ctx, 
 	void * const out)
 {
@@ -187,7 +187,7 @@ void blake2b_final(
 //Fill up with zeros
 	while (ctx->c < 128)
 		ctx->b[ctx->c++] = 0;
-	blake2b_compress(ctx, 1);           //Final block flag = 1
+	BLAKE_2B_Compress(ctx, 1);           //Final block flag = 1
 
 //Little endian convert and store
 	for (i = 0;i < ctx->outlen;++i)
@@ -225,7 +225,7 @@ static const uint32_t blake2s_iv[8U] =
 };
 
 //Compression function. "last" flag indicates last block
-static void blake2s_compress(
+static void BLAKE_2S_Compress(
 	blake2s_ctx * const ctx, 
 	int last)
 {
@@ -283,7 +283,7 @@ static void blake2s_compress(
 }
 
 //Add "inlen" bytes from "in" into the hash
-void blake2s_update(
+void BLAKE_2S_Update(
 	blake2s_ctx * const ctx, 
 	const void * const in, 
 	size_t inlen)                       //Data bytes
@@ -297,7 +297,7 @@ void blake2s_update(
 			ctx->t[0] += (uint32_t)ctx->c;   //Add counters
 			if (ctx->t[0] < ctx->c)          //Carry overflow ?
 				ctx->t[1U]++;                //High word
-			blake2s_compress(ctx, 0);        //Compress (not last)
+			BLAKE_2S_Compress(ctx, 0);        //Compress (not last)
 			ctx->c = 0;                      //Counter to zero
 		}
 
@@ -306,7 +306,7 @@ void blake2s_update(
 }
 
 //Initialize the hashing context "ctx" with optional key "key"
-int blake2s_init(
+int BLAKE_2S_Init(
 	blake2s_ctx * const ctx, 
 	size_t outlen, 
 	const void * const key, 
@@ -333,7 +333,7 @@ int blake2s_init(
 		ctx->b[i] = 0;
 	if (keylen > 0)
 	{
-		blake2s_update(ctx, key, keylen);
+		BLAKE_2S_Update(ctx, key, keylen);
 		ctx->c = 64;                    //At the end
 	}
 
@@ -341,7 +341,7 @@ int blake2s_init(
 }
 
 //Generate the message digest (size given in init)
-void blake2s_final(
+void BLAKE_2S_Final(
 	blake2s_ctx * const ctx, 
 	void * const out)
 {
@@ -353,7 +353,7 @@ void blake2s_final(
 //Fill up with zeros
 	while (ctx->c < 64)
 		ctx->b[ctx->c++] = 0;
-	blake2s_compress(ctx, 1);           //Final block flag = 1
+	BLAKE_2S_Compress(ctx, 1);           //Final block flag = 1
 
 //Little endian convert and store
 	for (i = 0;i < ctx->outlen;++i)
@@ -365,12 +365,12 @@ void blake2s_final(
 
 //////////////////////////////////////////////////
 // Hash function
-//
+// 
 //Read commands(BLAKE2)
-bool ReadCommands_BLAKE2(
+bool ReadCommand_BLAKE2(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command)
 #endif
 {
@@ -417,7 +417,8 @@ bool ReadCommands_BLAKE2(
 
 //BLAKE2 hash function
 bool BLAKE2_Hash(
-	FILE * const FileHandle)
+	FILE * const FileHandle, 
+	FILE * const OutputFile)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_BLAKE2 || FileHandle == nullptr)
@@ -427,8 +428,8 @@ bool BLAKE2_Hash(
 	}
 
 //Initialization
-	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]());
-	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
+	std::shared_ptr<uint8_t> StringBuffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
+	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	size_t ReadLength = 0, DigestSize = 0;
 
 //BLAKE2 initialization
@@ -436,14 +437,14 @@ bool BLAKE2_Hash(
 	blake2s_ctx CTX_2S;
 	memset(&CTX_2B, 0, sizeof(CTX_2B));
 	memset(&CTX_2S, 0, sizeof(CTX_2S));
-	if ((BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_160 && blake2b_init(&CTX_2B, BLAKE2_DIGEST_SIZE_160 / BYTES_TO_BITS, nullptr, 0) != EXIT_SUCCESS) || //BLAKE2B 160 bits
-		(BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_256 && blake2b_init(&CTX_2B, BLAKE2_DIGEST_SIZE_256 / BYTES_TO_BITS, nullptr, 0) != EXIT_SUCCESS) || //BLAKE2B 256 bits
-		(BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_384 && blake2b_init(&CTX_2B, BLAKE2_DIGEST_SIZE_384 / BYTES_TO_BITS, nullptr, 0) != EXIT_SUCCESS) || //BLAKE2B 384 bits
-		(BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_512 && blake2b_init(&CTX_2B, BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS, nullptr, 0) != EXIT_SUCCESS) || //BLAKE2B 512 bits
-		(BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_128 && blake2s_init(&CTX_2S, BLAKE2_DIGEST_SIZE_128 / BYTES_TO_BITS, nullptr, 0) != EXIT_SUCCESS) || //BLAKE2S 128 bits
-		(BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_160 && blake2s_init(&CTX_2S, BLAKE2_DIGEST_SIZE_160 / BYTES_TO_BITS, nullptr, 0) != EXIT_SUCCESS) || //BLAKE2S 160 bits
-		(BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_224 && blake2s_init(&CTX_2S, BLAKE2_DIGEST_SIZE_224 / BYTES_TO_BITS, nullptr, 0) != EXIT_SUCCESS) || //BLAKE2S 224 bits
-		(BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_256 && blake2s_init(&CTX_2S, BLAKE2_DIGEST_SIZE_256 / BYTES_TO_BITS, nullptr, 0) != EXIT_SUCCESS)) //BLAKE2S 256 bits
+	if ((BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_160 && BLAKE_2B_Init(&CTX_2B, BLAKE2_DIGEST_SIZE_160 / BYTES_TO_BITS, nullptr, 0) != 0) || //BLAKE2B 160 bits
+		(BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_256 && BLAKE_2B_Init(&CTX_2B, BLAKE2_DIGEST_SIZE_256 / BYTES_TO_BITS, nullptr, 0) != 0) || //BLAKE2B 256 bits
+		(BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_384 && BLAKE_2B_Init(&CTX_2B, BLAKE2_DIGEST_SIZE_384 / BYTES_TO_BITS, nullptr, 0) != 0) || //BLAKE2B 384 bits
+		(BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_512 && BLAKE_2B_Init(&CTX_2B, BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS, nullptr, 0) != 0) || //BLAKE2B 512 bits
+		(BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_128 && BLAKE_2S_Init(&CTX_2S, BLAKE2_DIGEST_SIZE_128 / BYTES_TO_BITS, nullptr, 0) != 0) || //BLAKE2S 128 bits
+		(BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_160 && BLAKE_2S_Init(&CTX_2S, BLAKE2_DIGEST_SIZE_160 / BYTES_TO_BITS, nullptr, 0) != 0) || //BLAKE2S 160 bits
+		(BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_224 && BLAKE_2S_Init(&CTX_2S, BLAKE2_DIGEST_SIZE_224 / BYTES_TO_BITS, nullptr, 0) != 0) || //BLAKE2S 224 bits
+		(BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_256 && BLAKE_2S_Init(&CTX_2S, BLAKE2_DIGEST_SIZE_256 / BYTES_TO_BITS, nullptr, 0) != 0)) //BLAKE2S 256 bits
 	{
 		fwprintf_s(stderr, L"[Error] Hash init error.\n");
 		return false;
@@ -482,9 +483,9 @@ bool BLAKE2_Hash(
 //Hash process
 	while (!feof(FileHandle))
 	{
-		memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
+		memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 		_set_errno(0);
-		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(uint8_t), FILE_BUFFER_SIZE, FileHandle);
+		ReadLength = fread_s(StringBuffer.get(), FILE_BUFFER_SIZE, sizeof(uint8_t), FILE_BUFFER_SIZE, FileHandle);
 		if (ReadLength == 0 && errno != 0)
 		{
 			std::wstring Message(L"[Error] Read file error");
@@ -501,13 +502,13 @@ bool BLAKE2_Hash(
 			if (BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_160 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_256 || 
 				BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_384 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_512)
 			{
-				blake2b_update(&CTX_2B, Buffer.get(), ReadLength);
+				BLAKE_2B_Update(&CTX_2B, StringBuffer.get(), ReadLength);
 			}
 		//BLAKE2S
 			else if (BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_128 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_160 || 
 				BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_224 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_256)
 			{
-				blake2s_update(&CTX_2S, Buffer.get(), ReadLength);
+				BLAKE_2S_Update(&CTX_2S, StringBuffer.get(), ReadLength);
 			}
 			else { //Commands error
 				fwprintf_s(stderr, L"[Error] Commands error.\n");
@@ -517,17 +518,17 @@ bool BLAKE2_Hash(
 	}
 
 //Finish hash process.
-	std::shared_ptr<uint8_t> Result(new uint8_t[BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS]());
+	std::shared_ptr<uint8_t> Result(new uint8_t[BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS](), std::default_delete<uint8_t[]>());
 	memset(Result.get(), 0, BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS);
 	if (BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_160 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_256 || 
 		BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_384 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_512) //BLAKE2B
 	{
-		blake2b_final(&CTX_2B, Result.get());
+		BLAKE_2B_Final(&CTX_2B, Result.get());
 	}
 	else if (BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_128 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_160 || 
 		BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_224 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_256) //BLAKE2S
 	{
-		blake2s_final(&CTX_2S, Result.get());
+		BLAKE_2S_Final(&CTX_2S, Result.get());
 	}
 	else { //Commands error
 		fwprintf_s(stderr, L"[Error] Commands error.\n");
@@ -535,14 +536,22 @@ bool BLAKE2_Hash(
 	}
 
 //Binary to hex
-	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
-	if (sodium_bin2hex(Buffer.get(), FILE_BUFFER_SIZE, Result.get(), DigestSize / BYTES_TO_BITS) == nullptr)
+	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, Result.get(), DigestSize / BYTES_TO_BITS) == nullptr)
 	{
 		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;
 	}
 	else {
-		PrintToScreen(Buffer.get());
+	//Lowercase convert.
+		std::string Hex(reinterpret_cast<const char *>(StringBuffer.get()));
+		if (!IsLowerCase)
+			CaseConvert(Hex, true);
+
+	//Print to screen and file.
+		WriteMessage_ScreenFile(stderr, reinterpret_cast<const uint8_t *>(Hex.c_str()));
+		if (OutputFile != nullptr)
+			WriteMessage_ScreenFile(OutputFile, reinterpret_cast<const uint8_t *>(Hex.c_str()));
 	}
 
 	return true;

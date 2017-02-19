@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // A useful and powerful toolkit(DNSPing)
-// Copyright (C) 2014-2016 Chengr28
+// Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,11 +20,12 @@
 #include "Base.h"
 
 #if defined(PLATFORM_WIN)
-//Catch Control-C exception from keyboard.
-BOOL CtrlHandler(
-	const DWORD fdwCtrlType)
+//Catch Control-C exception from keyboard
+BOOL WINAPI CtrlHandler(
+	const DWORD ControlType)
 {
-	switch (fdwCtrlType)
+//Print to screen.
+	switch (ControlType)
 	{
 	//Handle the CTRL-C signal.
 		case CTRL_C_EVENT:

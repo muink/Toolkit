@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,7 +20,7 @@
 #include "BLAKE.h"
 
 //BLAKE-224 compress process
-void blake224_compress(
+void BLAKE_224_Compress(
 	state224 * const S, 
 	const uint8_t * const block)
 {
@@ -84,7 +84,7 @@ void blake224_compress(
 }
 
 //BLAKE init process
-void blake224_init(
+void BLAKE_224_Init(
 	state224 * const S)
 {
 	S->h[0] = 0xC1059ED8;
@@ -102,7 +102,7 @@ void blake224_init(
 }
 
 //BLAKE-224 update process
-void blake224_update(
+void BLAKE_224_Update(
 	state224 * const S, 
 	const uint8_t *in, 
 	uint64_t inlen)
@@ -118,7 +118,7 @@ void blake224_update(
 		if (S->t[0] == 0)
 			S->t[1U]++;
 
-		blake224_compress(S, S->buf);
+		BLAKE_224_Compress(S, S->buf);
 		in += fill;
 		inlen -= fill;
 		left = 0;
@@ -132,7 +132,7 @@ void blake224_update(
 		if (S->t[0] == 0)
 			S->t[1U]++;
 
-		blake224_compress(S, in);
+		BLAKE_224_Compress(S, in);
 		in += 64;
 		inlen -= 64;
 	}
@@ -151,7 +151,7 @@ void blake224_update(
 }
 
 //BLAKE-224 final process
-void blake224_final(
+void BLAKE_224_Final(
 	state224 * const S, 
 	uint8_t * const out)
 {
@@ -169,7 +169,7 @@ void blake224_final(
 	if (S->buflen == 55)
 	{
 		S->t[0] -= 8;
-		blake224_update(S, &oz, 1);
+		BLAKE_224_Update(S, &oz, 1);
 	}
 	else {
 	//Enough space to fill the block
@@ -179,23 +179,23 @@ void blake224_final(
 				S->nullt = 1;
 
 			S->t[0] -= 440 - (S->buflen << 3U);
-			blake224_update(S, padding, 55 - S->buflen);
+			BLAKE_224_Update(S, padding, 55 - S->buflen);
 		}
 	//Need 2 compressions
 		else {
 			S->t[0] -= 512 - (S->buflen << 3U);
-			blake224_update(S, padding, 64 - S->buflen);
+			BLAKE_224_Update(S, padding, 64 - S->buflen);
 			S->t[0] -= 440;
-			blake224_update(S, padding + 1, 55);
+			BLAKE_224_Update(S, padding + 1, 55);
 			S->nullt = 1;
 		}
 
-		blake224_update(S, &zz, 1);
+		BLAKE_224_Update(S, &zz, 1);
 		S->t[0] -= 8;
 	}
 
 	S->t[0] -= 64;
-	blake224_update(S, msglen, 8);
+	BLAKE_224_Update(S, msglen, 8);
 	U32TO8_BIG(out + 0, S->h[0]);
 	U32TO8_BIG(out + 4, S->h[1U]);
 	U32TO8_BIG(out + 8, S->h[2U]);
@@ -208,7 +208,7 @@ void blake224_final(
 }
 
 //BLAKE-256 compress process
-void blake256_compress(
+void BLAKE_256_Compress(
 	state256 * const S, 
 	const uint8_t * const block)
 {
@@ -272,7 +272,7 @@ void blake256_compress(
 }
 
 //BLAKE-256 init process
-void blake256_init(
+void BLAKE_256_Init(
 	state256 * const S)
 {
 	S->h[0] = 0x6A09E667;
@@ -290,7 +290,7 @@ void blake256_init(
 }
 
 //BLAKE-256 update process
-void blake256_update(
+void BLAKE_256_Update(
 	state256 * const S, 
 	const uint8_t *in, 
 	uint64_t inlen)
@@ -306,7 +306,7 @@ void blake256_update(
 		if (S->t[0] == 0)
 			S->t[1U]++;
 
-		blake256_compress(S, S->buf);
+		BLAKE_256_Compress(S, S->buf);
 		in += fill;
 		inlen -= fill;
 		left = 0;
@@ -320,7 +320,7 @@ void blake256_update(
 		if (S->t[0] == 0)
 			S->t[1U]++;
 
-		blake256_compress(S, in);
+		BLAKE_256_Compress(S, in);
 		in += 64;
 		inlen -= 64;
 	}
@@ -339,7 +339,7 @@ void blake256_update(
 }
 
 //BLAKE-256 final process
-void blake256_final(
+void BLAKE_256_Final(
 	state256 * const S, 
 	uint8_t * const out)
 {
@@ -357,7 +357,7 @@ void blake256_final(
 	if (S->buflen == 55)
 	{
 		S->t[0] -= 8;
-		blake256_update(S, &oo, 1);
+		BLAKE_256_Update(S, &oo, 1);
 	}
 	else {
 	//Enough space to fill the block
@@ -367,23 +367,23 @@ void blake256_final(
 				S->nullt = 1;
 
 			S->t[0] -= 440 - (S->buflen << 3U);
-			blake256_update(S, padding, 55 - S->buflen);
+			BLAKE_256_Update(S, padding, 55 - S->buflen);
 		}
 	//Need 2 compressions
 		else {
 			S->t[0] -= 512 - (S->buflen << 3U);
-			blake256_update(S, padding, 64 - S->buflen);
+			BLAKE_256_Update(S, padding, 64 - S->buflen);
 			S->t[0] -= 440;
-			blake256_update(S, padding + 1, 55);
+			BLAKE_256_Update(S, padding + 1, 55);
 			S->nullt = 1;
 		}
 
-		blake256_update(S, &zo, 1);
+		BLAKE_256_Update(S, &zo, 1);
 		S->t[0] -= 8;
 	}
 
 	S->t[0] -= 64;
-	blake256_update(S, msglen, 8);
+	BLAKE_256_Update(S, msglen, 8);
 	U32TO8_BIG(out + 0, S->h[0]);
 	U32TO8_BIG(out + 4, S->h[1U]);
 	U32TO8_BIG(out + 8, S->h[2U]);
@@ -397,7 +397,7 @@ void blake256_final(
 }
 
 //BLAKE-384 compress process
-void blake384_compress(
+void BLAKE_384_Compress(
 	state384 * const S, 
 	const uint8_t * const block)
 {
@@ -461,7 +461,7 @@ void blake384_compress(
 }
 
 //BLAKE-384 init process
-void blake384_init(
+void BLAKE_384_Init(
 	state384 * const S)
 {
 	S->h[0] = 0xCBBB9D5DC1059ED8ULL;
@@ -479,7 +479,7 @@ void blake384_init(
 }
 
 //BLAKE-384 update process
-void blake384_update(
+void BLAKE_384_Update(
 	state384 * const S, 
 	const uint8_t *in, 
 	uint64_t inlen)
@@ -495,7 +495,7 @@ void blake384_update(
 		if (S->t[0] == 0)
 			S->t[1U]++;
 
-		blake384_compress(S, S->buf);
+		BLAKE_384_Compress(S, S->buf);
 		in += fill;
 		inlen -= fill;
 		left = 0;
@@ -509,7 +509,7 @@ void blake384_update(
 		if (S->t[0] == 0)
 			S->t[1U]++;
 
-		blake384_compress(S, in);
+		BLAKE_384_Compress(S, in);
 		in += 128;
 		inlen -= 128;
 	}
@@ -528,7 +528,7 @@ void blake384_update(
 }
 
 //BLAKE-384 final process
-void blake384_final(
+void BLAKE_384_Final(
 	state384 * const S, 
 	uint8_t * const out)
 {
@@ -546,7 +546,7 @@ void blake384_final(
 	if (S->buflen == 111)
 	{
 		S->t[0] -= 8;
-		blake384_update(S, &oz, 1);
+		BLAKE_384_Update(S, &oz, 1);
 	}
 	else {
 	//Enough space to fill the block
@@ -555,23 +555,23 @@ void blake384_final(
 			if (!S->buflen) S->nullt = 1;
 
 			S->t[0] -= 888 - (S->buflen << 3U);
-			blake384_update(S, padding, 111 - S->buflen);
+			BLAKE_384_Update(S, padding, 111 - S->buflen);
 		}
 	//Need 2 compressions
 		else {
 			S->t[0] -= 1024 - (S->buflen << 3U);
-			blake384_update(S, padding, 128 - S->buflen);
+			BLAKE_384_Update(S, padding, 128 - S->buflen);
 			S->t[0] -= 888;
-			blake384_update(S, padding + 1, 111);
+			BLAKE_384_Update(S, padding + 1, 111);
 			S->nullt = 1;
 		}
 
-		blake384_update(S, &zz, 1);
+		BLAKE_384_Update(S, &zz, 1);
 		S->t[0] -= 8;
 	}
 
 	S->t[0] -= 128;
-	blake384_update(S, msglen, 16);
+	BLAKE_384_Update(S, msglen, 16);
 	U64TO8_BIG(out + 0, S->h[0]);
 	U64TO8_BIG(out + 8, S->h[1U]);
 	U64TO8_BIG(out + 16, S->h[2U]);
@@ -583,7 +583,7 @@ void blake384_final(
 }
 
 //BLAKE-512 compress process
-void blake512_compress(
+void BLAKE_512_Compress(
 	state512 * const S, 
 	const uint8_t * const block)
 {
@@ -647,7 +647,7 @@ void blake512_compress(
 }
 
 //BLAKE-512 init process
-void blake512_init(
+void BLAKE_512_Init(
 	state512 * const S)
 {
 	S->h[0] = 0x6A09E667F3BCC908ULL;
@@ -665,7 +665,7 @@ void blake512_init(
 }
 
 //BLAKE-512 update process
-void blake512_update(
+void BLAKE_512_Update(
 	state512 * const S, 
 	const uint8_t *in, 
 	uint64_t inlen)
@@ -681,7 +681,7 @@ void blake512_update(
 		if (S->t[0] == 0)
 			S->t[1U]++;
 
-		blake512_compress(S, S->buf);
+		BLAKE_512_Compress(S, S->buf);
 		in += fill;
 		inlen -= fill;
 		left = 0;
@@ -695,7 +695,7 @@ void blake512_update(
 		if (S->t[0] == 0)
 			S->t[1U]++;
 
-		blake512_compress(S, in);
+		BLAKE_512_Compress(S, in);
 		in += 128;
 		inlen -= 128;
 	}
@@ -714,7 +714,7 @@ void blake512_update(
 }
 
 //BLAKE-512 final process
-void blake512_final(
+void BLAKE_512_Final(
 	state512 * const S, 
 	uint8_t * const out)
 {
@@ -732,7 +732,7 @@ void blake512_final(
 	if (S->buflen == 111)
 	{
 		S->t[0] -= 8;
-		blake512_update(S, &oo, 1);
+		BLAKE_512_Update(S, &oo, 1);
 	}
 	else {
 	//Enough space to fill the block
@@ -741,23 +741,23 @@ void blake512_final(
 			if (!S->buflen) S->nullt = 1;
 
 			S->t[0] -= 888 - (S->buflen << 3U);
-			blake512_update(S, padding, 111 - S->buflen);
+			BLAKE_512_Update(S, padding, 111 - S->buflen);
 		}
 	//Need 2 compressions
 		else {
 			S->t[0] -= 1024 - (S->buflen << 3U);
-			blake512_update(S, padding, 128 - S->buflen);
+			BLAKE_512_Update(S, padding, 128 - S->buflen);
 			S->t[0] -= 888;
-			blake512_update(S, padding + 1, 111);
+			BLAKE_512_Update(S, padding + 1, 111);
 			S->nullt = 1;
 		}
 
-		blake512_update(S, &zo, 1);
+		BLAKE_512_Update(S, &zo, 1);
 		S->t[0] -= 8;
 	}
 
 	S->t[0] -= 128;
-	blake512_update(S, msglen, 16);
+	BLAKE_512_Update(S, msglen, 16);
 	U64TO8_BIG(out + 0, S->h[0]);
 	U64TO8_BIG(out + 8, S->h[1U]);
 	U64TO8_BIG(out + 16, S->h[2U]);
@@ -774,10 +774,10 @@ void blake512_final(
 // Hash function
 // 
 //Read commands(BLAKE)
-bool ReadCommands_BLAKE(
+bool ReadCommand_BLAKE(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command)
 #endif
 {
@@ -808,7 +808,8 @@ bool ReadCommands_BLAKE(
 
 //BLAKE hash function
 bool BLAKE_Hash(
-	FILE * const FileHandle)
+	FILE * const FileHandle, 
+	FILE * const OutputFile)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_BLAKE || FileHandle == nullptr)
@@ -818,7 +819,8 @@ bool BLAKE_Hash(
 	}
 
 //Initialization
-	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
+	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
+	std::shared_ptr<uint8_t> StringBuffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	size_t ReadLength = 0, DigestSize = 0;
@@ -834,22 +836,22 @@ bool BLAKE_Hash(
 	memset(&State512, 0, sizeof(State512));
 	if (BLAKE_HashFunctionID == HASH_ID_BLAKE_224) //BLAKE 224 bits
 	{
-		blake224_init(&State224);
+		BLAKE_224_Init(&State224);
 		DigestSize = BLAKE_DIGEST_SIZE_224;
 	}
 	else if (BLAKE_HashFunctionID == HASH_ID_BLAKE_256) //BLAKE 256 bits
 	{
-		blake256_init(&State256);
+		BLAKE_256_Init(&State256);
 		DigestSize = BLAKE_DIGEST_SIZE_256;
 	}
 	else if (BLAKE_HashFunctionID == HASH_ID_BLAKE_384) //BLAKE 384 bits
 	{
-		blake384_init(&State384);
+		BLAKE_384_Init(&State384);
 		DigestSize = BLAKE_DIGEST_SIZE_384;
 	}
 	else if (BLAKE_HashFunctionID == HASH_ID_BLAKE_512) //BLAKE 512 bits
 	{
-		blake512_init(&State512);
+		BLAKE_512_Init(&State512);
 		DigestSize = BLAKE_DIGEST_SIZE_512;
 	}
 	else { //Commands error
@@ -877,19 +879,19 @@ bool BLAKE_Hash(
 		else {
 			if (BLAKE_HashFunctionID == HASH_ID_BLAKE_224) //BLAKE 224 bits
 			{
-				blake224_update(&State224, Buffer.get(), ReadLength);
+				BLAKE_224_Update(&State224, Buffer.get(), ReadLength);
 			}
 			else if (BLAKE_HashFunctionID == HASH_ID_BLAKE_256) //BLAKE 256 bits
 			{
-				blake256_update(&State256, Buffer.get(), ReadLength);
+				BLAKE_256_Update(&State256, Buffer.get(), ReadLength);
 			}
 			else if (BLAKE_HashFunctionID == HASH_ID_BLAKE_384) //BLAKE 384 bits
 			{
-				blake384_update(&State384, Buffer.get(), ReadLength);
+				BLAKE_384_Update(&State384, Buffer.get(), ReadLength);
 			}
 			else if (BLAKE_HashFunctionID == HASH_ID_BLAKE_512) //BLAKE 512 bits
 			{
-				blake512_update(&State512, Buffer.get(), ReadLength);
+				BLAKE_512_Update(&State512, Buffer.get(), ReadLength);
 			}
 			else { //Commands error
 				fwprintf_s(stderr, L"[Error] Commands error.\n");
@@ -902,19 +904,19 @@ bool BLAKE_Hash(
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	if (BLAKE_HashFunctionID == HASH_ID_BLAKE_224) //BLAKE 224 bits
 	{
-		blake224_final(&State224, Buffer.get());
+		BLAKE_224_Final(&State224, Buffer.get());
 	}
 	else if (BLAKE_HashFunctionID == HASH_ID_BLAKE_256) //BLAKE 256 bits
 	{
-		blake256_final(&State256, Buffer.get());
+		BLAKE_256_Final(&State256, Buffer.get());
 	}
 	else if (BLAKE_HashFunctionID == HASH_ID_BLAKE_384) //BLAKE 384 bits
 	{
-		blake384_final(&State384, Buffer.get());
+		BLAKE_384_Final(&State384, Buffer.get());
 	}
 	else if (BLAKE_HashFunctionID == HASH_ID_BLAKE_512) //BLAKE 512 bits
 	{
-		blake512_final(&State512, Buffer.get());
+		BLAKE_512_Final(&State512, Buffer.get());
 	}
 	else { //Commands error
 		fwprintf_s(stderr, L"[Error] Commands error.\n");
@@ -928,7 +930,15 @@ bool BLAKE_Hash(
 		return false;
 	}
 	else {
-		PrintToScreen(StringBuffer.get());
+	//Lowercase convert.
+		std::string Hex(reinterpret_cast<const char *>(StringBuffer.get()));
+		if (!IsLowerCase)
+			CaseConvert(Hex, true);
+
+	//Print to screen and file.
+		WriteMessage_ScreenFile(stderr, reinterpret_cast<const uint8_t *>(Hex.c_str()));
+		if (OutputFile != nullptr)
+			WriteMessage_ScreenFile(OutputFile, reinterpret_cast<const uint8_t *>(Hex.c_str()));
 	}
 
 	return true;

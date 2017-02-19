@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,6 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+
+#ifndef TOOLKIT_FILEHASH_CRC_H
+#define TOOLKIT_FILEHASH_CRC_H
 
 #include "Base.h"
 
@@ -139,7 +142,7 @@
 	#define COMMAND_CRC_64_1B             L"-CRC64_1B"
 	#define COMMAND_CRC_64_WE             L"-CRC64_WE"
 	#define COMMAND_CRC_64_JONES          L"-CRC64_JONES"
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACX))
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	#define COMMAND_CRC_8                 ("-CRC8")
 	#define COMMAND_CRC_8_ITU             ("-CRC8_ITU")
 	#define COMMAND_CRC_8_ATM             ("-CRC8_ATM")
@@ -199,4 +202,6 @@
 
 //Global variables
 extern size_t HashFamilyID;
+extern bool IsLowerCase;
 size_t CRC_HashFunctionID = HASH_ID_CRC_32;
+#endif

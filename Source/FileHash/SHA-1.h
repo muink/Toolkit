@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,6 +17,9 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+#ifndef TOOLKIT_FILEHASH_SHA_1_H
+#define TOOLKIT_FILEHASH_SHA_1_H
+
 #include "Base.h"
 
 //The SHA-1 block size, message digest size in bytes and some useful types.
@@ -27,6 +30,7 @@ typedef int64_t                 SHA1_INT64;
 
 //Global variables
 extern size_t HashFamilyID;
+extern bool IsLowerCase;
 
 //The structure for storing SHA1 info
 typedef struct _sha1_state_
@@ -41,14 +45,14 @@ typedef struct _sha1_state_
 #define ROLc(x, y) ((((uint32_t)(x) << (uint32_t)((y) & 31)) | (((uint32_t)(x) & 0xFFFFFFFFUL) >> (uint32_t)(32 - ((y) & 31)))) & 0xFFFFFFFFUL)
 
 //Endian Neutral macros that work on all platforms
-#define STORE32H(x, y)                                                                  \
-	{(y)[0] = (uint8_t)(((x) >> 24U) & 255); (y)[1U] = (uint8_t)(((x) >> 16U) & 255);   \
-		(y)[2U] = (uint8_t)(((x) >> 8U) & 255); (y)[3U] = (uint8_t)((x) & 255);}
+#define STORE32H(x, y)                                                                      \
+	{(y)[0] = (uint8_t)(((x) >> 24U) & 255); (y)[1U] = (uint8_t)(((x) >> 16U) & 255);       \
+	(y)[2U] = (uint8_t)(((x) >> 8U) & 255); (y)[3U] = (uint8_t)((x) & 255);}
 
-#define LOAD32H(x, y)                            \
-	{x = ((SHA1_INT32)((y)[0] & 255) << 24U) |   \
-		((SHA1_INT32)((y)[1U] & 255) << 16U) |   \
-		((SHA1_INT32)((y)[2U] & 255) << 8U)  |   \
+#define LOAD32H(x, y)                                                                       \
+	{x = ((SHA1_INT32)((y)[0] & 255) << 24U) |                                              \
+		((SHA1_INT32)((y)[1U] & 255) << 16U) |                                              \
+		((SHA1_INT32)((y)[2U] & 255) << 8U)  |                                              \
 		((SHA1_INT32)((y)[3U] & 255));}
 
 #define STORE64H(x, y)                                                                      \
@@ -66,3 +70,4 @@ typedef struct _sha1_state_
 #define SHA1_F1(x, y, z) (x ^ y ^ z)
 #define SHA1_F2(x, y, z) ((x & y) | (z & (x | y)))
 #define SHA1_F3(x, y, z) (x ^ y ^ z)
+#endif

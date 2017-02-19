@@ -1,4 +1,4 @@
-﻿### Linux/Mac 用法
+﻿### Linux/macOS 用法
 * 打開終端，並進入 Toolkit 目錄
 * 運行 chmod 755 CMake_Build.sh 給予編譯腳本運行許可權
 * 運行 ./CMake_Build.sh 生成二進位可執行檔
@@ -9,7 +9,7 @@
 
 ### DNSPing 用法和選項
        DNSPing [-options] domain target
-  e.g. DNSPing -a -qt AAAA -n 5 -w 500 -edns0 www.google.com 8.8.4.4
+  e.g. DNSPing -a -qt AAAA -n 5 -w 500 -edns www.google.com 8.8.4.4
 
    ?/-h              列印說明
    -t                直到按下 Control-Break 或 Control-C 才停止 Ping
@@ -19,7 +19,7 @@
    -n count          發送 Ping 的數量
                      Count 必須介乎于 1 - 0xFFFF/65535
    -f                設定 Ping 資料包的不分片選項（只適用于IPv4）
-                     不適用於 Mac OS X 系統
+                     不適用於 macOS 系統
    -i hoplimit/ttl   設定 Ping 資料包的跳數限制/存留時間
                      HopLimit/TTL 必須介乎于 1 - 255
    -w timeout        設定超時時間（單位：毫秒）
@@ -46,11 +46,11 @@
    -adn count        設定 DNS 請求包頭的 Additional count
                      Additional count 必須介乎于 0x0001 - 0xFFFF/65535
    -ti interval_time 設定每次請求之間的時間間隔（單位：毫秒）
-   -edns0            發送時添加 EDNS0 標籤
-   -payload length   設定 EDNS0 標籤的 UDP Payload length
+   -edns             發送時添加 EDNS 標籤
+   -payload length   設定 EDNS 標籤的 UDP Payload length
                      Payload length 必須介乎于 512 - 0xFFFF/65535
    -dnssec           發送時添加可以接受 DNSSEC 的請求
-                     啟用添加可以接受 DNSSEC 時發送時添加 EDNS0 標籤也會被啟用
+                     啟用添加可以接受 DNSSEC 時發送時添加 EDNS 標籤也會被啟用
    -qt type          設定請求類型 Query Type
                      Query 類型的值必須介乎于 0x0001 - 0xFFFF/65535
                      Type: A|NS|MD|MF|CNAME|SOA|MB|MG|MR|NULL|WKS|PTR|HINFO|
@@ -103,19 +103,12 @@
                                    SPS|PIPE|SCTP|FC|RSVPE2E|MOBILITY|UDPLITE|
                                    MPLS|MANET|HIP|SHIM6|WESP|ROHC|TEST-1|
                                    TEST-2|RAW
-   -socks target                   設定 SOCKS 伺服器的位址
-                                   位址的格式是 位址:埠，例如 [::1]:1080
-   -socks_username username        設定 SOCKS 伺服器的使用者名
-                                   使用者名長度必須介乎于 1 - 255 位元組
-   -socks_password password        設定 SOCKS 伺服器的密碼
-                                   密碼長度必須介乎于 1 - 255 位元組
    -buf size                       設定接收緩衝區長度
                                    緩衝區長度必須介乎于 512 - 4096 位元組
    -dv                             關閉資料包驗證
    -show type                      顯示收到的解析包的內容
                                    Type: Result|Hex
    -of file_name                   輸出結果到文字檔
-                                   文字檔名稱長度必須小於 260 位元組
    -6                              強制使用 IPv6
    -4                              強制使用 IPv4
    domain                          設定發送 DNS 請求用的查詢的功能變數名稱
@@ -126,12 +119,14 @@
 
 
 ### FileHash 用法和選項
-       FileHash -option/-algorithm [Filename]
+       FileHash -option -algorithm [Filename]
   e.g. FileHash -SHA3 filename
 
 支援的選項:
-   -v/--version: 輸出當前程式的版本號
-   -?/-h/--help 輸出程式的説明資訊
+   -v/--version:         輸出當前程式的版本號
+   -?/-h/--help          輸出程式的説明資訊
+   --lowercase           輸出小寫的 Hash
+   --output [Filename]   輸出結果到文件
 
 支援的 Hash 演算法:
    * BLAKE family:   -BLAKE                      = -BLAKE_256
@@ -238,12 +233,12 @@
 
 ### Release hash[SHA-3(256)]
 * Windows
-  * DNSPing.exe: A97A4B60B1D228EB6707302CDC2AB7D78ABB6D8667201DDB10396CD295D61E6F
-  * DNSPing_x86.exe: F11B22FF241D3A05A038B28B094D7A295993C672534134B48EF1E2683B9778B3
-  * DNSPing_XP.exe: 888F22C2E014F68C849789E167752DA987B94E91D816CB848375580C7B761BBF
-  * FileHash.exe: C89869502986D5A42FD00C46A07C7ED5E7AF545094D0DB00B30E3F8FBB8DCB37
-  * FileHash_x86.exe: 94B439E7A2187FADE3A11AED96E99CC0A072A5191F94A5C21E6A931DA8A8FE11
-  * FileHash_XP.exe: 8A8A806DB34D2660A0B7B86999E0A3A643D2720C1E5201862A70D9CA7BE3DAEE
-* Mac
-  * DNSPing: BE749E2676582862592428ED0D31FD204662A03824F68D77D078D51CCD0E9E61
-  * FileHash: F99DBBC16AF6C4F2D6EDABB1C9C86D764961E705A7B4B533748272926461F1C5
+  * DNSPing.exe: A3E4DC44BBF8B0E4457D601E48B62CB4D2D942B834C2E9EA96FF0AA71EE83FFA
+  * DNSPing_x86.exe: A306E400B152D8C1B2E94F60086732A79ACE7A8A5D70DA4ACD9DEB83639D842F
+  * DNSPing_XP.exe: 51B71EC569AF03FB95CDD89B56ADD6296B7844DD8A8EFDD45BE1DDE177F9A0C9
+  * FileHash.exe: 564BBA9814D8CF4BE3F0D8B1E04695529634347280A65D21E804A13314C82BE8
+  * FileHash_x86.exe: 785ADCBB3330EF00D73C9615D631872CED9A0EFC863B711D10DCDCB1EB0A76E9
+  * FileHash_XP.exe: CB7692B560D04D786E9F6DC1DF935E675A6CEE92B43F6F3678E511505E497566
+* macOS
+  * DNSPing: BFDE0F6DFE8296B9AE28294542BE4354D89D4A33CA127A2B5C2242CD126DB52F
+  * FileHash: 28E3BD6E969B180763E234CC6E0D9BFEFF1C25D4A7C8C0C9B9BF27F349EE291B

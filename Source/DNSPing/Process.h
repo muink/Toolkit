@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // A useful and powerful toolkit(DNSPing)
-// Copyright (C) 2014-2016 Chengr28
+// Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,18 +17,41 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+#ifndef TOOLKIT_DNSPING_PROCESS_H
+#define TOOLKIT_DNSPING_PROCESS_H
+
 #include "Base.h"
 
 //Global variables
 extern ConfigurationTable ConfigurationParameter;
 
 //Functions
-size_t SOCKS_UDP_ASSOCIATE(
-	sockaddr_storage &SockAddr_SOCKS_UDP, 
-	const uint16_t SOCKS_Local_Port, 
+bool MarkProcessTime(
+	const bool IsFinished, 
+#if defined(PLATFORM_WIN)
+	LARGE_INTEGER &CPU_Frequency, 
+	LARGE_INTEGER &BeforeTime, 
+	LARGE_INTEGER &AfterTime);
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	timeval &BeforeTime, 
+	timeval &AfterTime);
+#endif
+bool PrintSendResult(
 	const SOCKET Socket_Normal, 
-	const PSOCKADDR SockAddr, 
-	const socklen_t AddrLen);
+	const dns_hdr * const DNS_Header, 
+	std::shared_ptr<uint8_t> &RecvBuffer, 
+	ssize_t &DataLength, 
+	long double &Result, 
+	bool &IsContinue, 
+#if defined(PLATFORM_WIN)
+	LARGE_INTEGER &CPU_Frequency, 
+	LARGE_INTEGER &BeforeTime, 
+	LARGE_INTEGER &AfterTime);
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	timeval &BeforeTime, 
+	timeval &AfterTime);
+#endif
 void ErrorCodeToMessage(
 	const ssize_t ErrorCode, 
 	std::wstring &Message);
+#endif

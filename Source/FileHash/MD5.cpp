@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // A useful and powerful toolkit(FileHash)
-// Copyright (C) 2012-2016 Chengr28
+// Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -207,7 +207,8 @@ void MD5_Final(
 // 
 //MD5 hash function
 bool MD5_Hash(
-	FILE * const FileHandle)
+	FILE * const FileHandle, 
+	FILE * const OutputFile)
 {
 //Parameters check
 	if (HashFamilyID != HASH_ID_MD5 || FileHandle == nullptr)
@@ -217,7 +218,8 @@ bool MD5_Hash(
 	}
 
 //Initialization
-	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE]()), StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
+	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
+	std::shared_ptr<uint8_t> StringBuffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	size_t ReadLength = 0;
@@ -230,7 +232,7 @@ bool MD5_Hash(
 //Hash process
 	while (!feof(FileHandle))
 	{
-	//n * 512 + 448 + 64 = (n + 1) * 512 bits
+	//N * 512 + 448 + 64 = (N + 1) * 512 bits
 		memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 		_set_errno(0);
 		ReadLength = fread_s(Buffer.get(), FILE_BUFFER_SIZE, sizeof(uint8_t), FILE_BUFFER_SIZE, FileHandle);
@@ -246,20 +248,28 @@ bool MD5_Hash(
 			return false;
 		}
 		else {
-			MD5_Update(&HashInstance, Buffer.get(), (unsigned int)ReadLength);
+			MD5_Update(&HashInstance, Buffer.get(), static_cast<unsigned int>(ReadLength));
 		}
 	}
 
 //Finish hash process and binary to hex.
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	MD5_Final(&HashInstance, Buffer.get());
-	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, (const uint8_t *)Buffer.get(), MD5_DIGEST_SIZE) == nullptr)
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, Buffer.get(), MD5_DIGEST_SIZE) == nullptr)
 	{
 		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;
 	}
 	else {
-		PrintToScreen(StringBuffer.get());
+	//Lowercase convert.
+		std::string Hex(reinterpret_cast<const char *>(StringBuffer.get()));
+		if (!IsLowerCase)
+			CaseConvert(Hex, true);
+
+	//Print to screen and file.
+		WriteMessage_ScreenFile(stderr, reinterpret_cast<const uint8_t *>(Hex.c_str()));
+		if (OutputFile != nullptr)
+			WriteMessage_ScreenFile(OutputFile, reinterpret_cast<const uint8_t *>(Hex.c_str()));
 	}
 
 	return true;
