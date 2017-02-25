@@ -116,54 +116,54 @@ typedef int the_correct_size_was_chosen[sizeof(dword) == 4 ? 1 : -1]; //If this 
 #define J_160(x, y, z)        ((x) ^ ((y) | ~(z)))
   
 //The ten basic operations FF_160() through III_160()
-#define FF_160(a, b, c, d, e, x, s) {                   \
-	(a) += F_160((b), (c), (d)) + (x);                  \
-	(a) = ROL((a), (s)) + (e);                          \
-	(c) = ROL((c), 10);                                 \
+#define FF_160(a, b, c, d, e, x, s) {                     \
+	(a) += F_160((b), (c), (d)) + (x);                    \
+	(a) = ROL((a), (s)) + (e);                            \
+	(c) = ROL((c), 10);                                   \
 }
-#define GG_160(a, b, c, d, e, x, s) {                   \
-	(a) += G_160((b), (c), (d)) + (x) + 0x5A827999UL;   \
-	(a) = ROL((a), (s)) + (e);                          \
-	(c) = ROL((c), 10);                                 \
+#define GG_160(a, b, c, d, e, x, s) {                     \
+	(a) += G_160((b), (c), (d)) + (x) + 0x5A827999UL;     \
+	(a) = ROL((a), (s)) + (e);                            \
+	(c) = ROL((c), 10);                                   \
 }
-#define HH_160(a, b, c, d, e, x, s) {                   \
-	(a) += H_160((b), (c), (d)) + (x) + 0x6ED9EBA1UL;   \
-	(a) = ROL((a), (s)) + (e);                          \
-	(c) = ROL((c), 10);                                 \
+#define HH_160(a, b, c, d, e, x, s) {                     \
+	(a) += H_160((b), (c), (d)) + (x) + 0x6ED9EBA1UL;     \
+	(a) = ROL((a), (s)) + (e);                            \
+	(c) = ROL((c), 10);                                   \
 }
-#define II_160(a, b, c, d, e, x, s) {                   \
-	(a) += I_160((b), (c), (d)) + (x) + 0x8F1BBCDCUL;   \
-	(a) = ROL((a), (s)) + (e);                          \
-	(c) = ROL((c), 10);                                 \
+#define II_160(a, b, c, d, e, x, s) {                     \
+	(a) += I_160((b), (c), (d)) + (x) + 0x8F1BBCDCUL;     \
+	(a) = ROL((a), (s)) + (e);                            \
+	(c) = ROL((c), 10);                                   \
 }
-#define JJ_160(a, b, c, d, e, x, s) {                   \
-	(a) += J_160((b), (c), (d)) + (x) + 0xA953FD4EUL;   \
-	(a) = ROL((a), (s)) + (e);                          \
-	(c) = ROL((c), 10);                                 \
+#define JJ_160(a, b, c, d, e, x, s) {                     \
+	(a) += J_160((b), (c), (d)) + (x) + 0xA953FD4EUL;     \
+	(a) = ROL((a), (s)) + (e);                            \
+	(c) = ROL((c), 10);                                   \
 }
-#define FFF_160(a, b, c, d, e, x, s) {                  \
-	(a) += F_160((b), (c), (d)) + (x);                  \
-	(a) = ROL((a), (s)) + (e);                          \
-	(c) = ROL((c), 10);                                 \
+#define FFF_160(a, b, c, d, e, x, s) {                    \
+	(a) += F_160((b), (c), (d)) + (x);                    \
+	(a) = ROL((a), (s)) + (e);                            \
+	(c) = ROL((c), 10);                                   \
 }
-#define GGG_160(a, b, c, d, e, x, s) {                  \
-	(a) += G_160((b), (c), (d)) + (x) + 0x7A6D76E9UL;   \
-	(a) = ROL((a), (s)) + (e);                          \
-	(c) = ROL((c), 10);                                 \
+#define GGG_160(a, b, c, d, e, x, s) {                    \
+	(a) += G_160((b), (c), (d)) + (x) + 0x7A6D76E9UL;     \
+	(a) = ROL((a), (s)) + (e);                            \
+	(c) = ROL((c), 10);                                   \
 }
-#define HHH_160(a, b, c, d, e, x, s) {                  \
-	(a) += H_160((b), (c), (d)) + (x) + 0x6D703EF3UL;   \
-	(a) = ROL((a), (s)) + (e);                          \
-	(c) = ROL((c), 10);                                 \
+#define HHH_160(a, b, c, d, e, x, s) {                    \
+	(a) += H_160((b), (c), (d)) + (x) + 0x6D703EF3UL;     \
+	(a) = ROL((a), (s)) + (e);                            \
+	(c) = ROL((c), 10);                                   \
 }
-#define III_160(a, b, c, d, e, x, s) {                  \
-	(a) += I_160((b), (c), (d)) + (x) + 0x5C4DD124UL;   \
-	(a) = ROL((a), (s)) + (e);                          \
-	(c) = ROL((c), 10);                                 \
+#define III_160(a, b, c, d, e, x, s) {                    \
+	(a) += I_160((b), (c), (d)) + (x) + 0x5C4DD124UL;     \
+	(a) = ROL((a), (s)) + (e);                            \
+	(c) = ROL((c), 10);                                   \
 }
-#define JJJ_160(a, b, c, d, e, x, s) {                  \
-	(a) += J_160((b), (c), (d)) + (x) + 0x50A28BE6UL;   \
-	(a) = ROL((a), (s)) + (e);                          \
-	(c) = ROL((c), 10);                                 \
+#define JJJ_160(a, b, c, d, e, x, s) {                    \
+	(a) += J_160((b), (c), (d)) + (x) + 0x50A28BE6UL;     \
+	(a) = ROL((a), (s)) + (e);                            \
+	(c) = ROL((c), 10);                                   \
 }
 #endif

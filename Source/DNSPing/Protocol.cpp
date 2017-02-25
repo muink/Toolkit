@@ -31,9 +31,8 @@ bool IsLowerThanWin8(
 //Get system info.
 	const auto SystemVersionInfoEx = GetVersionExW(
 		reinterpret_cast<OSVERSIONINFO *>(&OSVI));
-	if (SystemVersionInfoEx && OSVI.dwPlatformId == VER_PLATFORM_WIN32_NT && 
-		(OSVI.dwMajorVersion < 6U || (OSVI.dwMajorVersion == 6U && OSVI.dwMinorVersion < 2U)))
-			return true;
+	if (SystemVersionInfoEx && OSVI.dwPlatformId == VER_PLATFORM_WIN32_NT && (OSVI.dwMajorVersion < 6U || (OSVI.dwMajorVersion == 6U && OSVI.dwMinorVersion < 2U)))
+		return true;
 
 	return false;
 }
@@ -76,7 +75,7 @@ bool MBS_To_WCS_String(
 		return false;
 
 //Convert string.
-	std::shared_ptr<wchar_t> TargetBuffer(new wchar_t[Length + PADDING_RESERVED_BYTES](), std::default_delete<wchar_t[]>());
+	std::unique_ptr<wchar_t[]> TargetBuffer(new wchar_t[Length + PADDING_RESERVED_BYTES]());
 	wmemset(TargetBuffer.get(), 0, Length + PADDING_RESERVED_BYTES);
 #if defined(PLATFORM_WIN)
 	if (MultiByteToWideChar(
@@ -117,7 +116,7 @@ bool WCS_To_MBS_String(
 		return false;
 
 //Convert string.
-	std::shared_ptr<uint8_t> TargetBuffer(new uint8_t[Length + PADDING_RESERVED_BYTES](), std::default_delete<uint8_t[]>());
+	std::unique_ptr<uint8_t[]> TargetBuffer(new uint8_t[Length + PADDING_RESERVED_BYTES]());
 	memset(TargetBuffer.get(), 0, Length + PADDING_RESERVED_BYTES);
 #if defined(PLATFORM_WIN)
 	if (WideCharToMultiByte(
@@ -1106,12 +1105,15 @@ size_t StringToPacketQuery(
 {
 //Initialization
 	int Index[]{static_cast<int>(strnlen_s(reinterpret_cast<const char *>(FName), DOMAIN_MAXSIZE)), 0, 0};
-	if (Index[0] > 0)
-		--Index[0];
-	else 
+	if (Index[0] <= 0)
+	{
 		return 0;
-	Index[2U] = Index[0] + 1;
-	*(TName + Index[0] + 2) = 0;
+	}
+	else {
+		--Index[0];
+		Index[2U] = Index[0] + 1;
+		*(TName + Index[0] + 2) = 0;
+	}
 
 //Convert domain.
 	for (;Index[0] >= 0;--Index[0], --Index[2U])
@@ -1135,7 +1137,7 @@ size_t StringToPacketQuery(
 size_t PacketQueryToString(
 	const uint8_t * const TName, 
 	uint8_t * const FName, 
-	uint16_t &Truncated)
+	uint16_t &TruncateLocation)
 {
 //Initialization
 	size_t LocateIndex = 0;
@@ -1147,9 +1149,9 @@ size_t PacketQueryToString(
 	//Pointer
 		if (TName[LocateIndex] >= DNS_POINTER_8_BITS)
 		{
-			Truncated = static_cast<uint8_t>(TName[LocateIndex] & 0x3F);
-			Truncated = Truncated << sizeof(uint8_t) * BYTES_TO_BITS;
-			Truncated += static_cast<uint8_t>(TName[LocateIndex + 1U]);
+			TruncateLocation = static_cast<uint8_t>(TName[LocateIndex] & 0x3F);
+			TruncateLocation = TruncateLocation << sizeof(uint8_t) * BYTES_TO_BITS;
+			TruncateLocation += static_cast<uint8_t>(TName[LocateIndex + 1U]);
 			return LocateIndex + sizeof(uint16_t);
 		}
 		else if (LocateIndex == 0)
@@ -1170,7 +1172,7 @@ size_t PacketQueryToString(
 		}
 	}
 
-	Truncated = 0;
+	TruncateLocation = 0;
 	return LocateIndex;
 }
 

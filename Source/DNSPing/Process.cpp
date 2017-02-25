@@ -132,15 +132,15 @@ bool SendRequestProcess(
 	}
 
 //Initialization(Part 2)
-	std::shared_ptr<uint8_t> SendBuffer(new uint8_t[ConfigurationParameter.BufferSize](), std::default_delete<uint8_t[]>());
-	std::shared_ptr<uint8_t> RecvBuffer(new uint8_t[ConfigurationParameter.BufferSize](), std::default_delete<uint8_t[]>());
+	std::unique_ptr<uint8_t[]> SendBuffer(new uint8_t[ConfigurationParameter.BufferSize]());
+	std::unique_ptr<uint8_t[]> RecvBuffer(new uint8_t[ConfigurationParameter.BufferSize]());
 	memset(SendBuffer.get(), 0, ConfigurationParameter.BufferSize);
 	memset(RecvBuffer.get(), 0, ConfigurationParameter.BufferSize);
 #if defined(PLATFORM_WIN)
 	LARGE_INTEGER CPU_Frequency, BeforeTime, AfterTime;
 	memset(&CPU_Frequency, 0, sizeof(CPU_Frequency));
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-	timeval BeforeTime, AfterTime;
+	timespec BeforeTime, AfterTime;
 #endif
 	memset(&BeforeTime, 0, sizeof(BeforeTime));
 	memset(&AfterTime, 0, sizeof(AfterTime));
@@ -233,14 +233,18 @@ bool SendRequestProcess(
 
 //Get waiting time.
 #if defined(PLATFORM_WIN)
-	auto Result = static_cast<long double>((AfterTime.QuadPart - BeforeTime.QuadPart) * static_cast<long double>(MICROSECOND_TO_MILLISECOND) / static_cast<long double>(CPU_Frequency.QuadPart));
+	auto Result = ResultTimeCalculator(CPU_Frequency, BeforeTime, AfterTime);
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-	auto Result = static_cast<long double>(AfterTime.tv_sec - BeforeTime.tv_sec) * static_cast<long double>(SECOND_TO_MILLISECOND);
-	if (AfterTime.tv_sec >= BeforeTime.tv_sec)
-		Result += static_cast<long double>(AfterTime.tv_usec - BeforeTime.tv_usec) / static_cast<long double>(MICROSECOND_TO_MILLISECOND);
-	else 
-		Result += static_cast<long double>(AfterTime.tv_usec + SECOND_TO_MILLISECOND * MICROSECOND_TO_MILLISECOND - BeforeTime.tv_usec) / static_cast<long double>(MICROSECOND_TO_MILLISECOND);
+	auto Result = ResultTimeCalculator(BeforeTime, AfterTime);
 #endif
+	if (Result == 0)
+	{
+		PrintErrorToScreen(L"[Error] Interval time calculating error", 0);
+
+		shutdown(Socket_Normal, SD_BOTH);
+		closesocket(Socket_Normal);
+		return false;
+	}
 
 //Print result to screen.
 	auto IsContinue = true;
@@ -292,62 +296,11 @@ bool SendRequestProcess(
 	return true;
 }
 
-//Mark process time
-bool MarkProcessTime(
-	const bool IsFinished, 
-#if defined(PLATFORM_WIN)
-	LARGE_INTEGER &CPU_Frequency, 
-	LARGE_INTEGER &BeforeTime, 
-	LARGE_INTEGER &AfterTime)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-	timeval &BeforeTime, 
-	timeval &AfterTime)
-#endif
-{
-//Mark start time.
-	if (!IsFinished)
-	{
-	#if defined(PLATFORM_WIN)
-		if (QueryPerformanceFrequency(
-				&CPU_Frequency) == 0 || 
-			QueryPerformanceCounter(
-				&BeforeTime) == 0)
-		{
-			PrintErrorToScreen(L"[Error] Get current time from High Precision Event Timer/HPET error", GetLastError());
-	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-		if (gettimeofday(&BeforeTime, NULL) != 0)
-		{
-			PrintErrorToScreen(L"[Error] Get current time error", errno);
-	#endif
-
-			return false;
-		}
-	}
-//Mark end time.
-	else {
-	#if defined(PLATFORM_WIN)
-		if (QueryPerformanceCounter(
-				&AfterTime) == 0)
-		{
-			PrintErrorToScreen(L"[Error] Get current time from High Precision Event Timer/HPET error", GetLastError());
-	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-		if (gettimeofday(&AfterTime, NULL) != 0)
-		{
-			PrintErrorToScreen(L"[Error] Get current time error", errno);
-	#endif
-
-			return false;
-		}
-	}
-
-	return true;
-}
-
 //Print result to screen
 bool PrintSendResult(
 	const SOCKET Socket_Normal, 
 	const dns_hdr * const DNS_Header, 
-	std::shared_ptr<uint8_t> &RecvBuffer, 
+	std::unique_ptr<uint8_t[]> &RecvBuffer, 
 	ssize_t &DataLength, 
 	long double &Result, 
 	bool &IsContinue, 
@@ -356,8 +309,8 @@ bool PrintSendResult(
 	LARGE_INTEGER &BeforeTime, 
 	LARGE_INTEGER &AfterTime)
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-	timeval &BeforeTime, 
-	timeval &AfterTime)
+	timespec &BeforeTime, 
+	timespec &AfterTime)
 #endif
 {
 	IsContinue = false;
@@ -404,14 +357,18 @@ bool PrintSendResult(
 
 		//Get waiting time.
 		#if defined(PLATFORM_WIN)
-			Result = static_cast<long double>((AfterTime.QuadPart - BeforeTime.QuadPart) * static_cast<long double>(MICROSECOND_TO_MILLISECOND) / static_cast<long double>(CPU_Frequency.QuadPart));
+			Result = ResultTimeCalculator(CPU_Frequency, BeforeTime, AfterTime);
 		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-			Result = static_cast<long double>(AfterTime.tv_sec - BeforeTime.tv_sec) * static_cast<long double>(SECOND_TO_MILLISECOND);
-			if (AfterTime.tv_sec >= BeforeTime.tv_sec)
-				Result += static_cast<long double>(AfterTime.tv_usec - BeforeTime.tv_usec) / static_cast<long double>(MICROSECOND_TO_MILLISECOND);
-			else 
-				Result += static_cast<long double>(AfterTime.tv_usec + SECOND_TO_MILLISECOND * MICROSECOND_TO_MILLISECOND - BeforeTime.tv_usec) / static_cast<long double>(MICROSECOND_TO_MILLISECOND);
+			Result = ResultTimeCalculator(BeforeTime, AfterTime);
 		#endif
+			if (Result == 0)
+			{
+				PrintErrorToScreen(L"[Error] Interval time calculating error", 0);
+
+				shutdown(Socket_Normal, SD_BOTH);
+				closesocket(Socket_Normal);
+				return false;
+			}
 
 		//SOCKET_ERROR
 			if (DataLength <= 0)
@@ -513,7 +470,114 @@ bool PrintSendResult(
 	return true;
 }
 
-//Print statistics to screen(and/or output result to file)
+//Mark process time
+bool MarkProcessTime(
+	const bool IsFinished, 
+#if defined(PLATFORM_WIN)
+	LARGE_INTEGER &CPU_Frequency, 
+	LARGE_INTEGER &BeforeTime, 
+	LARGE_INTEGER &AfterTime)
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	timespec &BeforeTime, 
+	timespec &AfterTime)
+#endif
+{
+//Mark start time.
+	if (!IsFinished)
+	{
+	#if defined(PLATFORM_WIN)
+		if (QueryPerformanceFrequency(
+				&CPU_Frequency) == 0 || 
+			QueryPerformanceCounter(
+				&BeforeTime) == 0)
+		{
+			PrintErrorToScreen(L"[Error] Get current time from High Precision Event Timer/HPET error", GetLastError());
+			return false;
+		}
+	#elif defined(PLATFORM_LINUX)
+		if (clock_gettime(CLOCK_MONOTONIC, &BeforeTime) != 0)
+		{
+			PrintErrorToScreen(L"[Error] Get current time error", errno);
+			return false;
+		}
+	#elif defined(PLATFORM_MACOS)
+		clock_serv_t ServClock;
+		mach_timespec_t MachTimespec;
+		memset(&ServClock, 0, sizeof(ServClock));
+		memset(&MachTimespec, 0, sizeof(MachTimespec));
+		if (host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &ServClock) != KERN_SUCCESS || 
+			clock_get_time(ServClock, &MachTimespec) != KERN_SUCCESS || 
+			mach_port_deallocate(mach_task_self(), ServClock) != KERN_SUCCESS)
+		{
+			PrintErrorToScreen(L"[Error] Get current time error", 0);
+			return false;
+		}
+		else {
+			BeforeTime.tv_sec = MachTimespec.tv_sec;
+			BeforeTime.tv_nsec = MachTimespec.tv_nsec;
+		}
+	#endif
+	}
+//Mark end time.
+	else {
+	#if defined(PLATFORM_WIN)
+		if (QueryPerformanceCounter(
+				&AfterTime) == 0)
+		{
+			PrintErrorToScreen(L"[Error] Get current time from High Precision Event Timer/HPET error", GetLastError());
+			return false;
+		}
+	#elif defined(PLATFORM_LINUX)
+		if (clock_gettime(CLOCK_MONOTONIC, &AfterTime) != 0)
+		{
+			PrintErrorToScreen(L"[Error] Get current time error", errno);
+			return false;
+		}
+	#elif defined(PLATFORM_MACOS)
+		clock_serv_t ServClock;
+		mach_timespec_t MachTimespec;
+		memset(&ServClock, 0, sizeof(ServClock));
+		memset(&MachTimespec, 0, sizeof(MachTimespec));
+		if (host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &ServClock) != KERN_SUCCESS ||
+			clock_get_time(ServClock, &MachTimespec) != KERN_SUCCESS ||
+			mach_port_deallocate(mach_task_self(), ServClock) != KERN_SUCCESS)
+		{
+			PrintErrorToScreen(L"[Error] Get current time error", 0);
+			return false;
+		}
+		else {
+			AfterTime.tv_sec = MachTimespec.tv_sec;
+			AfterTime.tv_nsec = MachTimespec.tv_nsec;
+		}
+	#endif
+	}
+
+	return true;
+}
+
+//Calculate all process result time
+long double ResultTimeCalculator(
+#if defined(PLATFORM_WIN)
+	const LARGE_INTEGER CPU_Frequency, 
+	const LARGE_INTEGER BeforeTime, 
+	const LARGE_INTEGER AfterTime)
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	const timespec BeforeTime, 
+	const timespec AfterTime)
+#endif
+{
+#if defined(PLATFORM_WIN)
+	if (AfterTime.QuadPart >= BeforeTime.QuadPart)
+		return static_cast<long double>((AfterTime.QuadPart - BeforeTime.QuadPart) * static_cast<LONGLONG>(MICROSECOND_TO_MILLISECOND)) / static_cast<long double>(CPU_Frequency.QuadPart);
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	if (AfterTime.tv_sec >= BeforeTime.tv_sec)
+		return static_cast<long double>((AfterTime.tv_sec - BeforeTime.tv_sec) * static_cast<time_t>(SECOND_TO_MILLISECOND)) + static_cast<long double>(AfterTime.tv_nsec - BeforeTime.tv_nsec) / static_cast<long double>(NANOSECOND_TO_MICROSECOND * MICROSECOND_TO_MILLISECOND);
+#endif
+
+	return 0;
+}
+
+//Print statistics to screen and/or output result to file
 void PrintProcess(
 	const bool IsPacketStatistics, 
 	const bool IsTimeStatistics)
@@ -667,8 +731,9 @@ void PrintHeaderToScreen(
 	{
 		if (WideTargetAddressString.empty())
 		{
-			uint8_t FQDN_String[NI_MAXHOST + 1U]{0};
-			if (getnameinfo(reinterpret_cast<PSOCKADDR>(&ConfigurationParameter.SockAddr_Normal), sizeof(sockaddr_in), reinterpret_cast<char *>(FQDN_String), NI_MAXHOST, nullptr, 0, NI_NUMERICSERV) != 0)
+			std::unique_ptr<uint8_t[]> FQDN_String(new uint8_t[NI_MAXHOST + PADDING_RESERVED_BYTES]());
+			memset(FQDN_String.get(), 0, NI_MAXHOST + PADDING_RESERVED_BYTES);
+			if (getnameinfo(reinterpret_cast<PSOCKADDR>(&ConfigurationParameter.SockAddr_Normal), sizeof(sockaddr_in), reinterpret_cast<char *>(FQDN_String.get()), NI_MAXHOST, nullptr, 0, NI_NUMERICSERV) != 0)
 			{
 				PrintErrorToScreen(L"[Error] Resolve addresses to host names error", WSAGetLastError());
 				fwprintf_s(stderr, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
@@ -676,7 +741,7 @@ void PrintHeaderToScreen(
 					fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
 			}
 			else {
-				if (ConfigurationParameter.TargetString_Normal == reinterpret_cast<const char *>(FQDN_String))
+				if (ConfigurationParameter.TargetString_Normal == reinterpret_cast<const char *>(FQDN_String.get()))
 				{
 					fwprintf_s(stderr, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
 					if (ConfigurationParameter.OutputFile != nullptr)
@@ -684,7 +749,7 @@ void PrintHeaderToScreen(
 				}
 				else {
 					std::wstring Wide_FQDN;
-					if (!MBS_To_WCS_String(FQDN_String, strnlen(reinterpret_cast<const char *>(FQDN_String), NI_MAXHOST), Wide_FQDN))
+					if (!MBS_To_WCS_String(FQDN_String.get(), strnlen(reinterpret_cast<const char *>(FQDN_String.get()), NI_MAXHOST), Wide_FQDN))
 					{
 						PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", GetLastError());
 						return;
@@ -916,17 +981,16 @@ void PrintDescription(
 	fwprintf_s(stderr, L"                                   SPS|PIPE|SCTP|FC|RSVPE2E|MOBILITY|UDPLITE|\n");
 	fwprintf_s(stderr, L"                                   MPLS|MANET|HIP|SHIM6|WESP|ROHC|TEST-1|\n");
 	fwprintf_s(stderr, L"                                   TEST-2|RAW\n");
-	fwprintf_s(stderr, L"   -buf size                Specifie receive buffer size.\n");
-	fwprintf_s(stderr, L"                            Buffer size must between 512 - 4096 bytes.\n");
-	fwprintf_s(stderr, L"   -dv                      Disable packets validated.\n");
-	fwprintf_s(stderr, L"   -show type               Show result or hex data of responses.\n");
-	fwprintf_s(stderr, L"                            Response: Result|Hex\n");
-	fwprintf_s(stderr, L"   -of file_name            Output result to file.\n");
-	fwprintf_s(stderr, L"   -6                       Using IPv6.\n");
-	fwprintf_s(stderr, L"   -4                       Using IPv4.\n");
-	fwprintf_s(stderr, L"   domain                   A domain name which will make request to send\n");
-	fwprintf_s(stderr, L"                            to DNS server.\n");
-	fwprintf_s(stderr, L"   target                   Target, support IPv4/IPv6 address and domain.\n");
+	fwprintf_s(stderr, L"   -buf size         Specifie receive buffer size.\n");
+	fwprintf_s(stderr, L"                     Buffer size must between 512 - 4096 bytes.\n");
+	fwprintf_s(stderr, L"   -dv               Disable packets validated.\n");
+	fwprintf_s(stderr, L"   -show type        Show result or hex data of responses.\n");
+	fwprintf_s(stderr, L"                     Response: Result|Hex\n");
+	fwprintf_s(stderr, L"   -of file_name     Output result to file.\n");
+	fwprintf_s(stderr, L"   -6                Using IPv6.\n");
+	fwprintf_s(stderr, L"   -4                Using IPv4.\n");
+	fwprintf_s(stderr, L"   domain            A domain name which will make request to send to DNS server.\n");
+	fwprintf_s(stderr, L"   target            Target, support IPv4/IPv6 address and domain.\n");
 
 #if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	fwprintf_s(stderr, L"\n");

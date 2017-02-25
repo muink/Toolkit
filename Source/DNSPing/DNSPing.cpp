@@ -165,7 +165,7 @@ bool ParameterCheckAndSetting(
 		if (ConfigurationParameter.SocketTimeout > SOCKET_MIN_TIMEOUT)
 			ConfigurationParameter.SocketTimeout -= SOCKET_MIN_TIMEOUT;
 		else if (ConfigurationParameter.SocketTimeout == SOCKET_MIN_TIMEOUT)
-			ConfigurationParameter.SocketTimeout = 1;
+			ConfigurationParameter.SocketTimeout = SOCKET_MIN_TIME_INTERVAL;
 	}
 
 	ConfigurationParameter.Statistics_MinTime = ConfigurationParameter.SocketTimeout;

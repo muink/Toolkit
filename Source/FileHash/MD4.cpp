@@ -252,9 +252,9 @@ bool MD4_Hash(
 	size_t ReadBlockSize = FILE_BUFFER_SIZE, ReadLength = 0, RoundCount = 0;
 	if (HashFamilyID == HASH_ID_ED2K)
 		ReadBlockSize = ED2K_SIZE_BLOCK;
-	std::shared_ptr<uint8_t> Buffer(new uint8_t[ReadBlockSize](), std::default_delete<uint8_t[]>());
-	std::shared_ptr<uint8_t> StringBuffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
-	std::shared_ptr<uint8_t> BufferED2K(new uint8_t[MD4_DIGEST_SIZE](), std::default_delete<uint8_t[]>());
+	std::unique_ptr<uint8_t[]> Buffer(new uint8_t[ReadBlockSize]());
+	std::unique_ptr<uint8_t[]> StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
+	std::unique_ptr<uint8_t[]> BufferED2K(new uint8_t[MD4_DIGEST_SIZE]());
 	memset(Buffer.get(), 0, ReadBlockSize);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(BufferED2K.get(), 0, MD4_DIGEST_SIZE);

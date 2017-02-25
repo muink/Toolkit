@@ -945,14 +945,14 @@ bool RIPEMD_Hash(
 	}
 
 //Initialization
-	std::shared_ptr<uint8_t> Buffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
-	std::shared_ptr<uint8_t> StringBuffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
+	std::unique_ptr<uint8_t[]> Buffer(new uint8_t[FILE_BUFFER_SIZE]());
+	std::unique_ptr<uint8_t[]> StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	size_t ReadLength = 0, DigestSize = RIPEMD_DIGEST_MAXSIZE;
 
 //RIPEMD initialization
-	std::shared_ptr<dword> MDbuf(new dword[DigestSize / (sizeof(uint32_t) * BYTES_TO_BITS)](), std::default_delete<dword[]>());
+	std::unique_ptr<dword[]> MDbuf(new dword[DigestSize / (sizeof(uint32_t) * BYTES_TO_BITS)]());
 	memset(MDbuf.get(), 0, DigestSize / (sizeof(uint32_t) * BYTES_TO_BITS));
 	if (RIPEMD_HashFunctionID == HASH_ID_RIPEMD_128)
 	{

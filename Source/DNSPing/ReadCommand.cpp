@@ -248,7 +248,7 @@ bool ReadCommand(
 					ConfigurationParameter.Parameter_Header.Flags = ConfigurationParameter.Parameter_Header.Flags | FlagsTemp;
 				#else //BIG_ENDIAN
 					auto FlagsTemp = static_cast<uint8_t>(UnsignedResult);
-					FlagsTemp = FlagsTemp & 15;//0x00001111
+					FlagsTemp = FlagsTemp & 15; //0x00001111
 					ConfigurationParameter.Parameter_Header.FlagsBits.OPCode = FlagsTemp;
 				#endif
 				}
@@ -699,9 +699,9 @@ bool ReadCommand(
 					PrintErrorToScreen(L"\n[Error] Command (-rawdata raw_data) error", 0);
 					return false;
 				}
-				std::shared_ptr<uint8_t> RawDataTemp(new uint8_t[PACKET_MAXSIZE](), std::default_delete<uint8_t[]>());
+				std::unique_ptr<uint8_t[]> RawDataTemp(new uint8_t[PACKET_MAXSIZE]());
 				memset(RawDataTemp.get(), 0, PACKET_MAXSIZE);
-				ConfigurationParameter.RawDataBuffer.swap(RawDataTemp);
+				std::swap(ConfigurationParameter.RawDataBuffer, RawDataTemp);
 				RawDataTemp.reset();
 				uint8_t BufferStringTemp[5U]{0};
 				BufferStringTemp[0] = ASCII_ZERO;
@@ -879,8 +879,8 @@ bool ReadCommand(
 			#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (Command.length() >= PATH_MAX)
 				{
-					std::shared_ptr<uint8_t> OutputFileNameBuffer(new uint8_t[Command.length() + 1U], std::default_delete<uint8_t[]>());
-					memset(OutputFileNameBuffer.get(), 0, Command.length() + 1U);
+					std::unique_ptr<uint8_t[]> OutputFileNameBuffer(new uint8_t[Command.length() + PADDING_RESERVED_BYTES]);
+					memset(OutputFileNameBuffer.get(), 0, Command.length() + PADDING_RESERVED_BYTES);
 					if (wcstombs(reinterpret_cast<char *>(OutputFileNameBuffer.get()), Command.c_str(), Command.length()) == static_cast<size_t>(RETURN_ERROR))
 					{
 						PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);

@@ -395,7 +395,7 @@
 #define ASCII_PERIOD                            46                          //"."
 
 //Version definitions
-#define FULL_VERSION                            L"0.3.5.0"
+#define FULL_VERSION                            L"0.3.6.0"
 #define COPYRIGHT_MESSAGE                       L"Copyright (C) 2012-2017 Chengr28"
 
 //Command definitions

@@ -26,20 +26,10 @@
 extern ConfigurationTable ConfigurationParameter;
 
 //Functions
-bool MarkProcessTime(
-	const bool IsFinished, 
-#if defined(PLATFORM_WIN)
-	LARGE_INTEGER &CPU_Frequency, 
-	LARGE_INTEGER &BeforeTime, 
-	LARGE_INTEGER &AfterTime);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-	timeval &BeforeTime, 
-	timeval &AfterTime);
-#endif
 bool PrintSendResult(
 	const SOCKET Socket_Normal, 
 	const dns_hdr * const DNS_Header, 
-	std::shared_ptr<uint8_t> &RecvBuffer, 
+	std::unique_ptr<uint8_t[]> &RecvBuffer, 
 	ssize_t &DataLength, 
 	long double &Result, 
 	bool &IsContinue, 
@@ -48,8 +38,27 @@ bool PrintSendResult(
 	LARGE_INTEGER &BeforeTime, 
 	LARGE_INTEGER &AfterTime);
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-	timeval &BeforeTime, 
-	timeval &AfterTime);
+	timespec &BeforeTime, 
+	timespec &AfterTime);
+#endif
+bool MarkProcessTime(
+	const bool IsFinished, 
+#if defined(PLATFORM_WIN)
+	LARGE_INTEGER &CPU_Frequency, 
+	LARGE_INTEGER &BeforeTime, 
+	LARGE_INTEGER &AfterTime);
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	timespec &BeforeTime, 
+	timespec &AfterTime);
+#endif
+long double ResultTimeCalculator(
+#if defined(PLATFORM_WIN)
+	const LARGE_INTEGER CPU_Frequency, 
+	const LARGE_INTEGER BeforeTime, 
+	const LARGE_INTEGER AfterTime);
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	const timespec BeforeTime, 
+	const timespec AfterTime);
 #endif
 void ErrorCodeToMessage(
 	const ssize_t ErrorCode, 

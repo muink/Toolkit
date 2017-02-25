@@ -428,7 +428,7 @@ bool BLAKE2_Hash(
 	}
 
 //Initialization
-	std::shared_ptr<uint8_t> StringBuffer(new uint8_t[FILE_BUFFER_SIZE](), std::default_delete<uint8_t[]>());
+	std::unique_ptr<uint8_t[]> StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
 	size_t ReadLength = 0, DigestSize = 0;
 
@@ -518,7 +518,7 @@ bool BLAKE2_Hash(
 	}
 
 //Finish hash process.
-	std::shared_ptr<uint8_t> Result(new uint8_t[BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS](), std::default_delete<uint8_t[]>());
+	std::unique_ptr<uint8_t[]> Result(new uint8_t[BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS]());
 	memset(Result.get(), 0, BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS);
 	if (BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_160 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_256 || 
 		BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_384 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_512) //BLAKE2B

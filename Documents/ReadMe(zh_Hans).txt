@@ -103,16 +103,16 @@
                                    SPS|PIPE|SCTP|FC|RSVPE2E|MOBILITY|UDPLITE|
                                    MPLS|MANET|HIP|SHIM6|WESP|ROHC|TEST-1|
                                    TEST-2|RAW
-   -buf size                设定接收缓冲区长度
-                            缓冲区长度必须介乎于 512 - 4096 字节
-   -dv                      关闭数据包验证
-   -show type               显示收到的解析包的内容
-                            Type: Result|Hex
-   -of file_name            输出结果到文本文件
-   -6                       强制使用 IPv6
-   -4                       强制使用 IPv4
-   domain                   设定发送 DNS 请求用的查询的域名
-   target                   Ping 的目标，支持 IPv4/IPv6 地址和域名
+   -buf size         设定接收缓冲区长度
+                     缓冲区长度必须介乎于 512 - 4096 字节
+   -dv               关闭数据包验证
+   -show type        显示收到的解析包的内容
+                     Type: Result|Hex
+   -of file_name     输出结果到文本文件
+   -6                强制使用 IPv6
+   -4                强制使用 IPv4
+   domain            设定发送 DNS 请求用的查询的域名
+   target            Ping 的目标，支持 IPv4/IPv6 地址和域名
 
 
 ----------------------------------------------------------------------------------------------------
@@ -233,12 +233,12 @@
 
 ### Release hash[SHA-3(256)]
 * Windows
-  * DNSPing.exe: A3E4DC44BBF8B0E4457D601E48B62CB4D2D942B834C2E9EA96FF0AA71EE83FFA
-  * DNSPing_x86.exe: A306E400B152D8C1B2E94F60086732A79ACE7A8A5D70DA4ACD9DEB83639D842F
-  * DNSPing_XP.exe: 51B71EC569AF03FB95CDD89B56ADD6296B7844DD8A8EFDD45BE1DDE177F9A0C9
-  * FileHash.exe: 564BBA9814D8CF4BE3F0D8B1E04695529634347280A65D21E804A13314C82BE8
-  * FileHash_x86.exe: 785ADCBB3330EF00D73C9615D631872CED9A0EFC863B711D10DCDCB1EB0A76E9
-  * FileHash_XP.exe: CB7692B560D04D786E9F6DC1DF935E675A6CEE92B43F6F3678E511505E497566
+  * DNSPing.exe: D5215DEC47B6B97CDFEC7AAC5FDBE9C0D32A0AAF03E5299DBCD79A905E0FE470
+  * DNSPing_x86.exe: C00FF6E05B43DC4B202AD9BA4F4EDE9A72C37C6D15A234F27B4972755D44FE39
+  * DNSPing_XP.exe: CD4B6E6A550E677C3AF9B296EE44325FD696F140568C6BFC96205A5E970BECDD
+  * FileHash.exe: E7CDFA247E0DE6027A52AE42AE0AE4DC5F1A176D0AA549D89FFB8B72D7647614
+  * FileHash_x86.exe: DE320E0C4A6097970283B99992CAD64F5A2422D5CF1774DDC25C7A3A34C6F039
+  * FileHash_XP.exe: 64290EB55686F78805A0B3837C2DF8F727728FB4CABCD00DE257B03B424D0786
 * macOS
-  * DNSPing: BFDE0F6DFE8296B9AE28294542BE4354D89D4A33CA127A2B5C2242CD126DB52F
-  * FileHash: 28E3BD6E969B180763E234CC6E0D9BFEFF1C25D4A7C8C0C9B9BF27F349EE291B
+  * DNSPing: 491BDEF0AE64A4FD4242FC936505A007029DF9F0F245C4A40651CF3ACC164C67
+  * FileHash: 219628137525FBB2093B527F999F818909D305E5563E17D58A41D1F6706085AF

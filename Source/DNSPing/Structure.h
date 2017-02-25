@@ -369,39 +369,45 @@
 	#pragma comment(lib, "ws2_32.lib")   //Windows WinSock 2.0+ support
 
 //Endian definitions
-	#define __LITTLE_ENDIAN            1234                         //Little Endian
-	#define __BIG_ENDIAN               4321                         //Big Endian
-	#define __BYTE_ORDER               __LITTLE_ENDIAN              //x86 and x86-64/x64 is Little Endian in Windows.
-	#define LITTLE_ENDIAN              __LITTLE_ENDIAN
-	#define BIG_ENDIAN                 __BIG_ENDIAN
-	#define BYTE_ORDER                 __BYTE_ORDER
+	#define __LITTLE_ENDIAN             1234                         //Little Endian
+	#define __BIG_ENDIAN                4321                         //Big Endian
+	#define __BYTE_ORDER                __LITTLE_ENDIAN              //x86 and x86-64/x64 is Little Endian in Windows.
+	#define LITTLE_ENDIAN               __LITTLE_ENDIAN
+	#define BIG_ENDIAN                  __BIG_ENDIAN
+	#define BYTE_ORDER                  __BYTE_ORDER
 
 //Winsock definitions
 	#define WINSOCK_VERSION_LOW_BYTE    2                           //Low byte of Winsock version 2.2
 	#define WINSOCK_VERSION_HIGH_BYTE   2                           //High byte of Winsock version 2.2
 
 //Windows compatible definitions
-	typedef SSIZE_T                   ssize_t;
+	typedef SSIZE_T                     ssize_t;
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 //Portable Operating System Interface/POSIX and Unix system header
-	#include <cerrno>                 //Error report support
-	#include <cstdio>                 //File Input/Output support
-	#include <cstdlib>                //C Standard Library support
-	#include <climits>                //Limits support
-	#include <netdb.h>                //Network database operations support
-	#include <pthread.h>              //Threads support
-	#include <signal.h>               //Signals support
-	#include <unistd.h>               //Standard library API support
-	#include <arpa/inet.h>            //Internet operations support
-	#include <sys/time.h>             //Date and time support
+	#include <cerrno>                   //Error report support
+	#include <climits>                  //Limits support
+	#include <cstdio>                   //File Input/Output support
+	#include <cstdlib>                  //C Standard Library support
+	#include <ctime>                    //Get and manipulate date and time information support
+	#include <netdb.h>                  //Network database operations support
+	#include <pthread.h>                //Threads support
+	#include <signal.h>                 //Signals support
+	#include <unistd.h>                 //Standard library API support
+	#include <arpa/inet.h>              //Internet operations support
+	#include <sys/time.h>               //Date and time support
+#if defined(PLATFORM_MACOS)
+	#include <mach/clock.h>             //Clock operations list structure. Contains vectors to machine dependent clock routines.
+	#include <mach/kern_return.h>       //Kernel return codes
+	#include <mach/mach.h>              //Includes all the types that a normal user of Mach programs should need
+#endif
 
 //Portable Operating System Interface/POSIX and Unix system header
 	#if defined(PLATFORM_LINUX)
-		#include <endian.h>                    //Endian support
+		#include <endian.h>                                              //Endian support
 	#elif defined(PLATFORM_MACOS)
-		#define __LITTLE_ENDIAN                1234                         //Little Endian
-		#define __BIG_ENDIAN                   4321                         //Big Endian
-		#define __BYTE_ORDER                   __LITTLE_ENDIAN              //x86 and x86-64/x64 is Little Endian in macOS.
+		#define __LITTLE_ENDIAN             1234                         //Little Endian
+		#define __BIG_ENDIAN                4321                         //Big Endian
+		#define __BYTE_ORDER                __LITTLE_ENDIAN              //x86 and x86-64/x64 is Little Endian in macOS.
 	#endif
 
 //Windows compatible

@@ -56,7 +56,7 @@ bool MBS_To_WCS_String(
 		return false;
 
 //Convert string.
-	std::shared_ptr<wchar_t> TargetBuffer(new wchar_t[Length + PADDING_RESERVED_BYTES](), std::default_delete<wchar_t[]>());
+	std::unique_ptr<wchar_t[]> TargetBuffer(new wchar_t[Length + PADDING_RESERVED_BYTES]());
 	wmemset(TargetBuffer.get(), 0, Length + PADDING_RESERVED_BYTES);
 #if defined(PLATFORM_WIN)
 	if (MultiByteToWideChar(
@@ -258,7 +258,6 @@ void PrintDescription(
 
 //Supported hash algorithm list
 	fwprintf_s(stderr, L"\nSupported hash algorithms:\n");
-
 	fwprintf_s(stderr, L"   * BLAKE family:   -BLAKE                      = -BLAKE_256\n");
 	fwprintf_s(stderr, L"                     -BLAKE_224                  BLAKE 224 bits\n");
 	fwprintf_s(stderr, L"                     -BLAKE_256                  BLAKE 256 bits\n");

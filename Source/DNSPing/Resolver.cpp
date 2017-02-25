@@ -560,15 +560,15 @@ size_t PrintDomainName(
 	}
 
 //Initialization
-	std::shared_ptr<uint8_t> BufferTemp(new uint8_t[PACKET_MAXSIZE](), std::default_delete<uint8_t[]>());
+	std::unique_ptr<uint8_t[]> BufferTemp(new uint8_t[PACKET_MAXSIZE]());
 	memset(BufferTemp.get(), 0, PACKET_MAXSIZE);
 	size_t Index = 0, Result = 0;
-	uint16_t Truncated = 0;
-	auto MultiplePTR = false;
+	uint16_t TruncateLocation = 0;
+	auto IsMultiplePointer = false;
 
 //Convert.
-	Result = PacketQueryToString(Buffer + Location, BufferTemp.get(), Truncated);
-	if (Truncated > 0)
+	Result = PacketQueryToString(Buffer + Location, BufferTemp.get(), TruncateLocation);
+	if (TruncateLocation > 0)
 	{
 	//Print once when pointer is not at first.
 		if (Result > sizeof(uint16_t))
@@ -580,15 +580,15 @@ size_t PrintDomainName(
 		}
 
 	//Get pointer.
-		while (Truncated > 0)
+		while (TruncateLocation > 0)
 		{
-			if (MultiplePTR)
+			if (IsMultiplePointer)
 				fwprintf_s(FileHandle, L".");
-			PacketQueryToString(Buffer + Truncated, BufferTemp.get(), Truncated);
+			PacketQueryToString(Buffer + TruncateLocation, BufferTemp.get(), TruncateLocation);
 			for (Index = 0;Index < strnlen_s(reinterpret_cast<const char *>(BufferTemp.get()), PACKET_MAXSIZE);++Index)
 				fwprintf_s(FileHandle, L"%c", BufferTemp.get()[Index]);
 			memset(BufferTemp.get(), 0, PACKET_MAXSIZE);
-			MultiplePTR = true;
+			IsMultiplePointer = true;
 		}
 	}
 	else {
@@ -725,8 +725,9 @@ void PrintResourseData(
 	//EDNS Option
 		if (Length >= sizeof(dns_edns_option))
 		{
-			const auto DNS_OPT_OPTION = reinterpret_cast<const dns_edns_option *>(Buffer + Location + sizeof(dns_record_opt));
 			fwprintf_s(FileHandle, L"\n         EDNS Option:\n                         Code: ");
+			
+			const auto DNS_OPT_OPTION = reinterpret_cast<const dns_edns_option *>(Buffer + Location + sizeof(dns_record_opt));
 			if (ntohs(DNS_OPT_OPTION->Code) == EDNS_CODE_LLQ)
 				fwprintf_s(FileHandle, L"LLQ");
 			else if (ntohs(DNS_OPT_OPTION->Code) == EDNS_CODE_UL)

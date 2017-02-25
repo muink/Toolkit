@@ -25,31 +25,40 @@
 //////////////////////////////////////////////////
 // Main header
 // 
+//Code definitions
 #define COMMAND_MIN_COUNT            2
 #if defined(PLATFORM_WIN)
-	#define DEFAULT_TIMEOUT              2000U                       //Default timeout, 2000 ms(2 seconds)
 	#define MBSTOWCS_NULL_TERMINATE      (-1)                        //MultiByteToWideChar function null-terminate
 	#define WCSTOMBS_NULL_TERMINATE      MBSTOWCS_NULL_TERMINATE     //WideCharToMultiByte function null-terminate
-	#define STANDARD_TIMEOUT             1000U                       //Standard timeout(1000 ms/1 second)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-	#define DEFAULT_TIMEOUT              2U                          //Default timeout, 2 seconds
-	#define SECOND_TO_MILLISECOND        1000U                       //1000 milliseconds(1 second)
-	#define STANDARD_TIMEOUT             1000000U                    //Standard timeout, 1000000 us(1000 ms or 1 second)
 #endif
 #define DEFAULT_SEND_TIMES           4U                          //Default send times
 #define HIGHEST_BIT_U16              0x7FFF                      //Get highest bit in uint16_t/16 bits structure.
 #define HIGHEST_MOVE_BIT_U16         15U                         //Move 15 bits to get highest bit in uint16_t/16 bits structure.
 #define LOWEST_MOVE_BIT_U16          11U                         //Move 11 bits to make highest bit to lowest bits in uint16_t/16 bits structure.
-#define MICROSECOND_TO_MILLISECOND   1000U                       //1000 microseconds(1 millisecond)
 #define NUM_HEX                      16
+#define U16_NUM_ONE                  0x0001
+#define UINT4_MAX                    0x000F
+
+//Time definitions
+#if defined(PLATFORM_WIN)
+	#define DEFAULT_TIMEOUT              2000U                       //Default timeout, 2000 ms(2 seconds)
+	#define STANDARD_TIMEOUT             1000U                       //Standard timeout(1000 ms/1 second)
+#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	#define DEFAULT_TIMEOUT              2U                          //Default timeout, 2 seconds
+	#define STANDARD_TIMEOUT             1000000U                    //Standard timeout, 1000000 us(1000 ms or 1 second)
+#endif
+#define MICROSECOND_TO_MILLISECOND   1000U                       //1000 microseconds(1 millisecond)
+#define NANOSECOND_TO_MICROSECOND    1000U                       //1000 nanoseconds(1 microsecond)
 #define SECONDS_IN_DAY               86400U                      //86400 seconds in a day
 #define SECONDS_IN_HOUR              3600U                       //3600 seconds in an hour
 #define SECONDS_IN_MINUTE            60U                         //60 seconds in a minute
 #define SECONDS_IN_MONTH             2592000U                    //2592000 seconds in a month(30 days in a month)
 #define SECONDS_IN_YEAR              31536000U                   //31536000 seconds in a year(30 days in a month and 12 months in a year)
+#define SECOND_TO_MILLISECOND        1000U                       //1000 milliseconds(1 second)
+#if defined(PLATFORM_WIN)
+	#define SOCKET_MIN_TIME_INTERVAL     1
+#endif
 #define SOCKET_MIN_TIMEOUT           500U                        //The shortest socket timeout(500 ms)
-#define U16_NUM_ONE                  0x0001
-#define UINT4_MAX                    0x000F
 
 //Size and length definitions
 #define ADDRESS_STRING_MAXSIZE       64U                         //Maximum size of addresses(IPv4/IPv6) words(64 bytes)
@@ -68,7 +77,7 @@
 #define DNS_PACKET_MINSIZE           (sizeof(dns_hdr) + 1U + sizeof(dns_qry))   //Minimum DNS packet size(DNS Header + Minimum Domain<ROOT> + DNS Query)
 
 //Version definitions
-#define FULL_VERSION                 L"0.3.5.0"
+#define FULL_VERSION                 L"0.3.6.0"
 #define COPYRIGHT_MESSAGE            L"Copyright (C) 2014-2017 Chengr28"
 
 
@@ -148,7 +157,7 @@ public:
 #endif
 	std::wstring WideTargetString;
 	std::wstring WideOutputFileName;
-	std::shared_ptr<uint8_t> RawDataBuffer;
+	std::unique_ptr<uint8_t[]> RawDataBuffer;
 
 //Member functions
 	ConfigurationTable(
@@ -237,7 +246,7 @@ size_t StringToPacketQuery(
 size_t PacketQueryToString(
 	const uint8_t * const TName, 
 	uint8_t * const FName, 
-	uint16_t &Truncated);
+	uint16_t &TruncateLocation);
 bool ValidatePacket(
 	const uint8_t * const Buffer, 
 	const size_t Length, 
