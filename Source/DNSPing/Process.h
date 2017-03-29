@@ -1,5 +1,5 @@
 ﻿// This code is part of Toolkit(DNSPing)
-// A useful and powerful toolkit(DNSPing)
+// DNSPing, a useful and powerful toolkit
 // Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
@@ -37,9 +37,12 @@ bool PrintSendResult(
 	LARGE_INTEGER &CPU_Frequency, 
 	LARGE_INTEGER &BeforeTime, 
 	LARGE_INTEGER &AfterTime);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif defined(PLATFORM_LINUX)
 	timespec &BeforeTime, 
 	timespec &AfterTime);
+#elif defined(PLATFORM_MACOS)
+	uint64_t &BeforeTime, 
+	uint64_t &AfterTime);
 #endif
 bool MarkProcessTime(
 	const bool IsFinished, 
@@ -47,18 +50,24 @@ bool MarkProcessTime(
 	LARGE_INTEGER &CPU_Frequency, 
 	LARGE_INTEGER &BeforeTime, 
 	LARGE_INTEGER &AfterTime);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif defined(PLATFORM_LINUX)
 	timespec &BeforeTime, 
 	timespec &AfterTime);
+#elif defined(PLATFORM_MACOS)
+	uint64_t &BeforeTime, 
+	uint64_t &AfterTime);
 #endif
 long double ResultTimeCalculator(
 #if defined(PLATFORM_WIN)
 	const LARGE_INTEGER CPU_Frequency, 
 	const LARGE_INTEGER BeforeTime, 
 	const LARGE_INTEGER AfterTime);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif defined(PLATFORM_LINUX)
 	const timespec BeforeTime, 
 	const timespec AfterTime);
+#elif defined(PLATFORM_MACOS)
+	const uint64_t BeforeTime, 
+	const uint64_t AfterTime);
 #endif
 void ErrorCodeToMessage(
 	const ssize_t ErrorCode, 

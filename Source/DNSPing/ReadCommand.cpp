@@ -1,5 +1,5 @@
 ﻿// This code is part of Toolkit(DNSPing)
-// A useful and powerful toolkit(DNSPing)
+// DNSPing, a useful and powerful toolkit
 // Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
@@ -877,7 +877,7 @@ bool ReadCommand(
 			//Mark file name.
 				ConfigurationParameter.WideOutputFileName = Command;
 			#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-				if (Command.length() >= PATH_MAX)
+				if (Command.length() < PATH_MAX)
 				{
 					std::unique_ptr<uint8_t[]> OutputFileNameBuffer(new uint8_t[Command.length() + PADDING_RESERVED_BYTES]);
 					memset(OutputFileNameBuffer.get(), 0, Command.length() + PADDING_RESERVED_BYTES);
@@ -964,7 +964,7 @@ bool ReadCommand(
 			//Mark address.
 				ConfigurationParameter.Protocol = AF_INET6;
 				ConfigurationParameter.SockAddr_Normal.ss_family = AF_INET6;
-				if (!AddressStringToBinary(AF_INET6, reinterpret_cast<const uint8_t *>(CommandString.c_str()), &(reinterpret_cast<PSOCKADDR_IN6>(&ConfigurationParameter.SockAddr_Normal))->sin6_addr, &SignedResult))
+				if (!AddressStringToBinary(AF_INET6, reinterpret_cast<const uint8_t *>(CommandString.c_str()), &(reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal))->sin6_addr, &SignedResult))
 				{
 					PrintErrorToScreen(L"\n[Error] Target format error", SignedResult);
 					return false;
@@ -1003,16 +1003,16 @@ bool ReadCommand(
 							for (auto AddrInfoIter = AddrInfo;AddrInfoIter != nullptr;AddrInfoIter = AddrInfoIter->ai_next)
 							{
 							//IPv6
-								if (AddrInfoIter->ai_family == AF_INET6 && !IN6_IS_ADDR_LINKLOCAL(reinterpret_cast<in6_addr *>(AddrInfoIter->ai_addr)) && !((reinterpret_cast<PSOCKADDR_IN6>(AddrInfoIter->ai_addr))->sin6_scope_id == 0)) //Get port from first(Main) IPv6 device
+								if (AddrInfoIter->ai_family == AF_INET6 && !IN6_IS_ADDR_LINKLOCAL(reinterpret_cast<in6_addr *>(AddrInfoIter->ai_addr)) && !((reinterpret_cast<sockaddr_in6 *>(AddrInfoIter->ai_addr))->sin6_scope_id == 0)) //Get port from first(Main) IPv6 device
 								{
 									ConfigurationParameter.Protocol = AF_INET6;
 									ConfigurationParameter.SockAddr_Normal.ss_family = AF_INET6;
-									(reinterpret_cast<PSOCKADDR_IN6>(&ConfigurationParameter.SockAddr_Normal))->sin6_addr = (reinterpret_cast<PSOCKADDR_IN6>(AddrInfoIter->ai_addr))->sin6_addr;
+									(reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal))->sin6_addr = (reinterpret_cast<sockaddr_in6 *>(AddrInfoIter->ai_addr))->sin6_addr;
 
 								//Convert binary to address string.
 									ConfigurationParameter.TargetAddressString = CommandString;
 									uint8_t AddrBuffer[ADDRESS_STRING_MAXSIZE]{0};
-									if (!BinaryToAddressString(AF_INET6, &(reinterpret_cast<PSOCKADDR_IN6>(&ConfigurationParameter.SockAddr_Normal))->sin6_addr, AddrBuffer, ADDRESS_STRING_MAXSIZE, &SignedResult))
+									if (!BinaryToAddressString(AF_INET6, &(reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal))->sin6_addr, AddrBuffer, ADDRESS_STRING_MAXSIZE, &SignedResult))
 									{
 										PrintErrorToScreen(L"\n[Error] IPv6 address format error error", SignedResult);
 										return false;
@@ -1025,16 +1025,16 @@ bool ReadCommand(
 									break;
 								}
 							//IPv4
-								else if (AddrInfoIter->ai_family == AF_INET && (reinterpret_cast<PSOCKADDR_IN>(AddrInfoIter->ai_addr))->sin_addr.s_addr != INADDR_LOOPBACK && (reinterpret_cast<PSOCKADDR_IN>(AddrInfoIter->ai_addr))->sin_addr.s_addr != INADDR_BROADCAST)
+								else if (AddrInfoIter->ai_family == AF_INET && (reinterpret_cast<sockaddr_in *>(AddrInfoIter->ai_addr))->sin_addr.s_addr != INADDR_LOOPBACK && (reinterpret_cast<sockaddr_in *>(AddrInfoIter->ai_addr))->sin_addr.s_addr != INADDR_BROADCAST)
 								{
 									ConfigurationParameter.Protocol = AF_INET;
 									ConfigurationParameter.SockAddr_Normal.ss_family = AF_INET;
-									(reinterpret_cast<PSOCKADDR_IN>(&ConfigurationParameter.SockAddr_Normal))->sin_addr = (reinterpret_cast<PSOCKADDR_IN>(AddrInfoIter->ai_addr))->sin_addr;
+									(reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal))->sin_addr = (reinterpret_cast<sockaddr_in *>(AddrInfoIter->ai_addr))->sin_addr;
 
 								//Convert binary to address string.
 									ConfigurationParameter.TargetAddressString = CommandString;
 									uint8_t AddrBuffer[ADDRESS_STRING_MAXSIZE]{0};
-									if (!BinaryToAddressString(AF_INET, &(reinterpret_cast<PSOCKADDR_IN>(&ConfigurationParameter.SockAddr_Normal))->sin_addr, AddrBuffer, ADDRESS_STRING_MAXSIZE, &SignedResult))
+									if (!BinaryToAddressString(AF_INET, &(reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal))->sin_addr, AddrBuffer, ADDRESS_STRING_MAXSIZE, &SignedResult))
 									{
 										PrintErrorToScreen(L"\n[Error] IPv4 address format error error", SignedResult);
 										return false;
@@ -1074,7 +1074,7 @@ bool ReadCommand(
 					//Mark address.
 						ConfigurationParameter.Protocol = AF_INET;
 						ConfigurationParameter.SockAddr_Normal.ss_family = AF_INET;
-						if (!AddressStringToBinary(AF_INET, reinterpret_cast<const uint8_t *>(CommandString.c_str()), &(reinterpret_cast<PSOCKADDR_IN>(&ConfigurationParameter.SockAddr_Normal))->sin_addr, &SignedResult))
+						if (!AddressStringToBinary(AF_INET, reinterpret_cast<const uint8_t *>(CommandString.c_str()), &(reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal))->sin_addr, &SignedResult))
 						{
 							PrintErrorToScreen(L"\n[Error] Target format error", SignedResult);
 							return false;

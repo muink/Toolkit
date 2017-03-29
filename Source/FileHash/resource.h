@@ -1,5 +1,5 @@
 ﻿// This code is part of Toolkit(FileHash)
-// A useful and powerful toolkit(FileHash)
+// FileHash, a useful and powerful toolkit
 // Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
@@ -34,6 +34,6 @@
 
 
 //Resource including and defining
-#define FULL_VERSION        L"0.3.6.0"
-#define DETACH_VERSION      0,3,6,0
+#define FULL_VERSION        L"0.3.7.0"
+#define DETACH_VERSION      0,3,7,0
 #define COPYRIGHT_MESSAGE   L"Copyright (C) 2012-2017 Chengr28"

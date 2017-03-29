@@ -1,5 +1,5 @@
 ﻿// This code is part of Toolkit(DNSPing)
-// A useful and powerful toolkit(DNSPing)
+// DNSPing, a useful and powerful toolkit
 // Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
@@ -82,9 +82,13 @@ ConfigurationTable::~ConfigurationTable(
 
 //Close all file handles and WinSock cleanup.
 #if defined(PLATFORM_WIN)
-	_fcloseall();
 	if (IsInitialized_WinSock)
+	{
 		WSACleanup();
+		IsInitialized_WinSock = false;
+	}
+	
+	_fcloseall();
 #elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
 	fcloseall();
 #endif

@@ -1,9 +1,9 @@
 ﻿Toolkit
 =======
-A useful and powerful toolkit
+DNSPing and FileHash, a useful and powerful toolkit
 
 ### Updated
-**0.3.6.0**
+**0.3.7.0**
 
 ### Usage
 * Windows/Linux/macOS: [ReadMe documents](https://github.com/chengr28/Toolkit/tree/master/Documents) and [releases](https://github.com/chengr28/Toolkit/releases)

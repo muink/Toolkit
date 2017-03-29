@@ -1,5 +1,5 @@
 ﻿// This code is part of Toolkit(DNSPing)
-// A useful and powerful toolkit(DNSPing)
+// DNSPing, a useful and powerful toolkit
 // Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
@@ -67,17 +67,18 @@
 #define DOMAIN_MAXSIZE               256U                        //Maximum size of whole level domain is 256 bytes(Section 2.3.1 in RFC 1035).
 #define DOMAIN_MINSIZE               2U                          //Minimum size of whole level domain is 3 bytes(Section 2.3.1 in RFC 1035).
 #define FILE_BUFFER_SIZE             DEFAULT_LARGE_BUFFER_SIZE   //Maximum size of file buffer(4KB/4096 bytes)
-#define IPV4_SHORTEST_ADDR_STRING    6U                          //The shortest IPv4 address strings(*.*.*.*).
-#define IPV4_LONGEST_ADDR_STRING     15U                         //The longest IPv6 address strings(***.***.***.***).
-#define IPV6_SHORTEST_ADDR_STRING    2U                          //The shortest IPv6 address strings(::).
-#define IPV6_LONGEST_ADDR_STRING     46U                         //The longest IPv6 address strings(xxxx::xxxx::xxxx::xxxx::xxxx::xxxx::xxxx::xxxx).
+#define IPV4_SHORTEST_ADDR_STRING    6U                          //The shortest IPv4 address strings(*.*.*.*)
+#define IPV4_LONGEST_ADDR_STRING     15U                         //The longest IPv6 address strings(***.***.***.***)
+#define IPV6_SHORTEST_ADDR_STRING    2U                          //The shortest IPv6 address strings(::)
+#define IPV6_LONGEST_ADDR_STRING     46U                         //The longest IPv6 address strings(xxxx::xxxx::xxxx::xxxx::xxxx::xxxx::xxxx::xxxx)
+#define NULL_TERMINATE_LENGTH        1U                          //Length of C style string null
 #define PACKET_MAXSIZE               1500U                       //Maximum size of packets, Standard MTU of Ethernet II network
 #define PACKET_MINSIZE               64U                         //Minimum size of packets in Ethernet network.
 #define PADDING_RESERVED_BYTES       2U                          //Padding reserved bytes(2 bytes)
-#define DNS_PACKET_MINSIZE           (sizeof(dns_hdr) + 1U + sizeof(dns_qry))   //Minimum DNS packet size(DNS Header + Minimum Domain<ROOT> + DNS Query)
+#define DNS_PACKET_MINSIZE           (sizeof(dns_hdr) + NULL_TERMINATE_LENGTH + sizeof(dns_qry))   //Minimum DNS packet size(DNS Header + Minimum Domain<ROOT> + DNS Query)
 
 //Version definitions
-#define FULL_VERSION                 L"0.3.6.0"
+#define FULL_VERSION                 L"0.3.7.0"
 #define COPYRIGHT_MESSAGE            L"Copyright (C) 2014-2017 Chengr28"
 
 

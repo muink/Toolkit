@@ -1,5 +1,5 @@
 ﻿// This code is part of Toolkit(DNSPing)
-// A useful and powerful toolkit(DNSPing)
+// DNSPing, a useful and powerful toolkit
 // Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
@@ -27,6 +27,7 @@ extern ConfigurationTable ConfigurationParameter;
 void SIG_Handler(
 	const int Signal)
 {
+//Print to screen.
 	fwprintf(stderr, L"[Notice] Get closing signal.\n");
 	PrintProcess(true, true);
 
@@ -37,6 +38,20 @@ void SIG_Handler(
 		ConfigurationParameter.OutputFile = nullptr;
 	}
 
+//Close all file handles and WinSock cleanup.
+#if defined(PLATFORM_WIN)
+	if (IsInitialized_WinSock)
+	{
+		WSACleanup();
+		IsInitialized_WinSock = false;
+	}
+	
+	_fcloseall();
+#elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
+	fcloseall();
+#endif
+
+//Exit process.
 	exit(EXIT_SUCCESS);
 	return;
 }

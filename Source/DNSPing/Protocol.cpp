@@ -1,5 +1,5 @@
 ﻿// This code is part of Toolkit(DNSPing)
-// A useful and powerful toolkit(DNSPing)
+// DNSPing, a useful and powerful toolkit
 // Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
@@ -242,7 +242,7 @@ bool AddressStringToBinary(
 				const_cast<LPSTR>(AddrString.c_str()), 
 				AF_INET6, 
 				nullptr, 
-				reinterpret_cast<PSOCKADDR>(&SockAddr), 
+				reinterpret_cast<sockaddr *>(&SockAddr), 
 				&SockLength) == SOCKET_ERROR)
 		{
 			if (ErrorCode != nullptr)
@@ -251,7 +251,7 @@ bool AddressStringToBinary(
 			return false;
 		}
 
-		memcpy_s(OriginalAddr, sizeof((reinterpret_cast<PSOCKADDR_IN6>(&SockAddr))->sin6_addr), &(reinterpret_cast<PSOCKADDR_IN6>(&SockAddr))->sin6_addr, sizeof((reinterpret_cast<PSOCKADDR_IN6>(&SockAddr))->sin6_addr));
+		memcpy_s(OriginalAddr, sizeof((reinterpret_cast<sockaddr_in6 *>(&SockAddr))->sin6_addr), &(reinterpret_cast<sockaddr_in6 *>(&SockAddr))->sin6_addr, sizeof((reinterpret_cast<sockaddr_in6 *>(&SockAddr))->sin6_addr));
 	#else
 		Result = inet_pton(AF_INET6, AddrString.c_str(), OriginalAddr);
 		if (Result == SOCKET_ERROR || Result == 0)
@@ -316,7 +316,7 @@ bool AddressStringToBinary(
 				const_cast<LPSTR>(AddrString.c_str()), 
 				AF_INET, 
 				nullptr, 
-				reinterpret_cast<PSOCKADDR>(&SockAddr), 
+				reinterpret_cast<sockaddr *>(&SockAddr), 
 				&SockLength) == SOCKET_ERROR)
 		{
 			if (ErrorCode != nullptr)
@@ -325,7 +325,7 @@ bool AddressStringToBinary(
 			return false;
 		}
 
-		memcpy_s(OriginalAddr, sizeof((reinterpret_cast<PSOCKADDR_IN>(&SockAddr))->sin_addr), &(reinterpret_cast<PSOCKADDR_IN>(&SockAddr))->sin_addr, sizeof((reinterpret_cast<PSOCKADDR_IN>(&SockAddr))->sin_addr));
+		memcpy_s(OriginalAddr, sizeof((reinterpret_cast<sockaddr_in *>(&SockAddr))->sin_addr), &(reinterpret_cast<sockaddr_in *>(&SockAddr))->sin_addr, sizeof((reinterpret_cast<sockaddr_in *>(&SockAddr))->sin_addr));
 	#else
 		Result = inet_pton(AF_INET, AddrString.c_str(), OriginalAddr);
 		if (Result == SOCKET_ERROR || Result == 0)
@@ -363,12 +363,12 @@ bool BinaryToAddressString(
 	if (Protocol == AF_INET6)
 	{
 		SockAddr.ss_family = AF_INET6;
-		(reinterpret_cast<PSOCKADDR_IN6>(&SockAddr))->sin6_addr = *reinterpret_cast<const in6_addr *>(OriginalAddr);
+		(reinterpret_cast<sockaddr_in6 *>(&SockAddr))->sin6_addr = *reinterpret_cast<const in6_addr *>(OriginalAddr);
 	}
 	else if (Protocol == AF_INET)
 	{
 		SockAddr.ss_family = AF_INET;
-		(reinterpret_cast<PSOCKADDR_IN>(&SockAddr))->sin_addr = *reinterpret_cast<const in_addr *>(OriginalAddr);
+		(reinterpret_cast<sockaddr_in *>(&SockAddr))->sin_addr = *reinterpret_cast<const in_addr *>(OriginalAddr);
 	}
 	else {
 		return false;
@@ -376,7 +376,7 @@ bool BinaryToAddressString(
 
 	DWORD BufferLength = StringSize;
 	if (WSAAddressToStringA(
-		reinterpret_cast<PSOCKADDR>(&SockAddr), 
+		reinterpret_cast<sockaddr *>(&SockAddr), 
 		sizeof(sockaddr_in6), 
 		nullptr, 
 		static_cast<LPSTR>(AddressString), 
@@ -1130,7 +1130,7 @@ size_t StringToPacketQuery(
 	}
 
 	*(TName + Index[2U]) = static_cast<uint8_t>(Index[1U]);
-	return strnlen_s(reinterpret_cast<const char *>(TName), DOMAIN_MAXSIZE - 1U) + 1U;
+	return strnlen_s(reinterpret_cast<const char *>(TName), DOMAIN_MAXSIZE - 1U) + NULL_TERMINATE_LENGTH;
 }
 
 //Convert data from DNS query to string

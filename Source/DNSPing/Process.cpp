@@ -1,5 +1,5 @@
 ﻿// This code is part of Toolkit(DNSPing)
-// A useful and powerful toolkit(DNSPing)
+// DNSPing, a useful and powerful toolkit
 // Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
@@ -114,12 +114,10 @@ bool SendRequestProcess(
 	#if (defined(PLATFORM_WIN) || defined(PLATFORM_LINUX))
 	#if defined(PLATFORM_WIN)
 		BOOL DoNotFragment = TRUE;
-		if (ConfigurationParameter.IsDoNotFragment && 
-			setsockopt(Socket_Normal, IPPROTO_IP, IP_DONTFRAGMENT, reinterpret_cast<const char *>(&DoNotFragment), sizeof(DoNotFragment)) == SOCKET_ERROR)
+		if (ConfigurationParameter.IsDoNotFragment && setsockopt(Socket_Normal, IPPROTO_IP, IP_DONTFRAGMENT, reinterpret_cast<const char *>(&DoNotFragment), sizeof(DoNotFragment)) == SOCKET_ERROR)
 	#elif defined(PLATFORM_LINUX)
 		int DoNotFragment = IP_PMTUDISC_DO;
-		if (ConfigurationParameter.IsDoNotFragment && 
-			setsockopt(Socket_Normal, IPPROTO_IP, IP_MTU_DISCOVER, &DoNotFragment, sizeof(DoNotFragment)) == SOCKET_ERROR)
+		if (ConfigurationParameter.IsDoNotFragment && setsockopt(Socket_Normal, IPPROTO_IP, IP_MTU_DISCOVER, &DoNotFragment, sizeof(DoNotFragment)) == SOCKET_ERROR)
 	#endif
 		{
 			PrintErrorToScreen(L"[Error] Set Do Not Fragment flag error", WSAGetLastError());
@@ -139,8 +137,10 @@ bool SendRequestProcess(
 #if defined(PLATFORM_WIN)
 	LARGE_INTEGER CPU_Frequency, BeforeTime, AfterTime;
 	memset(&CPU_Frequency, 0, sizeof(CPU_Frequency));
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif defined(PLATFORM_LINUX)
 	timespec BeforeTime, AfterTime;
+#elif defined(PLATFORM_MACOS)
+	uint64_t BeforeTime = 0, AfterTime = 0;
 #endif
 	memset(&BeforeTime, 0, sizeof(BeforeTime));
 	memset(&AfterTime, 0, sizeof(AfterTime));
@@ -308,9 +308,12 @@ bool PrintSendResult(
 	LARGE_INTEGER &CPU_Frequency, 
 	LARGE_INTEGER &BeforeTime, 
 	LARGE_INTEGER &AfterTime)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif defined(PLATFORM_LINUX)
 	timespec &BeforeTime, 
 	timespec &AfterTime)
+#elif defined(PLATFORM_MACOS)
+	uint64_t &BeforeTime, 
+	uint64_t &AfterTime)
 #endif
 {
 	IsContinue = false;
@@ -477,9 +480,12 @@ bool MarkProcessTime(
 	LARGE_INTEGER &CPU_Frequency, 
 	LARGE_INTEGER &BeforeTime, 
 	LARGE_INTEGER &AfterTime)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif defined(PLATFORM_LINUX)
 	timespec &BeforeTime, 
 	timespec &AfterTime)
+#elif defined(PLATFORM_MACOS)
+	uint64_t &BeforeTime, 
+	uint64_t &AfterTime)
 #endif
 {
 //Mark start time.
@@ -501,20 +507,24 @@ bool MarkProcessTime(
 			return false;
 		}
 	#elif defined(PLATFORM_MACOS)
-		clock_serv_t ServClock;
-		mach_timespec_t MachTimespec;
-		memset(&ServClock, 0, sizeof(ServClock));
-		memset(&MachTimespec, 0, sizeof(MachTimespec));
-		if (host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &ServClock) != KERN_SUCCESS || 
-			clock_get_time(ServClock, &MachTimespec) != KERN_SUCCESS || 
-			mach_port_deallocate(mach_task_self(), ServClock) != KERN_SUCCESS)
+	//Convert to nanoseconds.
+		mach_timebase_info_data_t TimeBaseInfo;
+		memset(&TimeBaseInfo, 0, sizeof(TimeBaseInfo));
+		if (mach_timebase_info(&TimeBaseInfo) != KERN_SUCCESS)
 		{
-			PrintErrorToScreen(L"[Error] Get current time error", 0);
+			PrintErrorToScreen(L"[Error] Get current time error", errno);
+			return false;
+		}
+	
+	//Mark time.
+		BeforeTime = mach_absolute_time();
+		if (BeforeTime == 0)
+		{
+			PrintErrorToScreen(L"[Error] Get current time error", errno);
 			return false;
 		}
 		else {
-			BeforeTime.tv_sec = MachTimespec.tv_sec;
-			BeforeTime.tv_nsec = MachTimespec.tv_nsec;
+			BeforeTime = BeforeTime * TimeBaseInfo.numer / TimeBaseInfo.denom;
 		}
 	#endif
 	}
@@ -534,20 +544,24 @@ bool MarkProcessTime(
 			return false;
 		}
 	#elif defined(PLATFORM_MACOS)
-		clock_serv_t ServClock;
-		mach_timespec_t MachTimespec;
-		memset(&ServClock, 0, sizeof(ServClock));
-		memset(&MachTimespec, 0, sizeof(MachTimespec));
-		if (host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &ServClock) != KERN_SUCCESS ||
-			clock_get_time(ServClock, &MachTimespec) != KERN_SUCCESS ||
-			mach_port_deallocate(mach_task_self(), ServClock) != KERN_SUCCESS)
+	//Mark time.
+		AfterTime = mach_absolute_time();
+		if (AfterTime == 0)
 		{
-			PrintErrorToScreen(L"[Error] Get current time error", 0);
+			PrintErrorToScreen(L"[Error] Get current time error", errno);
+			return false;
+		}
+
+	//Convert to nanoseconds.
+		mach_timebase_info_data_t TimeBaseInfo;
+		memset(&TimeBaseInfo, 0, sizeof(TimeBaseInfo));
+		if (mach_timebase_info(&TimeBaseInfo) != KERN_SUCCESS)
+		{
+			PrintErrorToScreen(L"[Error] Get current time error", errno);
 			return false;
 		}
 		else {
-			AfterTime.tv_sec = MachTimespec.tv_sec;
-			AfterTime.tv_nsec = MachTimespec.tv_nsec;
+			AfterTime = AfterTime * TimeBaseInfo.numer / TimeBaseInfo.denom;
 		}
 	#endif
 	}
@@ -561,17 +575,23 @@ long double ResultTimeCalculator(
 	const LARGE_INTEGER CPU_Frequency, 
 	const LARGE_INTEGER BeforeTime, 
 	const LARGE_INTEGER AfterTime)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif defined(PLATFORM_LINUX)
 	const timespec BeforeTime, 
 	const timespec AfterTime)
+#elif defined(PLATFORM_MACOS)
+	const uint64_t BeforeTime, 
+	const uint64_t AfterTime)
 #endif
 {
 #if defined(PLATFORM_WIN)
 	if (AfterTime.QuadPart >= BeforeTime.QuadPart)
 		return static_cast<long double>((AfterTime.QuadPart - BeforeTime.QuadPart) * static_cast<LONGLONG>(MICROSECOND_TO_MILLISECOND)) / static_cast<long double>(CPU_Frequency.QuadPart);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif defined(PLATFORM_LINUX)
 	if (AfterTime.tv_sec >= BeforeTime.tv_sec)
 		return static_cast<long double>((AfterTime.tv_sec - BeforeTime.tv_sec) * static_cast<time_t>(SECOND_TO_MILLISECOND)) + static_cast<long double>(AfterTime.tv_nsec - BeforeTime.tv_nsec) / static_cast<long double>(NANOSECOND_TO_MICROSECOND * MICROSECOND_TO_MILLISECOND);
+#elif defined(PLATFORM_MACOS)
+	if (AfterTime >= BeforeTime)
+		return static_cast<long double>(AfterTime - BeforeTime) / static_cast<long double>(NANOSECOND_TO_MICROSECOND * MICROSECOND_TO_MILLISECOND);
 #endif
 
 	return 0;
@@ -733,7 +753,7 @@ void PrintHeaderToScreen(
 		{
 			std::unique_ptr<uint8_t[]> FQDN_String(new uint8_t[NI_MAXHOST + PADDING_RESERVED_BYTES]());
 			memset(FQDN_String.get(), 0, NI_MAXHOST + PADDING_RESERVED_BYTES);
-			if (getnameinfo(reinterpret_cast<PSOCKADDR>(&ConfigurationParameter.SockAddr_Normal), sizeof(sockaddr_in), reinterpret_cast<char *>(FQDN_String.get()), NI_MAXHOST, nullptr, 0, NI_NUMERICSERV) != 0)
+			if (getnameinfo(reinterpret_cast<sockaddr *>(&ConfigurationParameter.SockAddr_Normal), sizeof(sockaddr_in), reinterpret_cast<char *>(FQDN_String.get()), NI_MAXHOST, nullptr, 0, NI_NUMERICSERV) != 0)
 			{
 				PrintErrorToScreen(L"[Error] Resolve addresses to host names error", WSAGetLastError());
 				fwprintf_s(stderr, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
@@ -877,7 +897,7 @@ void PrintDescription(
 #elif defined(PLATFORM_MACOS)
 	fwprintf(stderr, L"(macOS)\n");
 #endif
-	fwprintf_s(stderr, L"A useful and powerful toolkit(DNSPing)\n");
+	fwprintf_s(stderr, L"DNSPing, a useful and powerful toolkit\n");
 	fwprintf_s(stderr, COPYRIGHT_MESSAGE);
 	fwprintf_s(stderr, L"\n--------------------------------------------------\n");
 

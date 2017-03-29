@@ -1,5 +1,5 @@
 ﻿// This code is part of Toolkit(DNSPing)
-// A useful and powerful toolkit(DNSPing)
+// DNSPing, a useful and powerful toolkit
 // Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
@@ -371,7 +371,7 @@
 //Endian definitions
 	#define __LITTLE_ENDIAN             1234                         //Little Endian
 	#define __BIG_ENDIAN                4321                         //Big Endian
-	#define __BYTE_ORDER                __LITTLE_ENDIAN              //x86 and x86-64/x64 is Little Endian in Windows.
+	#define __BYTE_ORDER                __LITTLE_ENDIAN              //x86 and x86-64/x64 is Little Endian.
 	#define LITTLE_ENDIAN               __LITTLE_ENDIAN
 	#define BIG_ENDIAN                  __BIG_ENDIAN
 	#define BYTE_ORDER                  __BYTE_ORDER
@@ -396,9 +396,9 @@
 	#include <arpa/inet.h>              //Internet operations support
 	#include <sys/time.h>               //Date and time support
 #if defined(PLATFORM_MACOS)
-	#include <mach/clock.h>             //Clock operations list structure. Contains vectors to machine dependent clock routines.
-	#include <mach/kern_return.h>       //Kernel return codes
-	#include <mach/mach.h>              //Includes all the types that a normal user of Mach programs should need
+	#include <mach/kern_return.h>       //Mach kernel return codes
+	#include <mach/mach.h>              //Mach includes all the types that a normal user of Mach programs should need
+	#include <mach/mach_time.h>         //Mach time structure support
 #endif
 
 //Portable Operating System Interface/POSIX and Unix system header
@@ -407,7 +407,7 @@
 	#elif defined(PLATFORM_MACOS)
 		#define __LITTLE_ENDIAN             1234                         //Little Endian
 		#define __BIG_ENDIAN                4321                         //Big Endian
-		#define __BYTE_ORDER                __LITTLE_ENDIAN              //x86 and x86-64/x64 is Little Endian in macOS.
+		#define __BYTE_ORDER                __LITTLE_ENDIAN              //x86 and x86-64/x64 is Little Endian.
 	#endif
 
 //Windows compatible
@@ -416,9 +416,6 @@
 	#define SOCKET_ERROR             (-1)
 	#define RETURN_ERROR             (-1)
 	typedef int                      SOCKET;
-	typedef sockaddr                 *PSOCKADDR;
-	typedef sockaddr_in              *PSOCKADDR_IN;
-	typedef sockaddr_in6             *PSOCKADDR_IN6;
 #endif
 
 
@@ -986,7 +983,7 @@ typedef struct _dns_hdr_
 	uint16_t              Answer;
 	uint16_t              Authority;
 	uint16_t              Additional;
-}dns_hdr, *pdns_hdr;
+}dns_hdr;
 
 /* Domain Name System/DNS header
 //With Transmission Control Protocol/TCP
@@ -1042,7 +1039,7 @@ typedef struct _dns_tcp_hdr_
 	uint16_t              Answer;
 	uint16_t              Authority;
 	uint16_t              Additional;
-}dns_tcp_hdr, *pdns_tcp_hdr;
+}dns_tcp_hdr;
 
 /* Domain Name System/DNS Query
 
@@ -1062,7 +1059,7 @@ typedef struct _dns_qry_
 //	uint8_t               *Name;
 	uint16_t              Type;
 	uint16_t              Classes;
-}dns_qry, *pdns_qry;
+}dns_qry;
 
 /* Domain Name System/DNS Standard Resource Records
 
@@ -1091,7 +1088,7 @@ typedef struct _dns_record_standard_
 	uint32_t              TTL;
 	uint16_t              Length;
 //	uint8_t               *Data;
-}dns_record_standard, *pdns_record_standard;
+}dns_record_standard;
 
 /* Domain Name System/DNS A(IPv4) Records
 
@@ -1120,7 +1117,7 @@ typedef struct _dns_record_a_
 	uint32_t              TTL;
 	uint16_t              Length;
 	in_addr               Address;
-}dns_record_a, *pdns_record_a;
+}dns_record_a;
 
 /* Domain Name System/DNS Canonical Name/CNAME Records
 
@@ -1151,7 +1148,7 @@ typedef struct _dns_record_cname_
 	uint32_t              TTL;
 	uint16_t              Length;
 //	uint8_t               *PrimaryName;
-}dns_record_cname, *pdns_record_cname;
+}dns_record_cname;
 
 /* Domain Name System/DNS Start Of a zone of Authority/SOA Resource Records
 
@@ -1187,7 +1184,7 @@ typedef struct _dns_record_soa_
 	uint32_t              RetryInterval;
 	uint32_t              ExpireLimit;
 	uint32_t              MinimumTTL;
-}dns_record_soa, *pdns_record_soa;
+}dns_record_soa;
 
 /* Domain Name System/DNS Pointer/PTR Records
 
@@ -1214,7 +1211,7 @@ typedef struct _dns_record_ptr_
 	uint32_t              TTL;
 	uint16_t              Length;
 //	uint8_t               *Name;
-}dns_record_ptr, *pdns_record_ptr;
+}dns_record_ptr;
 
 /* Domain Name System/DNS Mail eXchange/MX Resource Records
 
@@ -1233,7 +1230,7 @@ typedef struct _dns_record_mx_
 {
 	uint16_t              Preference;
 //	uint8_t               MailExchangeName;
-}dns_record_mx, *pdns_record_mx;
+}dns_record_mx;
 
 /* Domain Name System/DNS Test Strings/TXT Records
 
@@ -1263,7 +1260,7 @@ typedef struct _dns_record_txt_
 	uint16_t              Length;
 	uint8_t               TXT_Length;
 //	uint8_t               *TXT;
-}dns_record_txt, *pdns_record_txt;
+}dns_record_txt;
 
 /* Domain Name System/DNS AAAA(IPv6) Records
 
@@ -1290,7 +1287,7 @@ typedef struct _dns_record_aaaa_
 	uint32_t              TTL;
 	uint16_t              Length;
 	in6_addr              Address;
-}dns_record_aaaa, *pdns_record_aaaa;
+}dns_record_aaaa;
 
 /* Domain Name System/DNS Server Selection/SRV Resource Records
 
@@ -1313,7 +1310,7 @@ typedef struct _dns_record_srv_
 	uint16_t             Weight;
 	uint16_t             Port;
 //	uint8_t              *Target;
-}dns_record_srv, *pdns_record_srv;
+}dns_record_srv;
 
 /* Extension Mechanisms for Domain Name System/DNS, EDNS Label/OPT Resource Records
 
@@ -1355,7 +1352,7 @@ typedef struct _dns_record_opt_
 		}Z_Bits;
 	};
 	uint16_t              DataLength;
-}dns_record_opt, *pdns_record_opt, edns_header, *pedns_header;
+}dns_record_opt, edns_header;
 
 /* Extension Mechanisms for Domain Name System/EDNS Option
                     1                   2                   3
@@ -1375,7 +1372,7 @@ typedef struct _dns_edns_option_
 	uint16_t              Code;
 	uint16_t              Length;
 //	uint8_t               *Data;
-}dns_edns_option, *pdns_edns_option;
+}dns_edns_option;
 
 /* Extension Mechanisms for Domain Name System/DNS, Client subnet in EDNS requests
 * RFC 7871, Client Subnet in DNS Queries(https://tools.ietf.org/html/rfc7871)
@@ -1418,7 +1415,7 @@ typedef struct _edns_client_subnet_
 	uint8_t               Netmask_Source;
 	uint8_t               Netmask_Scope;
 //	uint8_t               *Address;
-}edns_client_subnet, *pedns_client_subnet;
+}edns_client_subnet;
 
 /* Domain Name System/DNS Delegation Signer/DS Resource Records
 
@@ -1455,7 +1452,7 @@ typedef struct _dns_record_ds_
 	uint8_t               Algorithm;
 	uint8_t               Type;
 //	uint8_t               *Digest;
-}dns_record_ds, *pdns_record_ds;
+}dns_record_ds;
 
 /* Domain Name System/DNS Resource Record Digital Signature/RRSIG Records
 
@@ -1516,7 +1513,7 @@ typedef struct _dns_record_rrsig_
 	uint16_t              KeyTag;
 //	uint8_t               *SignerName;
 //	uint8_t               *Signature;
-}dns_record_rrsig, *pdns_record_rrsig;
+}dns_record_rrsig;
 
 /* Domain Name System/DNS DNS Key/DNSKEY Resource Records
 
@@ -1559,7 +1556,7 @@ typedef struct _dns_record_dnskey_
 	uint8_t               Protocol;
 	uint8_t               Algorithm;
 //	uint8_t               *PublicKey;
-}dns_record_dnskey, *pdns_record_dnskey;
+}dns_record_dnskey;
 
 /* Domain Name System/DNS Next-Secure/NSEC Resource Records
 
@@ -1579,7 +1576,7 @@ typedef struct _dns_record_nsec_
 {
 //	uint8_t                NextDomainName;
 //	uint8_t                TypeBitMap;
-}dns_record_nsec, *pdns_record_nsec;
+}dns_record_nsec;
 */
 
 /* Domain Name System/DNS NSEC version 3/NSEC3 Resource Records
@@ -1623,7 +1620,7 @@ typedef struct _dns_record_nsec3_
 //	uint8_t               HashLength;
 //	uint8_t               *NextHashedOwnerName;
 //	uint8_t               *TypeBitMap;
-}dns_record_nsec3, *pdns_record_nsec3;
+}dns_record_nsec3;
 
 /* Domain Name System/DNS NSEC version 3 Parameters/NSEC3PARAM Resource Records
 
@@ -1656,7 +1653,7 @@ typedef struct _dns_record_nsec3param_
 	uint16_t              Iterations;
 	uint8_t               SaltLength;
 //	uint8_t               *Salt;
-}dns_record_nsec3param, *pdns_record_nsec3param;
+}dns_record_nsec3param;
 
 /* Domain Name System/DNS Certification Authority Authorization/CAA Resource Records
 
@@ -1691,7 +1688,7 @@ typedef struct _dns_record_caa_
 	uint8_t               Length;
 //	uint8_t               *Tag;
 //	uint8_t               *Value;
-}dns_record_caa, *pdns_record_caa;
+}dns_record_caa;
 
 //Memory alignment settings(Part 2)
 #pragma pack(pop) //Restore original alignment from stack.

@@ -1,5 +1,5 @@
 # This code is part of Toolkit(DNSPing)
-# A useful and powerful toolkit(DNSPing)
+# DNSPing, a useful and powerful toolkit
 # Copyright (C) 2014-2017 Chengr28
 # 
 # This program is free software; you can redistribute it and/or

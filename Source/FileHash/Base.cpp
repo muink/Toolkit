@@ -1,5 +1,5 @@
 ﻿// This code is part of Toolkit(FileHash)
-// A useful and powerful toolkit(FileHash)
+// FileHash, a useful and powerful toolkit
 // Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
@@ -125,7 +125,7 @@ uint8_t * sodium_bin2hex(
 	const uint8_t * const bin, 
 	const size_t bin_len)
 {
-	size_t       i = (size_t)0U;
+	size_t       i = static_cast<size_t>(0U);
 	unsigned int x = 0;
 	int          b = 0;
 	int          c = 0;
@@ -136,10 +136,10 @@ uint8_t * sodium_bin2hex(
 	{
 		c = bin[i] & 0xf;
 		b = bin[i] >> 4;
-		x = (uint8_t)(87U + c + (((c - 10U) >> 8) & ~38U)) << 8 | (uint8_t) (87U + b + (((b - 10U) >> 8) & ~38U));
-		hex[i * 2U] = (char)x;
+		x = static_cast<uint8_t>(87U + c + (((c - 10U) >> 8) & ~38U)) << 8 | static_cast<uint8_t>(87U + b + (((b - 10U) >> 8) & ~38U));
+		hex[i * 2U] = static_cast<char>(x);
 		x >>= 8;
-		hex[i * 2U + 1U] = (char)x;
+		hex[i * 2U + 1U] = static_cast<char>(x);
 		i++;
 	}
 	hex[i * 2U] = 0U;
@@ -241,7 +241,7 @@ void PrintDescription(
 #elif defined(PLATFORM_MACOS)
 	fwprintf(stderr, L"(macOS)\n");
 #endif
-	fwprintf_s(stderr, L"A useful and powerful toolkit(FileHash)\n");
+	fwprintf_s(stderr, L"FileHash, a useful and powerful toolkit\n");
 	fwprintf_s(stderr, COPYRIGHT_MESSAGE);
 	fwprintf_s(stderr, L"\n--------------------------------------------------\n");
 

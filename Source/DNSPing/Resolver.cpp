@@ -1,5 +1,5 @@
 ﻿// This code is part of Toolkit(DNSPing)
-// A useful and powerful toolkit(DNSPing)
+// DNSPing, a useful and powerful toolkit
 // Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
@@ -116,7 +116,7 @@ void PrintResponse(
 		//Print Name.
 			PrintDomainName(FileHandle, Buffer, CurrentLength);
 			fwprintf_s(FileHandle, L"\n");
-			CurrentLength += strnlen_s(reinterpret_cast<const char *>(Buffer) + CurrentLength, Length - CurrentLength) + 1U;
+			CurrentLength += strnlen_s(reinterpret_cast<const char *>(Buffer) + CurrentLength, Length - CurrentLength) + NULL_TERMINATE_LENGTH;
 
 		//Print Type and Classes.
 			DNS_Query = const_cast<dns_qry *>(reinterpret_cast<const dns_qry *>(Buffer + CurrentLength));
@@ -813,7 +813,7 @@ void PrintResourseData(
 		PrintDateTime(FileHandle, ntohl(DNS_RRSIG_RECORD->Inception));
 		fwprintf_s(FileHandle, L"\n         Key Tag: %u", ntohs(DNS_RRSIG_RECORD->KeyTag));
 		fwprintf_s(FileHandle, L"\n         Signer's name: ");
-		CurrentLength = PrintDomainName(FileHandle, Buffer, Location + sizeof(dns_record_rrsig)) + 1U;
+		CurrentLength = PrintDomainName(FileHandle, Buffer, Location + sizeof(dns_record_rrsig)) + NULL_TERMINATE_LENGTH;
 		CurrentLength += sizeof(dns_record_rrsig);
 		fwprintf_s(FileHandle, L"\n         Signature: ");
 		for (Index = Location + CurrentLength;Index < Location + Length;++Index)

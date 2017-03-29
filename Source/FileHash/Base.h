@@ -1,5 +1,5 @@
 ﻿// This code is part of Toolkit(FileHash)
-// A useful and powerful toolkit(FileHash)
+// FileHash, a useful and powerful toolkit
 // Copyright (C) 2012-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
@@ -355,13 +355,13 @@
 #include <vector>                  //Vector support
 
 #if defined(PLATFORM_WIN)
-	#include <windows.h>                 //Master include file in Windows
+	#include <windows.h>                 //Master include file
 	#pragma comment(lib, "ws2_32.lib")   //Windows WinSock 2.0+ support
 
 //Endian definitions
 	#define __LITTLE_ENDIAN            1234                      //Little Endian
 	#define __BIG_ENDIAN               4321                      //Big Endian
-	#define __BYTE_ORDER               __LITTLE_ENDIAN           //x86 and x86-64/x64 is Little Endian in Windows.
+	#define __BYTE_ORDER               __LITTLE_ENDIAN           //x86 and x86-64/x64 is Little Endian.
 	#define LITTLE_ENDIAN              __LITTLE_ENDIAN
 	#define BIG_ENDIAN                 __BIG_ENDIAN
 	#define BYTE_ORDER                 __BYTE_ORDER
@@ -375,7 +375,7 @@
 //Endian definitions
 	#define __LITTLE_ENDIAN            1234                      //Little Endian
 	#define __BIG_ENDIAN               4321                      //Big Endian
-	#define __BYTE_ORDER               __LITTLE_ENDIAN           //x86 and x86-64/x64 is Little Endian in macOS.
+	#define __BYTE_ORDER               __LITTLE_ENDIAN           //x86 and x86-64/x64 is Little Endian.
 #endif
 
 
@@ -395,7 +395,7 @@
 #define ASCII_PERIOD                            46                          //"."
 
 //Version definitions
-#define FULL_VERSION                            L"0.3.6.0"
+#define FULL_VERSION                            L"0.3.7.0"
 #define COPYRIGHT_MESSAGE                       L"Copyright (C) 2012-2017 Chengr28"
 
 //Command definitions
@@ -486,8 +486,8 @@
 	#define strnlen_s                                         strnlen
 	#define wcsnlen_s                                         wcsnlen
 	#define _set_errno(Value)                                 errno = (Value)
-	#define fread_s(Dst, DstSize, ElementSize, Count, File)   fread(Dst, ElementSize, Count, File)
-	#define memcpy_s(Dst, DstSize, Src, Size)                 memcpy(Dst, Src, Size)
+	#define fread_s(Dst, DstSize, ElementSize, Count, File)   fread((Dst), (ElementSize), (Count), (File))
+	#define memcpy_s(Dst, DstSize, Src, Size)                 memcpy((Dst), (Src), (Size))
 #endif
 
 //Function definitions

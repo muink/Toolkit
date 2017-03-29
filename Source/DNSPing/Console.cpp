@@ -1,5 +1,5 @@
 ﻿// This code is part of Toolkit(DNSPing)
-// A useful and powerful toolkit(DNSPing)
+// DNSPing, a useful and powerful toolkit
 // Copyright (C) 2014-2017 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
@@ -20,6 +20,9 @@
 #include "Base.h"
 
 #if defined(PLATFORM_WIN)
+//Global variables
+extern ConfigurationTable ConfigurationParameter;
+
 //Catch Control-C exception from keyboard
 BOOL WINAPI CtrlHandler(
 	const DWORD ControlType)
@@ -39,6 +42,7 @@ BOOL WINAPI CtrlHandler(
 			fwprintf_s(stderr, L"[Notice] Get Control-Break.\n");
 			PrintProcess(true, true);
 
+		//Exit process.
 			return TRUE;
 		}break;
 	//Handle other signals.
@@ -49,6 +53,28 @@ BOOL WINAPI CtrlHandler(
 		}
 	}
 
+//Close file handle.
+	if (ConfigurationParameter.OutputFile != nullptr)
+	{
+		fclose(ConfigurationParameter.OutputFile);
+		ConfigurationParameter.OutputFile = nullptr;
+	}
+
+//Close all file handles and WinSock cleanup.
+#if defined(PLATFORM_WIN)
+	if (ConfigurationParameter.IsInitialized_WinSock)
+	{
+		WSACleanup();
+		ConfigurationParameter.IsInitialized_WinSock = false;
+	}
+	
+	_fcloseall();
+#elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
+	fcloseall();
+#endif
+
+//Exit process.
+//	exit(EXIT_SUCCESS);
 	return FALSE;
 }
 #endif

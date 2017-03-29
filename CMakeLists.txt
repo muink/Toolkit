@@ -1,5 +1,5 @@
 # This code is part of Toolkit
-# A useful and powerful toolkit
+# DNSPing and FileHash, a useful and powerful toolkit
 # Copyright (C) 2012-2017 Chengr28
 # 
 # This program is free software; you can redistribute it and/or
