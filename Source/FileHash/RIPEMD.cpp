@@ -902,10 +902,11 @@ void MD_Finish(
 //Read commands(RIPEMD)
 bool ReadCommand_RIPEMD(
 #if defined(PLATFORM_WIN)
-	std::wstring &Command)
+	std::wstring &Command
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-	std::string &Command)
+	std::string &Command
 #endif
+)
 {
 //Hash function check
 	if (Command == COMMAND_RIPEMD_128) //RIPEMD 128 bits
@@ -945,15 +946,15 @@ bool RIPEMD_Hash(
 	}
 
 //Initialization
-	std::unique_ptr<uint8_t[]> Buffer(new uint8_t[FILE_BUFFER_SIZE]());
-	std::unique_ptr<uint8_t[]> StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
-	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
-	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
+	std::unique_ptr<uint8_t[]> Buffer(new uint8_t[FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES]());
+	std::unique_ptr<uint8_t[]> StringBuffer(new uint8_t[FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES]());
+	memset(Buffer.get(), 0, FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES);
+	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES);
 	size_t ReadLength = 0, DigestSize = RIPEMD_DIGEST_MAXSIZE;
 
 //RIPEMD initialization
-	std::unique_ptr<dword[]> MDbuf(new dword[DigestSize / (sizeof(uint32_t) * BYTES_TO_BITS)]());
-	memset(MDbuf.get(), 0, DigestSize / (sizeof(uint32_t) * BYTES_TO_BITS));
+	std::unique_ptr<dword[]> MDbuf(new dword[DigestSize / (sizeof(uint32_t) * BYTES_TO_BITS) + PADDING_RESERVED_BYTES]());
+	memset(MDbuf.get(), 0, DigestSize / (sizeof(uint32_t) * BYTES_TO_BITS) + PADDING_RESERVED_BYTES);
 	if (RIPEMD_HashFunctionID == HASH_ID_RIPEMD_128)
 	{
 		DigestSize = RIPEMD_DIGEST_SIZE_128;

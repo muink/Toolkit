@@ -28,13 +28,12 @@ bool IsLowerCase = false;
 int wmain(
 	int argc, 
 	wchar_t *argv[])
-{
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 int main(
 	int argc, 
 	char *argv[])
-{
 #endif
+{
 //Initialization(Part 1)
 #if defined(PLATFORM_WIN)
 	std::wstring FileName, OutputFile;
@@ -93,7 +92,7 @@ int main(
 	Result = _wfopen_s(&FileHandle, FileName.c_str(), L"rb");
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	errno = 0;
-	FileHandle = fopen(FileName.c_str(), "rb");
+	FileHandle = fopen(FileName.c_str(), ("rb"));
 #endif
 	if (FileHandle == nullptr)
 	{
@@ -118,7 +117,7 @@ int main(
 		Result = _wfopen_s(&OutputFileHandle, OutputFile.c_str(), L"a,ccs=UTF-8");
 	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		errno = 0;
-		OutputFileHandle = fopen(OutputFile.c_str(), "a");
+		OutputFileHandle = fopen(OutputFile.c_str(), ("a"));
 	#endif
 		if (OutputFileHandle == nullptr)
 		{
@@ -156,12 +155,13 @@ bool ReadCommand(
 #if defined(PLATFORM_WIN)
 	std::vector<std::wstring> CommandList, 
 	std::wstring &FileName, 
-	std::wstring &OutputFile)
+	std::wstring &OutputFile
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::vector<std::string> CommandList, 
 	std::string &FileName, 
-	std::string &OutputFile)
+	std::string &OutputFile
 #endif
+)
 {
 //Command list check
 	for (size_t Index = 0;Index < CommandList.size();++Index)

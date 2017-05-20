@@ -776,10 +776,11 @@ void BLAKE_512_Final(
 //Read commands(BLAKE)
 bool ReadCommand_BLAKE(
 #if defined(PLATFORM_WIN)
-	std::wstring &Command)
+	std::wstring &Command
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-	std::string &Command)
+	std::string &Command
 #endif
+)
 {
 //Hash function check
 	if (Command == COMMAND_BLAKE_224) //BLAKE 224 bits
@@ -819,10 +820,10 @@ bool BLAKE_Hash(
 	}
 
 //Initialization
-	std::unique_ptr<uint8_t[]> Buffer(new uint8_t[FILE_BUFFER_SIZE]());
-	std::unique_ptr<uint8_t[]> StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
-	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
-	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
+	std::unique_ptr<uint8_t[]> Buffer(new uint8_t[FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES]());
+	std::unique_ptr<uint8_t[]> StringBuffer(new uint8_t[FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES]());
+	memset(Buffer.get(), 0, FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES);
+	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES);
 	size_t ReadLength = 0, DigestSize = 0;
 
 //BLAKE initialization

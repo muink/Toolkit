@@ -69,8 +69,8 @@ bool Checksum_Hash(
 	}
 
 //Initialization
-	std::unique_ptr<uint8_t[]> StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
-	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
+	std::unique_ptr<uint8_t[]> StringBuffer(new uint8_t[FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES]());
+	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES);
 	size_t ReadLength = 0;
 
 //Checksum initialization

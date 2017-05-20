@@ -369,8 +369,8 @@
 //Windows compatible definitions
 	typedef SSIZE_T                    ssize_t;
 #elif defined(PLATFORM_LINUX)
-	#include <arpa/inet.h>             //Internet operations
-	#include <endian.h>                //Endian
+	#include <arpa/inet.h>                                           //Internet operations
+	#include <endian.h>                                              //Endian
 #elif defined(PLATFORM_MACOS)
 //Endian definitions
 	#define __LITTLE_ENDIAN            1234                      //Little Endian
@@ -384,18 +384,20 @@
 // 
 //Code definitions
 #define BYTES_TO_BITS                           8U
-#define FILE_BUFFER_SIZE                        4096U
+#define DEFAULT_LARGE_BUFFER_SIZE               4096U                       //Default size of large buffer(4KB/4096 bytes)
+#define FILE_BUFFER_SIZE                        DEFAULT_LARGE_BUFFER_SIZE   //Maximum size of file buffer(4KB/4096 bytes)
 #if defined(PLATFORM_WIN)
-	#define MBSTOWCS_NULL_TERMINATE                 (-1)                       //MultiByteToWideChar function find null-terminate.
+	#define MBSTOWCS_NULL_TERMINATE                 (-1)                        //MultiByteToWideChar function find null-terminate.
 #endif
-#define PADDING_RESERVED_BYTES                  2U
+#define NULL_TERMINATE_LENGTH                   1U                          //Length of C style string null
+#define PADDING_RESERVED_BYTES                  2U                          //Padding reserved bytes(2 bytes)
 
 //Character value definitions
 #define ASCII_SPACE                             32                          //" "
 #define ASCII_PERIOD                            46                          //"."
 
 //Version definitions
-#define FULL_VERSION                            L"0.3.7.0"
+#define FULL_VERSION                            L"0.3.8.0"
 #define COPYRIGHT_MESSAGE                       L"Copyright (C) 2012-2017 Chengr28"
 
 //Command definitions

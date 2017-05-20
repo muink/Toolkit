@@ -22,7 +22,7 @@
 # Create release directories.
 if (uname -s | grep -iq "Darwin"); then
 	ThreadNum=`sysctl -n hw.ncpu`
-else
+else 
 	ThreadNum=`nproc`
 fi
 rm -Rrf Object

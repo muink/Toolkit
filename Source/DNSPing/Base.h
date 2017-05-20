@@ -78,7 +78,7 @@
 #define DNS_PACKET_MINSIZE           (sizeof(dns_hdr) + NULL_TERMINATE_LENGTH + sizeof(dns_qry))   //Minimum DNS packet size(DNS Header + Minimum Domain<ROOT> + DNS Query)
 
 //Version definitions
-#define FULL_VERSION                 L"0.3.7.0"
+#define FULL_VERSION                 L"0.3.8.0"
 #define COPYRIGHT_MESSAGE            L"Copyright (C) 2014-2017 Chengr28"
 
 

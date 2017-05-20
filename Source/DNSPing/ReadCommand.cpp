@@ -699,8 +699,8 @@ bool ReadCommand(
 					PrintErrorToScreen(L"\n[Error] Command (-rawdata raw_data) error", 0);
 					return false;
 				}
-				std::unique_ptr<uint8_t[]> RawDataTemp(new uint8_t[PACKET_MAXSIZE]());
-				memset(RawDataTemp.get(), 0, PACKET_MAXSIZE);
+				std::unique_ptr<uint8_t[]> RawDataTemp(new uint8_t[PACKET_MAXSIZE + PADDING_RESERVED_BYTES]());
+				memset(RawDataTemp.get(), 0, PACKET_MAXSIZE + PADDING_RESERVED_BYTES);
 				std::swap(ConfigurationParameter.RawDataBuffer, RawDataTemp);
 				RawDataTemp.reset();
 				uint8_t BufferStringTemp[5U]{0};

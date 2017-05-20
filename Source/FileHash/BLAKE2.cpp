@@ -151,7 +151,7 @@ int BLAKE_2B_Init(
 	if (outlen == 0 || outlen > 64 || keylen > 64)
 		return -1;
 
-//State, "param block"
+//State, param block
 	for (i = 0;i < 8;++i)
 		ctx->h[i] = blake2b_iv[i];
 	ctx->h[0] ^= 0x01010000 ^ (keylen << 8U) ^ outlen;
@@ -318,7 +318,7 @@ int BLAKE_2S_Init(
 	if (outlen == 0 || outlen > 32 || keylen > 32)
 		return -1;
 
-//State, "param block"
+//State, param block
 	for (i = 0;i < 8;++i)
 		ctx->h[i] = blake2s_iv[i];
 	ctx->h[0] ^= 0x01010000 ^ (keylen << 8U) ^ outlen;
@@ -369,10 +369,11 @@ void BLAKE_2S_Final(
 //Read commands(BLAKE2)
 bool ReadCommand_BLAKE2(
 #if defined(PLATFORM_WIN)
-	std::wstring &Command)
+	std::wstring &Command
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-	std::string &Command)
+	std::string &Command
 #endif
+)
 {
 //Hash function check
 	if (Command == COMMAND_BLAKE2B_160) //BLAKE2B 160 bits
@@ -428,8 +429,8 @@ bool BLAKE2_Hash(
 	}
 
 //Initialization
-	std::unique_ptr<uint8_t[]> StringBuffer(new uint8_t[FILE_BUFFER_SIZE]());
-	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
+	std::unique_ptr<uint8_t[]> StringBuffer(new uint8_t[FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES]());
+	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES);
 	size_t ReadLength = 0, DigestSize = 0;
 
 //BLAKE2 initialization
@@ -518,8 +519,8 @@ bool BLAKE2_Hash(
 	}
 
 //Finish hash process.
-	std::unique_ptr<uint8_t[]> Result(new uint8_t[BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS]());
-	memset(Result.get(), 0, BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS);
+	std::unique_ptr<uint8_t[]> Result(new uint8_t[BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS + PADDING_RESERVED_BYTES]());
+	memset(Result.get(), 0, BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS + PADDING_RESERVED_BYTES);
 	if (BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_160 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_256 || 
 		BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_384 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_512) //BLAKE2B
 	{

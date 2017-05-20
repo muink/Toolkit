@@ -130,10 +130,10 @@ bool SendRequestProcess(
 	}
 
 //Initialization(Part 2)
-	std::unique_ptr<uint8_t[]> SendBuffer(new uint8_t[ConfigurationParameter.BufferSize]());
-	std::unique_ptr<uint8_t[]> RecvBuffer(new uint8_t[ConfigurationParameter.BufferSize]());
-	memset(SendBuffer.get(), 0, ConfigurationParameter.BufferSize);
-	memset(RecvBuffer.get(), 0, ConfigurationParameter.BufferSize);
+	std::unique_ptr<uint8_t[]> SendBuffer(new uint8_t[ConfigurationParameter.BufferSize + PADDING_RESERVED_BYTES]());
+	std::unique_ptr<uint8_t[]> RecvBuffer(new uint8_t[ConfigurationParameter.BufferSize + PADDING_RESERVED_BYTES]());
+	memset(SendBuffer.get(), 0, ConfigurationParameter.BufferSize + PADDING_RESERVED_BYTES);
+	memset(RecvBuffer.get(), 0, ConfigurationParameter.BufferSize + PADDING_RESERVED_BYTES);
 #if defined(PLATFORM_WIN)
 	LARGE_INTEGER CPU_Frequency, BeforeTime, AfterTime;
 	memset(&CPU_Frequency, 0, sizeof(CPU_Frequency));
@@ -307,14 +307,15 @@ bool PrintSendResult(
 #if defined(PLATFORM_WIN)
 	LARGE_INTEGER &CPU_Frequency, 
 	LARGE_INTEGER &BeforeTime, 
-	LARGE_INTEGER &AfterTime)
+	LARGE_INTEGER &AfterTime
 #elif defined(PLATFORM_LINUX)
 	timespec &BeforeTime, 
-	timespec &AfterTime)
+	timespec &AfterTime
 #elif defined(PLATFORM_MACOS)
 	uint64_t &BeforeTime, 
-	uint64_t &AfterTime)
+	uint64_t &AfterTime
 #endif
+)
 {
 	IsContinue = false;
 
@@ -479,14 +480,15 @@ bool MarkProcessTime(
 #if defined(PLATFORM_WIN)
 	LARGE_INTEGER &CPU_Frequency, 
 	LARGE_INTEGER &BeforeTime, 
-	LARGE_INTEGER &AfterTime)
+	LARGE_INTEGER &AfterTime
 #elif defined(PLATFORM_LINUX)
 	timespec &BeforeTime, 
-	timespec &AfterTime)
+	timespec &AfterTime
 #elif defined(PLATFORM_MACOS)
 	uint64_t &BeforeTime, 
-	uint64_t &AfterTime)
+	uint64_t &AfterTime
 #endif
+)
 {
 //Mark start time.
 	if (!IsFinished)

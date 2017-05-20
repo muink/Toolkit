@@ -560,8 +560,8 @@ size_t PrintDomainName(
 	}
 
 //Initialization
-	std::unique_ptr<uint8_t[]> BufferTemp(new uint8_t[PACKET_MAXSIZE]());
-	memset(BufferTemp.get(), 0, PACKET_MAXSIZE);
+	std::unique_ptr<uint8_t[]> BufferTemp(new uint8_t[PACKET_MAXSIZE + PADDING_RESERVED_BYTES]());
+	memset(BufferTemp.get(), 0, PACKET_MAXSIZE + PADDING_RESERVED_BYTES);
 	size_t Index = 0, Result = 0;
 	uint16_t TruncateLocation = 0;
 	auto IsMultiplePointer = false;

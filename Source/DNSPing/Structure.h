@@ -361,9 +361,9 @@
 //	#include <windows.h>                 //Master include file
 
 //Part 4 including files(MUST be including after Part 3)
-	#if !defined(PLATFORM_WIN_XP)
-		#include <versionhelpers.h>          //Version Helper functions
-	#endif
+#if !defined(PLATFORM_WIN_XP)
+	#include <versionhelpers.h>          //Version Helper functions
+#endif
 
 //Library linking
 	#pragma comment(lib, "ws2_32.lib")   //Windows WinSock 2.0+ support
@@ -402,13 +402,13 @@
 #endif
 
 //Portable Operating System Interface/POSIX and Unix system header
-	#if defined(PLATFORM_LINUX)
-		#include <endian.h>                                              //Endian support
-	#elif defined(PLATFORM_MACOS)
-		#define __LITTLE_ENDIAN             1234                         //Little Endian
-		#define __BIG_ENDIAN                4321                         //Big Endian
-		#define __BYTE_ORDER                __LITTLE_ENDIAN              //x86 and x86-64/x64 is Little Endian.
-	#endif
+#if defined(PLATFORM_LINUX)
+	#include <endian.h>                                              //Endian support
+#elif defined(PLATFORM_MACOS)
+	#define __LITTLE_ENDIAN             1234                         //Little Endian
+	#define __BIG_ENDIAN                4321                         //Big Endian
+	#define __BYTE_ORDER                __LITTLE_ENDIAN              //x86 and x86-64/x64 is Little Endian.
+#endif
 
 //Windows compatible
 	#define FALSE                    0
