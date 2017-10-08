@@ -34,29 +34,32 @@ extern bool IsLowerCase;
 #define ED2K_SIZE_BLOCK    9728000U
 
 //Code definitions
-#define INIT_DATA_A (uint32_t)0x67452301L
-#define INIT_DATA_B (uint32_t)0xEFCDAB89L
-#define INIT_DATA_C (uint32_t)0x98BADCFEL
-#define INIT_DATA_D (uint32_t)0x10325476L
-#define HASH_MAKE_STRING(c, s) do {                           \
-	uint32_t ll = 0;                                          \
-	ll = (c)->A; (void)HOST_l2c(ll, (s));                     \
-	ll = (c)->B; (void)HOST_l2c(ll, (s));                     \
-	ll = (c)->C; (void)HOST_l2c(ll, (s));                     \
-	ll = (c)->D; (void)HOST_l2c(ll, (s));                     \
+#define INIT_DATA_A        (uint32_t)0x67452301L
+#define INIT_DATA_B        (uint32_t)0xEFCDAB89L
+#define INIT_DATA_C        (uint32_t)0x98BADCFEL
+#define INIT_DATA_D        (uint32_t)0x10325476L
+#define HASH_MAKE_STRING(c, s)                                \
+	do {                                                      \
+		uint32_t ll = 0;                                      \
+		ll = (c)->A; (void)HOST_l2c(ll, (s));                 \
+		ll = (c)->B; (void)HOST_l2c(ll, (s));                 \
+		ll = (c)->C; (void)HOST_l2c(ll, (s));                 \
+		ll = (c)->D; (void)HOST_l2c(ll, (s));                 \
 	} while (0)
-#define HOST_c2l(c, l) (l = (((uint32_t)(*((c)++)))),         \
+#define HOST_c2l(c, l)                                        \
+	(l = (((uint32_t)(*((c)++)))),                            \
 	l |= (((uint32_t)(*((c)++))) << 8U),                      \
 	l |= (((uint32_t)(*((c)++))) << 16U),                     \
 	l |= (((uint32_t)(*((c)++))) << 24U))
-#define HOST_l2c(l, c)   (*((c)++)=(uint8_t)(((l)) & 0xFF),   \
+#define HOST_l2c(l, c)                                        \
+	(*((c)++)=(uint8_t)(((l)) & 0xFF),                        \
 	*((c)++) = (uint8_t)(((l) >> 8U) & 0xFF),                 \
 	*((c)++) = (uint8_t)(((l) >> 16U) & 0xFF),                \
 	*((c)++) = (uint8_t)(((l) >> 24U) & 0xFF),                \
 	l)
-#define F(b, c, d) ((((c) ^ (d)) & (b)) ^ (d))
-#define G(b, c, d) (((b) & (c)) | ((b) & (d)) | ((c) & (d)))
-#define H(b, c, d) ((b) ^ (c) ^ (d))
+#define F(b, c, d)         ((((c) ^ (d)) & (b)) ^ (d))
+#define G(b, c, d)         (((b) & (c)) | ((b) & (d)) | ((c) & (d)))
+#define H(b, c, d)         ((b) ^ (c) ^ (d))
 #define R0(a, b, c, d, k, s, t) {                             \
 	a += ((k) + (t) + F((b), (c), (d)));                      \
 	a = ROTATE(a, s);};
@@ -66,7 +69,7 @@ extern bool IsLowerCase;
 #define R2(a, b, c, d, k, s, t) {                             \
 	a += ((k) + (t) + H((b), (c), (d)));                      \
 	a = ROTATE(a, s);};
-#define ROTATE(a, n) (((a) << (n)) | (((a) & 0xFFFFFFFF) >> (32 - (n))))   
+#define ROTATE(a, n)       (((a) << (n)) | (((a) & 0xFFFFFFFF) >> (32 - (n))))
 
 //The structure for storing MD4 info
 typedef struct _md4_state_st_

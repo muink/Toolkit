@@ -45,7 +45,7 @@ void SIG_Handler(
 		WSACleanup();
 		IsInitialized_WinSock = false;
 	}
-	
+
 	_fcloseall();
 #elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
 	fcloseall();

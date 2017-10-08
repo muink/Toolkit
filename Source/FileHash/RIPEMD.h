@@ -56,7 +56,7 @@ size_t RIPEMD_HashFunctionID = DEFAULT_HASH_FUNCTION_ID;
 
 //RIPEMD definitions
 typedef uint32_t dword;
-typedef int the_correct_size_was_chosen[sizeof(dword) == 4 ? 1 : -1]; //If this line causes a compiler error, adapt the defintion of dword above
+typedef int the_correct_size_was_chosen[sizeof(dword) == 4 ? 1 : (-1)]; //If this line causes a compiler error, adapt the defintion of dword above
 
 //Macro definitions
 #define BYTES_TO_DWORD(strptr)                            \
@@ -66,7 +66,7 @@ typedef int the_correct_size_was_chosen[sizeof(dword) == 4 ? 1 : -1]; //If this 
 	((dword) *(strptr)))
 
 //ROL(x, n) cyclically rotates x over n bits to the left
-#define ROL(x, n)        (((x) << (n)) | ((x) >> (32 - (n))))
+#define ROL(x, n)             (((x) << (n)) | ((x) >> (32 - (n))))
 
 //The four basic functions F_128(), G_128() and H_128()
 #define F_128(x, y, z)        ((x) ^ (y) ^ (z))

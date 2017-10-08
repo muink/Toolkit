@@ -195,7 +195,7 @@ bool AddressStringToBinary(
 		memset(OriginalAddr, 0, sizeof(in_addr));
 	else 
 		return false;
-	
+
 //Initialization
 	std::string AddrString(reinterpret_cast<const char *>(AddrBuffer));
 	if (ErrorCode != nullptr)
@@ -251,7 +251,7 @@ bool AddressStringToBinary(
 			return false;
 		}
 
-		memcpy_s(OriginalAddr, sizeof((reinterpret_cast<sockaddr_in6 *>(&SockAddr))->sin6_addr), &(reinterpret_cast<sockaddr_in6 *>(&SockAddr))->sin6_addr, sizeof((reinterpret_cast<sockaddr_in6 *>(&SockAddr))->sin6_addr));
+		memcpy_s(OriginalAddr, sizeof((reinterpret_cast<sockaddr_in6 *>(&SockAddr))->sin6_addr), &reinterpret_cast<sockaddr_in6 *>(&SockAddr)->sin6_addr, sizeof((reinterpret_cast<sockaddr_in6 *>(&SockAddr))->sin6_addr));
 	#else
 		Result = inet_pton(AF_INET6, AddrString.c_str(), OriginalAddr);
 		if (Result == SOCKET_ERROR || Result == 0)
@@ -325,7 +325,7 @@ bool AddressStringToBinary(
 			return false;
 		}
 
-		memcpy_s(OriginalAddr, sizeof((reinterpret_cast<sockaddr_in *>(&SockAddr))->sin_addr), &(reinterpret_cast<sockaddr_in *>(&SockAddr))->sin_addr, sizeof((reinterpret_cast<sockaddr_in *>(&SockAddr))->sin_addr));
+		memcpy_s(OriginalAddr, sizeof((reinterpret_cast<sockaddr_in *>(&SockAddr))->sin_addr), &reinterpret_cast<sockaddr_in *>(&SockAddr)->sin_addr, sizeof((reinterpret_cast<sockaddr_in *>(&SockAddr))->sin_addr));
 	#else
 		Result = inet_pton(AF_INET, AddrString.c_str(), OriginalAddr);
 		if (Result == SOCKET_ERROR || Result == 0)

@@ -726,7 +726,7 @@ void PrintResourseData(
 		if (Length >= sizeof(dns_edns_option))
 		{
 			fwprintf_s(FileHandle, L"\n         EDNS Option:\n                         Code: ");
-			
+
 			const auto DNS_OPT_OPTION = reinterpret_cast<const dns_edns_option *>(Buffer + Location + sizeof(dns_record_opt));
 			if (ntohs(DNS_OPT_OPTION->Code) == EDNS_CODE_LLQ)
 				fwprintf_s(FileHandle, L"LLQ");

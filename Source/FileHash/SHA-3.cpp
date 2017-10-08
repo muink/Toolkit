@@ -224,7 +224,7 @@ bool SHA3_Hash(
 		fwprintf_s(stderr, L"[Error] Hash squeeze error.\n");
 		return false;
 	}
-	
+
 //Binary to hex
 	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, Buffer.get(), DigestSize / BYTES_TO_BITS) == nullptr)
 	{

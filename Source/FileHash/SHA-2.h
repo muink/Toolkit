@@ -70,11 +70,10 @@ extern bool IsLowerCase;
 size_t SHA2_HashFunctionID = DEFAULT_HASH_FUNCTION_ID;
 
 //Endianness testing and definitions
-#define TestEndianness(variable) {                   \
-				int i = 1;variable = PCT_BIG_ENDIAN; \
-				if (*((uint8_t *) & i) == 1)         \
-				variable = PCT_LITTLE_ENDIAN;        \
-			}
+#define TestEndianness(variable)                 \
+		{int i = 1;variable = PCT_BIG_ENDIAN;    \
+			if (*((uint8_t *) & i) == 1)         \
+			variable = PCT_LITTLE_ENDIAN;}
 #define PCT_LITTLE_ENDIAN        1
 #define PCT_BIG_ENDIAN           0
 

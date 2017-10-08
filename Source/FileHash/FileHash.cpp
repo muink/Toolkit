@@ -204,7 +204,7 @@ bool ReadCommand(
 		//Mark output file name.
 			else {
 				++Index;
-				
+
 			//Path and file name check.
 			#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (CommandList.at(Index).length() >= PATH_MAX)
@@ -391,6 +391,8 @@ bool MainHashProcess(
 	FILE * const FileHandle, 
 	FILE * const OutputFile)
 {
+//Hash process
+	auto IsHashSuccess = true;
 	if ((HashFamilyID == HASH_ID_BLAKE && !BLAKE_Hash(FileHandle, OutputFile)) ||                                 //BLAKE family
 		(HashFamilyID == HASH_ID_BLAKE2 && !BLAKE2_Hash(FileHandle, OutputFile)) ||                               //BLAKE2 family
 		(HashFamilyID == HASH_ID_CRC && !CRC_Hash(FileHandle, OutputFile)) ||                                     //CRC family
@@ -402,30 +404,17 @@ bool MainHashProcess(
 		(HashFamilyID == HASH_ID_SHA1 && !SHA1_Hash(FileHandle, OutputFile)) ||                                   //SHA-1
 		(HashFamilyID == HASH_ID_SHA2 && !SHA2_Hash(FileHandle, OutputFile)) ||                                   //SHA-2 family
 		(HashFamilyID == HASH_ID_SHA3 && !SHA3_Hash(FileHandle, OutputFile)))                                     //SHA-3 family
-	{
-	//Close all file and network handles.
-		fclose(FileHandle);
-		if (OutputFile != nullptr)
-			fclose(OutputFile);
-	#if defined(PLATFORM_WIN)
-		_fcloseall();
-	#elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
-		fcloseall();
-	#endif
+			IsHashSuccess = false;
 
-		return false;
-	}
-	else {
-	//Close all file and network handles.
-		fclose(FileHandle);
-		if (OutputFile != nullptr)
-			fclose(OutputFile);
-	#if defined(PLATFORM_WIN)
-		_fcloseall();
-	#elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
-		fcloseall();
-	#endif
-	}
+//Close all file and network handles.
+	fclose(FileHandle);
+	if (OutputFile != nullptr)
+		fclose(OutputFile);
+#if defined(PLATFORM_WIN)
+	_fcloseall();
+#elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
+	fcloseall();
+#endif
 
-	return true;
+	return IsHashSuccess;
 }

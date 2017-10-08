@@ -25,6 +25,7 @@ void BLAKE_224_Compress(
 	const uint8_t * const block)
 {
 	uint32_t v[16U]{0}, m[16U]{0}, i = 0;
+
 #define ROT(x, n) (((x) << (32 - n)) | ((x) >> (n)))
 #define G(a, b, c, d, e)                                       \
 	v[a] += (m[sigma[i][e]] ^ u256[sigma[i][e + 1]]) + v[b];   \
@@ -71,8 +72,10 @@ void BLAKE_224_Compress(
 		G(1, 6, 11, 12, 10);
 		G(2, 7, 8, 13, 12);
 		G(3, 4, 9, 14, 14);
+
 #undef G
 #undef ROT
+
 	}
 
 	for (i = 0;i < 16;++i)
@@ -213,6 +216,7 @@ void BLAKE_256_Compress(
 	const uint8_t * const block)
 {
 	uint32_t v[16U]{0}, m[16U]{0}, i = 0;
+
 #define ROT(x, n) (((x) << (32 - n)) | ((x) >> (n)))
 #define G(a, b, c, d, e)                                       \
 	v[a] += (m[sigma[i][e]] ^ u256[sigma[i][e + 1]]) + v[b];   \
@@ -259,8 +263,10 @@ void BLAKE_256_Compress(
 		G(1, 6, 11, 12, 10);
 		G(2, 7, 8, 13, 12);
 		G(3, 4, 9, 14, 14);
+
 #undef G
 #undef ROT
+
 	}
 
 	for (i = 0;i < 16;++i)
@@ -402,6 +408,7 @@ void BLAKE_384_Compress(
 	const uint8_t * const block)
 {
 	uint64_t v[16U]{0}, m[16U]{0}, i = 0;
+
 #define ROT(x, n) (((x) << (64 - n)) | ((x) >> (n)))
 #define G(a, b, c, d, e)                                       \
 	v[a] += (m[sigma[i][e]] ^ u512[sigma[i][e + 1]]) + v[b];   \
@@ -448,8 +455,10 @@ void BLAKE_384_Compress(
 		G(1, 6, 11, 12, 10);
 		G(2, 7, 8, 13, 12);
 		G(3, 4, 9, 14, 14);
+
 #undef G
 #undef ROT
+
 	}
 
 	for (i = 0;i < 16;++i)
@@ -588,6 +597,7 @@ void BLAKE_512_Compress(
 	const uint8_t * const block)
 {
 	uint64_t v[16U]{0}, m[16U]{0}, i = 0;
+
 #define ROT(x, n) (((x) << (64 - n)) | ((x) >> (n)))
 #define G(a, b, c, d, e)                                       \
 	v[a] += (m[sigma[i][e]] ^ u512[sigma[i][e + 1]]) + v[b];   \
@@ -634,8 +644,10 @@ void BLAKE_512_Compress(
 		G(1, 6, 11, 12, 10);
 		G(2, 7, 8, 13, 12);
 		G(3, 4, 9, 14, 14);
+
 #undef G
 #undef ROT
+
 	}
 
 	for (i = 0;i < 16;++i)

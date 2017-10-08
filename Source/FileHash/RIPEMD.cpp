@@ -187,7 +187,7 @@ void Compress_128(
 	HHH_128(ccc, ddd, aaa, bbb, X[1U], 13);
 	HHH_128(bbb, ccc, ddd, aaa, X[2U], 11);
 
-//Parallel round 3	
+//Parallel round 3
 	GGG_128(aaa, bbb, ccc, ddd, X[15U], 9);
 	GGG_128(ddd, aaa, bbb, ccc, X[5U], 7);
 	GGG_128(ccc, ddd, aaa, bbb, X[1U], 15);
@@ -541,7 +541,7 @@ void Compress_256(
 	HH_128(cc, dd, aa, bb, X[5U], 7);
 	HH_128(bb, cc, dd, aa, X[12U], 5);
 
-//Parallel round 3	
+//Parallel round 3
 	GGG_128(aaa, bbb, ccc, ddd, X[15U], 9);
 	GGG_128(ddd, aaa, bbb, ccc, X[5U], 7);
 	GGG_128(ccc, ddd, aaa, bbb, X[1U], 15);

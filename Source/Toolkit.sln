@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Toolkit", "Toolkit\Toolkit.vcxproj", "{6983A209-96E6-42A9-A03E-5D5CF7E9E0DB}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -22,8 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{4264ADEE-DC69-4664-B7C8-FF40408066B7}"
 	ProjectSection(SolutionItems) = preProject
-		CMake_Build.sh = CMake_Build.sh
-		CMakeLists.txt = CMakeLists.txt
+		Auxiliary\Resources\CMake_Build.sh = Auxiliary\Resources\CMake_Build.sh
+		Auxiliary\Resources\CMakeLists.txt = Auxiliary\Resources\CMakeLists.txt
 	EndProjectSection
 EndProject
 Global
@@ -75,5 +75,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {08A5661D-0250-44EB-87F6-51CF3E770C2B}
 	EndGlobalSection
 EndGlobal

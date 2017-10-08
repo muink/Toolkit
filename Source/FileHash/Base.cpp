@@ -185,13 +185,13 @@ void ErrorCodeToMessage(
 		if (Message.back() == ASCII_PERIOD)
 			Message.pop_back(); //Delete period.
 		Message.append(L"[%d]");
-		
+
 	//Free pointer.
 		LocalFree(InnerMessage);
 	}
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::wstring InnerMessage;
-	auto ErrorMessage = strerror(static_cast<int>(ErrorCode));
+	const auto ErrorMessage = strerror(static_cast<int>(ErrorCode));
 	if (ErrorMessage == nullptr || !MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(ErrorMessage), strnlen(ErrorMessage, FILE_BUFFER_SIZE), InnerMessage))
 	{
 		Message.append(L", error code is %d");

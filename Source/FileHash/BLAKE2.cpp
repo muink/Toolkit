@@ -42,7 +42,7 @@
 	v[a] = v[a] + v[b] + y;           \
 	v[d] = ROTR64(v[d] ^ v[a], 16);   \
 	v[c] = v[c] + v[d];               \
-	v[b] = ROTR64(v[b] ^ v[c], 63); }
+	v[b] = ROTR64(v[b] ^ v[c], 63);}
 
 //Initialization Vector.
 static const uint64_t blake2b_iv[8U] = 
@@ -215,7 +215,7 @@ void BLAKE_2B_Final(
 	v[a] = v[a] + v[b] + y;           \
 	v[d] = ROTR32(v[d] ^ v[a], 8);    \
 	v[c] = v[c] + v[d];               \
-	v[b] = ROTR32(v[b] ^ v[c], 7); }
+	v[b] = ROTR32(v[b] ^ v[c], 7);}
 
 //Initialization Vector.
 static const uint32_t blake2s_iv[8U] = 

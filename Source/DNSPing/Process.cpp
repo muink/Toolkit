@@ -25,7 +25,7 @@ bool SendRequestProcess(
 	const bool IsLastSend)
 {
 //Initialization(Part 1)
-	SOCKET Socket_Normal = 0;
+	SOCKET Socket_Normal = INVALID_SOCKET;
 	socklen_t AddrLen_Normal = 0;
 
 //IPv6
@@ -39,7 +39,7 @@ bool SendRequestProcess(
 			Socket_Normal = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 
 	//Socket check
-		if (Socket_Normal == INVALID_SOCKET)
+		if (Socket_Normal == INVALID_SOCKET || Socket_Normal == SOCKET_ERROR)
 		{
 			PrintErrorToScreen(L"[Error] Socket initialization error", WSAGetLastError());
 			return false;
@@ -55,7 +55,7 @@ bool SendRequestProcess(
 			Socket_Normal = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
 	//Socket check
-		if (Socket_Normal == INVALID_SOCKET)
+		if (Socket_Normal == INVALID_SOCKET || Socket_Normal == SOCKET_ERROR)
 		{
 			PrintErrorToScreen(L"[Error] Socket initialization error", WSAGetLastError());
 			return false;
@@ -208,13 +208,34 @@ bool SendRequestProcess(
 	}
 
 //Send request.
-	if (send(Socket_Normal, reinterpret_cast<const char *>(SendBuffer.get()), static_cast<int>(DataLength), 0) == SOCKET_ERROR)
+	ssize_t TotalSendSize = DataLength;
+	DataLength = 0;
+	for (;;)
 	{
-		PrintErrorToScreen(L"[Error] Send packet error", WSAGetLastError());
+		ssize_t SendLength = send(Socket_Normal, reinterpret_cast<const char *>(SendBuffer.get() + DataLength), static_cast<int>(TotalSendSize - DataLength), 0);
+		if (SendLength == SOCKET_ERROR || SendLength == 0) //SOCKET_ERROR or connection closed
+		{
+			PrintErrorToScreen(L"[Error] Send packet error", WSAGetLastError());
 
-		shutdown(Socket_Normal, SD_BOTH);
-		closesocket(Socket_Normal);
-		return false;
+			shutdown(Socket_Normal, SD_BOTH);
+			closesocket(Socket_Normal);
+			return false;
+		}
+		else {
+			DataLength += SendLength;
+			if (DataLength == TotalSendSize) //Send completed.
+			{
+				break;
+			}
+			else if (DataLength > TotalSendSize) //SOCKET_ERROR
+			{
+				PrintErrorToScreen(L"[Error] Send packet error", 0);
+
+				shutdown(Socket_Normal, SD_BOTH);
+				closesocket(Socket_Normal);
+				return false;
+			}
+		}
 	}
 
 //Receive response and mark end time.
@@ -517,7 +538,7 @@ bool MarkProcessTime(
 			PrintErrorToScreen(L"[Error] Get current time error", errno);
 			return false;
 		}
-	
+
 	//Mark time.
 		BeforeTime = mach_absolute_time();
 		if (BeforeTime == 0)
@@ -771,15 +792,16 @@ void PrintHeaderToScreen(
 				}
 				else {
 					std::wstring Wide_FQDN;
-					if (!MBS_To_WCS_String(FQDN_String.get(), strnlen(reinterpret_cast<const char *>(FQDN_String.get()), NI_MAXHOST), Wide_FQDN))
+					if (!MBS_To_WCS_String(FQDN_String.get(), strnlen_s(reinterpret_cast<const char *>(FQDN_String.get()), NI_MAXHOST), Wide_FQDN))
 					{
 						PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", GetLastError());
 						return;
 					}
-
-					fwprintf_s(stderr, L"DNSPing %ls:%u [%ls] with %ls:\n", Wide_FQDN.c_str(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.WideTargetString.c_str(), WideTestDomainString.c_str());
-					if (ConfigurationParameter.OutputFile != nullptr)
-						fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u [%ls] with %ls:\n", Wide_FQDN.c_str(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.WideTargetString.c_str(), WideTestDomainString.c_str());
+					else {
+						fwprintf_s(stderr, L"DNSPing %ls:%u [%ls] with %ls:\n", Wide_FQDN.c_str(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.WideTargetString.c_str(), WideTestDomainString.c_str());
+						if (ConfigurationParameter.OutputFile != nullptr)
+							fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u [%ls] with %ls:\n", Wide_FQDN.c_str(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.WideTargetString.c_str(), WideTestDomainString.c_str());
+					}
 				}
 			}
 		}
@@ -845,13 +867,13 @@ void ErrorCodeToMessage(
 		if (Message.back() == ASCII_PERIOD)
 			Message.pop_back(); //Delete period.
 		Message.append(L"[%d]");
-		
+
 	//Free pointer.
 		LocalFree(InnerMessage);
 	}
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::wstring InnerMessage;
-	auto ErrorMessage = strerror(static_cast<int>(ErrorCode));
+	const auto ErrorMessage = strerror(static_cast<int>(ErrorCode));
 	if (ErrorMessage == nullptr || !MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(ErrorMessage), strnlen(ErrorMessage, FILE_BUFFER_SIZE), InnerMessage))
 	{
 		Message.append(L", error code is %d");

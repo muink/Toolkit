@@ -964,7 +964,7 @@ bool ReadCommand(
 			//Mark address.
 				ConfigurationParameter.Protocol = AF_INET6;
 				ConfigurationParameter.SockAddr_Normal.ss_family = AF_INET6;
-				if (!AddressStringToBinary(AF_INET6, reinterpret_cast<const uint8_t *>(CommandString.c_str()), &(reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal))->sin6_addr, &SignedResult))
+				if (!AddressStringToBinary(AF_INET6, reinterpret_cast<const uint8_t *>(CommandString.c_str()), &reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr, &SignedResult))
 				{
 					PrintErrorToScreen(L"\n[Error] Target format error", SignedResult);
 					return false;
@@ -1012,7 +1012,7 @@ bool ReadCommand(
 								//Convert binary to address string.
 									ConfigurationParameter.TargetAddressString = CommandString;
 									uint8_t AddrBuffer[ADDRESS_STRING_MAXSIZE]{0};
-									if (!BinaryToAddressString(AF_INET6, &(reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal))->sin6_addr, AddrBuffer, ADDRESS_STRING_MAXSIZE, &SignedResult))
+									if (!BinaryToAddressString(AF_INET6, &reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr, AddrBuffer, ADDRESS_STRING_MAXSIZE, &SignedResult))
 									{
 										PrintErrorToScreen(L"\n[Error] IPv6 address format error error", SignedResult);
 										return false;
@@ -1034,7 +1034,7 @@ bool ReadCommand(
 								//Convert binary to address string.
 									ConfigurationParameter.TargetAddressString = CommandString;
 									uint8_t AddrBuffer[ADDRESS_STRING_MAXSIZE]{0};
-									if (!BinaryToAddressString(AF_INET, &(reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal))->sin_addr, AddrBuffer, ADDRESS_STRING_MAXSIZE, &SignedResult))
+									if (!BinaryToAddressString(AF_INET, &reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_addr, AddrBuffer, ADDRESS_STRING_MAXSIZE, &SignedResult))
 									{
 										PrintErrorToScreen(L"\n[Error] IPv4 address format error error", SignedResult);
 										return false;
@@ -1074,7 +1074,7 @@ bool ReadCommand(
 					//Mark address.
 						ConfigurationParameter.Protocol = AF_INET;
 						ConfigurationParameter.SockAddr_Normal.ss_family = AF_INET;
-						if (!AddressStringToBinary(AF_INET, reinterpret_cast<const uint8_t *>(CommandString.c_str()), &(reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal))->sin_addr, &SignedResult))
+						if (!AddressStringToBinary(AF_INET, reinterpret_cast<const uint8_t *>(CommandString.c_str()), &reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_addr, &SignedResult))
 						{
 							PrintErrorToScreen(L"\n[Error] Target format error", SignedResult);
 							return false;

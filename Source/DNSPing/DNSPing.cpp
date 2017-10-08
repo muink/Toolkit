@@ -117,7 +117,7 @@ bool ParameterCheckAndSetting(
 //Socket address check
 	if (ConfigurationParameter.SockAddr_Normal.ss_family == AF_INET6) //IPv6
 	{
-		if (CheckEmptyBuffer(&(reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal))->sin6_addr, sizeof((reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal))->sin6_addr)))
+		if (CheckEmptyBuffer(&reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr, sizeof((reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal))->sin6_addr)))
 		{
 			PrintErrorToScreen(L"\n[Error] Target is empty", 0);
 			return false;
@@ -232,7 +232,6 @@ bool ParameterCheckAndSetting(
 
 //Print to screen before sending and send request.
 	PrintHeaderToScreen(WideTargetAddressString, WideTestDomainString);
-
 	return true;
 }
 

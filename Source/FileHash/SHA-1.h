@@ -62,7 +62,7 @@ typedef struct _sha1_state_
 		(y)[6U] = (uint8_t)(((x) >> 8U) & 255); (y)[7U] = (uint8_t)((x) & 255);}
 
 #ifndef MIN
-	#define MIN(x, y) (((x)<(y)) ? (x):(y))
+	#define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #endif
 
 //SHA-1 macros
