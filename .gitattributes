@@ -18,6 +18,3 @@ Source/FileHash/CMakeLists.txt text eol=lf
 Source/FileHash/SHA3/CMakeLists.txt text eol=lf
 Source/FileHash.xcodeproj/* eol=lf
 Source/Toolkit.xcodeproj/* eol=lf
-
-# Binary files
-*.xcuserstate binary

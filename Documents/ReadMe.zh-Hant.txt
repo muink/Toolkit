@@ -1,58 +1,58 @@
 ﻿### Linux/macOS 用法
-* 打开终端，并进入 Toolkit 目录
-* 运行 chmod 755 CMake_Build.sh 给予编译脚本运行权限
-* 运行 ./CMake_Build.sh 生成二进制可执行文件
+* 打開終端，並進入 Toolkit 目錄
+* 運行 chmod 755 CMake_Build.sh 給予編譯腳本運行許可權
+* 運行 ./CMake_Build.sh 生成二進位可執行檔
 
 
 ----------------------------------------------------------------------------------------------------
 
 
-### DNSPing 用法和选项
+### DNSPing 用法和選項
        DNSPing [-options] domain target
   e.g. DNSPing -a -qt AAAA -n 5 -w 500 -edns www.google.com 8.8.4.4
 
-   ?/-h              打印说明
+   ?/-h              列印說明
    -t                直到按下 Control-Break 或 Control-C 才停止 Ping
-                     想看从 Ping 开始到按下时的统计信息但不想停止请按 Control-Break
-                     想停止 Ping 并查看统计信息请按 Control-C
-   -a                反向解析地址的域名
-   -n count          发送 Ping 的数量
-                     Count 必须介乎于 1 - 0xFFFF/65535
-   -f                设定 Ping 数据包的不分片选项（只适用于 IPv4）
-                     不适用于 macOS 系统
-   -i hoplimit/ttl   设定 Ping 数据包的跳数限制/生存时间
-                     HopLimit/TTL 必须介乎于 1 - 255
-   -w timeout        设定超时时间（单位：毫秒）
-                     Timeout 必须介乎于 500 - 0xFFFF/65535
-   -id dns_id        设定 DNS 请求包头的 ID
-                     DNS ID 必须介乎于 0x0001 - 0xFFFF/65535
-   -qr               设定 DNS 请求包头的 QR 标志
-   -opcode opcode    设定 DNS 请求包头的 OPCode
-                     OPCode 必须介乎于 0x0000 - 0x00FF/255
-   -aa               设定 DNS 请求包头的 AA 标志
-   -tc               设定 DNS 请求包头的 TC 标志
-   -rd               设定 DNS 请求包头的 RD 标志
-   -ra               设定 DNS 请求包头的 RA 标志
-   -ad               设定 DNS 请求包头的 AD 标志
-   -cd               设定 DNS 请求包头的 CD 标志
-   -rcode rcode      设定 DNS 请求包头的 RCode
-                     RCode 必须介乎于 0x0000 - 0x00FF/255
-   -qn count         设定 DNS 请求包头的 Question count
-                     Question count 必须介乎于 0x0001 - 0xFFFF/65535
-   -ann count        设定 DNS 请求包头的 Answer count
-                     Answer count 必须介乎于 0x0001 - 0xFFFF/65535
-   -aun count        设定 DNS 请求包头的 Authority count
-                     Authority count 必须介乎于 0x0001 - 0xFFFF/65535
-   -adn count        设定 DNS 请求包头的 Additional count
-                     Additional count 必须介乎于 0x0001 - 0xFFFF/65535
-   -ti interval_time 设定每次请求之间的时间间隔（单位：毫秒）
-   -edns             发送时添加 EDNS 标签
-   -payload length   设定 EDNS 标签的 UDP Payload length
-                     Payload length 必须介乎于 512 - 0xFFFF/65535
-   -dnssec           发送时添加可以接受 DNSSEC 的请求
-                     启用添加可以接受 DNSSEC 时发送时添加 EDNS 标签也会被启用
-   -qt type          设定请求类型 Query Type
-                     Query 类型的值必须介乎于 0x0001 - 0xFFFF/65535
+                     想看從 Ping 開始到按下時的統計資訊但不想停止請按 Control-Break
+                     想停止 Ping 並查看統計資訊請按 Control-C
+   -a                反向解析位址的功能變數名稱
+   -n count          發送 Ping 的數量
+                     Count 必須介乎于 1 - 0xFFFF/65535
+   -f                設定 Ping 資料包的不分片選項（只適用于 IPv4）
+                     不適用於 macOS 系統
+   -i hoplimit/ttl   設定 Ping 資料包的跳數限制/存留時間
+                     HopLimit/TTL 必須介乎于 1 - 255
+   -w timeout        設定超時時間（單位：毫秒）
+                     Timeout 必須介乎于 500 - 0xFFFF/65535
+   -id dns_id        設定 DNS 請求包頭的 ID
+                     DNS ID 必須介乎于 0x0001 - 0xFFFF/65535
+   -qr               設定 DNS 請求包頭的 QR 標誌
+   -opcode opcode    設定 DNS 請求包頭的 OPCode
+                     OPCode 必須介乎于 0x0000 - 0x00FF/255
+   -aa               設定 DNS 請求包頭的 AA 標誌
+   -tc               設定 DNS 請求包頭的 TC 標誌
+   -rd               設定 DNS 請求包頭的 RD 標誌
+   -ra               設定 DNS 請求包頭的 RA 標誌
+   -ad               設定 DNS 請求包頭的 AD 標誌
+   -cd               設定 DNS 請求包頭的 CD 標誌
+   -rcode rcode      設定 DNS 請求包頭的 RCode
+                     RCode 必須介乎于 0x0000 - 0x00FF/255
+   -qn count         設定 DNS 請求包頭的 Question count
+                     Question count 必須介乎于 0x0001 - 0xFFFF/65535
+   -ann count        設定 DNS 請求包頭的 Answer count
+                     Answer count 必須介乎于 0x0001 - 0xFFFF/65535
+   -aun count        設定 DNS 請求包頭的 Authority count
+                     Authority count 必須介乎于 0x0001 - 0xFFFF/65535
+   -adn count        設定 DNS 請求包頭的 Additional count
+                     Additional count 必須介乎于 0x0001 - 0xFFFF/65535
+   -ti interval_time 設定每次請求之間的時間間隔（單位：毫秒）
+   -edns             發送時添加 EDNS 標籤
+   -payload length   設定 EDNS 標籤的 UDP Payload length
+                     Payload length 必須介乎于 512 - 0xFFFF/65535
+   -dnssec           發送時添加可以接受 DNSSEC 的請求
+                     啟用添加可以接受 DNSSEC 時發送時添加 EDNS 標籤也會被啟用
+   -qt type          設定請求類型 Query Type
+                     Query 類型的值必須介乎于 0x0001 - 0xFFFF/65535
                      Type: A|NS|MD|MF|CNAME|SOA|MB|MG|MR|NULL|WKS|PTR|HINFO|
                            MINFO|MX|TXT|RP|AFSDB|X25|ISDN|RT|NSAP|NSAPPTR|
                            SIG|KEY|PX|GPOS|AAAA|LOC|NXT|EID|NIMLOC|SRV|ATMA|
@@ -62,11 +62,11 @@
                            SPF|UINFO|UID|GID|UNSPEC|NID|L32|L64|LP|EUI48|
                            EUI64|ADDRS|TKEY|TSIG|IXFR|AXFR|MAILB|MAILA|ANY|
                            URI|CAA|TA|DLV|RESERVED
-   -qc classes       设定请求类型 Query Classes
-                     Classes 类型的值必须介乎于 0x0001 - 0xFFFF/65535
+   -qc classes       設定請求類型 Query Classes
+                     Classes 類型的值必須介乎于 0x0001 - 0xFFFF/65535
                      Classes: IN|CSNET|CHAOS|HESIOD|NONE|ALL|ANY
-   -p service_name   设定 UDP 端口或服务名称
-                     UDP 端口的值必须介乎于 0x0001 - 0xFFFF/65535
+   -p service_name   設定 UDP 埠
+                     UDP 埠的值必須介乎于 0x0001 - 0xFFFF/65535
                      Protocol: TCPMUX|ECHO|DISCARD|SYSTAT|DAYTIME|NETSTAT|
                                QOTD|MSP|CHARGEN|FTP|SSH|TELNET|SMTP|
                                TIME|RAP|RLP|NAME|WHOIS|TACACS|DNS|XNSAUTH|MTP
@@ -80,10 +80,10 @@
                                ISAKMP|BIFFUDP|WHOSERVER|SYSLOG|ROUTERSERVER|
                                NCP|COURIER|COMMERCE|RTSP|NNTP|HTTPRPCEPMAP|
                                IPP|LDAPS|MSDP|AODV|FTPSDATA|FTPS|NAS|TELNETS
-   -rawdata raw_data 设定想要发送的原始数据
-                     RAW_Data 是以十六进制表示的数据，不需要在前面加 0x
-                     RAW_Data 长度必须介乎于 64 - 1500 字节
-   -raw service_name 设定要使用的原始套接字类型
+   -rawdata raw_data 設定發送原始資料
+                     原始資料為不需要添加 0x 開頭的16進制數
+                     原始資料長度必須介乎于 64 - 1500 位元組
+   -raw service_name 設定 RAW 通訊端類型
                      Service Name: HOPOPTS|ICMP|IGMP|GGP|IPV4|ST|TCP|CBT|EGP|
                                    IGP|BBNRCCMON|NVPII|PUP|ARGUS|EMCON|XNET|
                                    CHAOS|MUX|DCN|HMP|PRM|IDP|TRUNK_1|TRUNK_2
@@ -103,32 +103,32 @@
                                    SPS|PIPE|SCTP|FC|RSVPE2E|MOBILITY|UDPLITE|
                                    MPLS|MANET|HIP|SHIM6|WESP|ROHC|TEST-1|
                                    TEST-2|RAW
-   -buf size         设定接收缓冲区长度
-                     缓冲区长度必须介乎于 512 - 4096 字节
-   -dv               关闭数据包验证
-   -show type        显示收到的解析包的内容
+   -buf size         設定接收緩衝區長度
+                     緩衝區長度必須介乎于 512 - 4096 位元組
+   -dv               關閉資料包驗證
+   -show type        顯示收到的解析包的內容
                      Type: Result|Hex
-   -of file_name     输出结果到文本文件
-   -6                强制使用 IPv6
-   -4                强制使用 IPv4
-   domain            设定发送 DNS 请求用的查询的域名
-   target            Ping 的目标，支持 IPv4/IPv6 地址和域名
+   -of file_name     輸出結果到文字檔
+   -6                強制使用 IPv6
+   -4                強制使用 IPv4
+   domain            設定發送 DNS 請求用的查詢的功能變數名稱
+   target            Ping 的目標，支援 IPv4/IPv6 位址和功能變數名稱
 
 
 ----------------------------------------------------------------------------------------------------
 
 
-### FileHash 用法和选项
+### FileHash 用法和選項
        FileHash -option -algorithm [Filename]
   e.g. FileHash -SHA3 filename
 
-支持的选项:
-   -v/--version:         输出当前程序的版本号
-   -?/-h/--help          输出程序的帮助信息
-   --lowercase           输出小写的 Hash
-   --output [Filename]   输出结果到文件
+支援的選項:
+   -v/--version:         輸出當前程式的版本號
+   -?/-h/--help          輸出程式的説明資訊
+   --lowercase           輸出小寫的 Hash
+   --output [Filename]   輸出結果到文件
 
-支持的 Hash 算法:
+支援的 Hash 演算法:
    * BLAKE family:   -BLAKE                      = -BLAKE_256
                      -BLAKE_224                  BLAKE 224 位
                      -BLAKE_256                  BLAKE 256 位
@@ -197,10 +197,10 @@
                      -CRC64_1B                   CRC 64 位 1B
                      -CRC64_WE                   CRC 64 位 WE
                      -CRC64_JONES                CRC 64 位 JONES
-   * Checksum:       -CHECKSUM                   Internet 协议检验和
+   * Checksum:       -CHECKSUM                   Internet 協定校驗和
    * MD2:            -MD2
    * MD4 family:     -MD4
-                     -ED2K                       eDonkey/eMule Hash 算法
+                     -ED2K                       eDonkey/eMule Hash 演算法
    * MD5:            -MD5
    * RIPEMD family:  -RIPEMD                     = -RIPEMD_160
                      -RIPEMD_128                 RIPEMD 128 位
@@ -213,8 +213,8 @@
                      -SHA256/-SHA2_256           SHA-2 256 位
                      -SHA384/-SHA2_384           SHA-2 384 位
                      -SHA512/-SHA2_512           SHA-2 512 位
-                     -SHA512_224/-SHA2_512_224   SHA-2 512/224 位截断
-                     -SHA512_256/-SHA2_512_256   SHA-2 512/256 位截断
+                     -SHA512_224/-SHA2_512_224   SHA-2 512/224 位截斷
+                     -SHA512_256/-SHA2_512_256   SHA-2 512/256 位截斷
    * SHA-3 family:   -SHA3                       = -SHA3_256
                      -SHA3_224                   SHA-3 224 位
                      -SHA3_256                   SHA-3 256 位
@@ -223,22 +223,6 @@
                      -SHA3_SHAKE                 = -SHA3_SHAKE_128
                      -SHA3_SHAKE=Size            = -SHA3_SHAKE_128=Size
                      -SHA3_SHAKE_128=Size        SHA-3 SHAKE 128 位
-                                                 Size = 输出长度
+                                                 Size = 輸出長度
                      -SHA3_SHAKE_256=Size        SHA-3 SHAKE 256 位
-                                                 Size = 输出长度
-
-
-----------------------------------------------------------------------------------------------------
-
-
-### Release Hash[SHA-3(256)]
-* Windows:
-  * DNSPing.exe: AA4C39A5551ED5A79A25D0D76EFB3B2C2E2FA6E87DC213DC9C604496C3BB94E0
-  * DNSPing_x86.exe: C3E7B25D390F063F39253869360ECF56F2507CA08DB17CB60C61C9F512580671
-  * DNSPing_XP.exe: 3ABA61F2374160EDF3C171ED1B68EA6F3639CF9F0AF09939BABB67F5E4CCEEA5
-  * FileHash.exe: 1DEC3D8172A9D618DAF3826943E1BEBD20528113EB65FAC230DC750B3F3AF4B0
-  * FileHash_x86.exe: 80EE1AE9EB994B0A5846E19ABCD779CA0523AE23E307EBBB59519BE7F105797D
-  * FileHash_XP.exe: A25952EA2D39F64F7A05C50994B409BEDDFC843798F495C3A25D9203CD6F17C7
-* macOS:
-  * DNSPing: 2A7712C5822446C798B46F2EA9FBF3DC211DC8329E10BF80D8814577774D57D0
-  * FileHash: 6329DBE263936FC4FBD97C2F046E30E2E4F911556CC8975FEC4EC45098898B1C
+                                                 Size = 輸出長度
