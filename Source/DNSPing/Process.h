@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // DNSPing, a useful and powerful toolkit
-// Copyright (C) 2014-2017 Chengr28
+// Copyright (C) 2014-2018 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License

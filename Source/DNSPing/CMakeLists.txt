@@ -1,6 +1,6 @@
 # This code is part of Toolkit(DNSPing)
 # DNSPing, a useful and powerful toolkit
-# Copyright (C) 2014-2017 Chengr28
+# Copyright (C) 2014-2018 Chengr28
 # 
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,11 +18,7 @@
 
 
 # CMake minimum version
-IF(PLATFORM_OPENWRT)
-	cmake_minimum_required(VERSION 2.8.12.2)
-ELSE(PLATFORM_OPENWRT)
-	cmake_minimum_required(VERSION 3.0.2)
-ENDIF(PLATFORM_OPENWRT)
+cmake_minimum_required(VERSION 3.1)
 
 # Project name and build type
 project(DNSPing)
@@ -44,12 +40,8 @@ set(MAIN_SRC_FILES
 		"Terminal.cpp")
 
 # Compiling and linking flags
-## C++ 11 standard definitions
-IF(CMAKE_VERSION VERSION_LESS "3.1")
-	add_definitions(-std=c++11)
-ELSE(CMAKE_VERSION VERSION_LESS "3.1")
-	set(CMAKE_CXX_STANDARD 11)
-ENDIF(CMAKE_VERSION VERSION_LESS "3.1")
+## C++ 14 standard definitions
+set(CMAKE_CXX_STANDARD 14)
 ## Platform definitions
 IF(PLATFORM_OPENWRT)
 	add_definitions(-DPLATFORM_OPENWRT)

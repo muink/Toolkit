@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.8
+VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Toolkit", "Toolkit\Toolkit.vcxproj", "{6983A209-96E6-42A9-A03E-5D5CF7E9E0DB}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -13,17 +13,32 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DNSPing", "DNSPing\DNSPing.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FileHash", "FileHash\FileHash.vcxproj", "{E65C4C70-40DF-48E8-9FE1-52DD7D003558}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{F62DF33C-B875-4FE2-B65F-144BEE5A9E52}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Auxiliary", "Auxiliary", "{AC565E85-7BD0-412D-B264-0B24BEF0D911}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{88A4D74D-CF1F-442D-B73E-E39575D79AFE}"
 	ProjectSection(SolutionItems) = preProject
-		Documents\ReadMe(zh_Hans).txt = Documents\ReadMe(zh_Hans).txt
-		Documents\ReadMe(zh_Hant).txt = Documents\ReadMe(zh_Hant).txt
-		Documents\ReadMe.txt = Documents\ReadMe.txt
+		Auxiliary\Documents\Hash.md = Auxiliary\Documents\Hash.md
+		Auxiliary\Documents\ReadMe.en.txt = Auxiliary\Documents\ReadMe.en.txt
+		Auxiliary\Documents\ReadMe.zh-Hans.txt = Auxiliary\Documents\ReadMe.zh-Hans.txt
+		Auxiliary\Documents\ReadMe.zh-Hant.txt = Auxiliary\Documents\ReadMe.zh-Hant.txt
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{4264ADEE-DC69-4664-B7C8-FF40408066B7}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Markdown", "Markdown", "{F3BAA78B-36DD-4114-A071-13B75AD56F76}"
 	ProjectSection(SolutionItems) = preProject
-		Auxiliary\Resources\CMake_Build.sh = Auxiliary\Resources\CMake_Build.sh
-		Auxiliary\Resources\CMakeLists.txt = Auxiliary\Resources\CMakeLists.txt
+		Auxiliary\Markdown\.gitattributes = Auxiliary\Markdown\.gitattributes
+		Auxiliary\Markdown\ISSUE_TEMPLATE.md = Auxiliary\Markdown\ISSUE_TEMPLATE.md
+		Auxiliary\Markdown\LICENSE = Auxiliary\Markdown\LICENSE
+		Auxiliary\Markdown\README.md = Auxiliary\Markdown\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{6CF3FEAE-E178-4022-8E14-E2548FE87896}"
+	ProjectSection(SolutionItems) = preProject
+		Auxiliary\Scripts\CMake_Build.sh = Auxiliary\Scripts\CMake_Build.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependency", "Dependency", "{9C4F0C69-2762-4271-9E6D-30F0177C7B54}"
+	ProjectSection(SolutionItems) = preProject
+		Dependency\CMakeLists.txt = Dependency\CMakeLists.txt
 	EndProjectSection
 EndProject
 Global
@@ -75,6 +90,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{88A4D74D-CF1F-442D-B73E-E39575D79AFE} = {AC565E85-7BD0-412D-B264-0B24BEF0D911}
+		{F3BAA78B-36DD-4114-A071-13B75AD56F76} = {AC565E85-7BD0-412D-B264-0B24BEF0D911}
+		{6CF3FEAE-E178-4022-8E14-E2548FE87896} = {AC565E85-7BD0-412D-B264-0B24BEF0D911}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {08A5661D-0250-44EB-87F6-51CF3E770C2B}

@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // DNSPing, a useful and powerful toolkit
-// Copyright (C) 2014-2017 Chengr28
+// Copyright (C) 2014-2018 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -79,7 +79,7 @@
 
 //Version definitions
 #define FULL_VERSION                 L"0.3.9.0"
-#define COPYRIGHT_MESSAGE            L"Copyright (C) 2014-2017 Chengr28"
+#define COPYRIGHT_MESSAGE            L"Copyright (C) 2014-2018 Chengr28"
 
 
 //////////////////////////////////////////////////
@@ -159,6 +159,11 @@ public:
 	std::wstring WideTargetString;
 	std::wstring WideOutputFileName;
 	std::unique_ptr<uint8_t[]> RawDataBuffer;
+
+//Redefine operator functions
+//	ConfigurationTable() = default;
+	ConfigurationTable(const ConfigurationTable &) = delete;
+	ConfigurationTable & operator=(const ConfigurationTable &) = delete;
 
 //Member functions
 	ConfigurationTable(

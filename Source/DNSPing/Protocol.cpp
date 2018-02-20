@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // DNSPing, a useful and powerful toolkit
-// Copyright (C) 2014-2017 Chengr28
+// Copyright (C) 2014-2018 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -251,7 +251,7 @@ bool AddressStringToBinary(
 			return false;
 		}
 
-		memcpy_s(OriginalAddr, sizeof((reinterpret_cast<sockaddr_in6 *>(&SockAddr))->sin6_addr), &reinterpret_cast<sockaddr_in6 *>(&SockAddr)->sin6_addr, sizeof((reinterpret_cast<sockaddr_in6 *>(&SockAddr))->sin6_addr));
+		memcpy_s(OriginalAddr, sizeof(reinterpret_cast<sockaddr_in6 *>(&SockAddr)->sin6_addr), &reinterpret_cast<sockaddr_in6 *>(&SockAddr)->sin6_addr, sizeof(reinterpret_cast<sockaddr_in6 *>(&SockAddr)->sin6_addr));
 	#else
 		Result = inet_pton(AF_INET6, AddrString.c_str(), OriginalAddr);
 		if (Result == SOCKET_ERROR || Result == 0)
@@ -325,7 +325,7 @@ bool AddressStringToBinary(
 			return false;
 		}
 
-		memcpy_s(OriginalAddr, sizeof((reinterpret_cast<sockaddr_in *>(&SockAddr))->sin_addr), &reinterpret_cast<sockaddr_in *>(&SockAddr)->sin_addr, sizeof((reinterpret_cast<sockaddr_in *>(&SockAddr))->sin_addr));
+		memcpy_s(OriginalAddr, sizeof(reinterpret_cast<sockaddr_in *>(&SockAddr)->sin_addr), &reinterpret_cast<sockaddr_in *>(&SockAddr)->sin_addr, sizeof(reinterpret_cast<sockaddr_in *>(&SockAddr)->sin_addr));
 	#else
 		Result = inet_pton(AF_INET, AddrString.c_str(), OriginalAddr);
 		if (Result == SOCKET_ERROR || Result == 0)
@@ -363,12 +363,12 @@ bool BinaryToAddressString(
 	if (Protocol == AF_INET6)
 	{
 		SockAddr.ss_family = AF_INET6;
-		(reinterpret_cast<sockaddr_in6 *>(&SockAddr))->sin6_addr = *reinterpret_cast<const in6_addr *>(OriginalAddr);
+		reinterpret_cast<sockaddr_in6 *>(&SockAddr)->sin6_addr = *reinterpret_cast<const in6_addr *>(OriginalAddr);
 	}
 	else if (Protocol == AF_INET)
 	{
 		SockAddr.ss_family = AF_INET;
-		(reinterpret_cast<sockaddr_in *>(&SockAddr))->sin_addr = *reinterpret_cast<const in_addr *>(OriginalAddr);
+		reinterpret_cast<sockaddr_in *>(&SockAddr)->sin_addr = *reinterpret_cast<const in_addr *>(OriginalAddr);
 	}
 	else {
 		return false;

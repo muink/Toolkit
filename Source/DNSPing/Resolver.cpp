@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // DNSPing, a useful and powerful toolkit
-// Copyright (C) 2014-2017 Chengr28
+// Copyright (C) 2014-2018 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -620,7 +620,7 @@ void PrintResourseData(
 	{
 		fwprintf_s(FileHandle, L"\n   Data: ");
 		const auto Addr = reinterpret_cast<const in_addr *>(Buffer + Location);
-		fwprintf_s(FileHandle, L"%u.", *(reinterpret_cast<const uint8_t *>(&Addr->s_addr)));
+		fwprintf_s(FileHandle, L"%u.", *reinterpret_cast<const uint8_t *>(&Addr->s_addr));
 		fwprintf_s(FileHandle, L"%u.", *(reinterpret_cast<const uint8_t *>(&Addr->s_addr) + sizeof(uint8_t)));
 		fwprintf_s(FileHandle, L"%u.", *(reinterpret_cast<const uint8_t *>(&Addr->s_addr) + sizeof(uint8_t) * 2U));
 		fwprintf_s(FileHandle, L"%u", *(reinterpret_cast<const uint8_t *>(&Addr->s_addr) + sizeof(uint8_t) * 3U));

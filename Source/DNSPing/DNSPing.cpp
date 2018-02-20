@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // DNSPing, a useful and powerful toolkit
-// Copyright (C) 2014-2017 Chengr28
+// Copyright (C) 2014-2018 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -117,7 +117,7 @@ bool ParameterCheckAndSetting(
 //Socket address check
 	if (ConfigurationParameter.SockAddr_Normal.ss_family == AF_INET6) //IPv6
 	{
-		if (CheckEmptyBuffer(&reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr, sizeof((reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal))->sin6_addr)))
+		if (CheckEmptyBuffer(&reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr, sizeof(reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr)))
 		{
 			PrintErrorToScreen(L"\n[Error] Target is empty", 0);
 			return false;
@@ -126,16 +126,16 @@ bool ParameterCheckAndSetting(
 			if (ConfigurationParameter.ServiceType == 0)
 			{
 				ConfigurationParameter.ServiceType = htons(IPPORT_DNS);
-				(reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal))->sin6_port = htons(IPPORT_DNS);
+				reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_port = htons(IPPORT_DNS);
 			}
 			else {
-				(reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal))->sin6_port = ConfigurationParameter.ServiceType;
+				reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_port = ConfigurationParameter.ServiceType;
 			}
 		}
 	}
 	else if (ConfigurationParameter.SockAddr_Normal.ss_family == AF_INET) //IPv4
 	{
-		if ((reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal))->sin_addr.s_addr == 0)
+		if (reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_addr.s_addr == 0)
 		{
 			PrintErrorToScreen(L"\n[Error] Target is empty", 0);
 			return false;
@@ -144,10 +144,10 @@ bool ParameterCheckAndSetting(
 			if (ConfigurationParameter.ServiceType == 0)
 			{
 				ConfigurationParameter.ServiceType = htons(IPPORT_DNS);
-				(reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal))->sin_port = htons(IPPORT_DNS);
+				reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_port = htons(IPPORT_DNS);
 			}
 			else {
-				(reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal))->sin_port = ConfigurationParameter.ServiceType;
+				reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_port = ConfigurationParameter.ServiceType;
 			}
 		}
 	}

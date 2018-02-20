@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // DNSPing, a useful and powerful toolkit
-// Copyright (C) 2014-2017 Chengr28
+// Copyright (C) 2014-2018 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -1003,11 +1003,11 @@ bool ReadCommand(
 							for (auto AddrInfoIter = AddrInfo;AddrInfoIter != nullptr;AddrInfoIter = AddrInfoIter->ai_next)
 							{
 							//IPv6
-								if (AddrInfoIter->ai_family == AF_INET6 && !IN6_IS_ADDR_LINKLOCAL(reinterpret_cast<in6_addr *>(AddrInfoIter->ai_addr)) && !((reinterpret_cast<sockaddr_in6 *>(AddrInfoIter->ai_addr))->sin6_scope_id == 0)) //Get port from first(Main) IPv6 device
+								if (AddrInfoIter->ai_family == AF_INET6 && !IN6_IS_ADDR_LINKLOCAL(reinterpret_cast<in6_addr *>(AddrInfoIter->ai_addr)) && !(reinterpret_cast<sockaddr_in6 *>(AddrInfoIter->ai_addr)->sin6_scope_id == 0)) //Get port from first(Main) IPv6 device
 								{
 									ConfigurationParameter.Protocol = AF_INET6;
 									ConfigurationParameter.SockAddr_Normal.ss_family = AF_INET6;
-									(reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal))->sin6_addr = (reinterpret_cast<sockaddr_in6 *>(AddrInfoIter->ai_addr))->sin6_addr;
+									reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr = reinterpret_cast<sockaddr_in6 *>(AddrInfoIter->ai_addr)->sin6_addr;
 
 								//Convert binary to address string.
 									ConfigurationParameter.TargetAddressString = CommandString;
@@ -1025,11 +1025,11 @@ bool ReadCommand(
 									break;
 								}
 							//IPv4
-								else if (AddrInfoIter->ai_family == AF_INET && (reinterpret_cast<sockaddr_in *>(AddrInfoIter->ai_addr))->sin_addr.s_addr != INADDR_LOOPBACK && (reinterpret_cast<sockaddr_in *>(AddrInfoIter->ai_addr))->sin_addr.s_addr != INADDR_BROADCAST)
+								else if (AddrInfoIter->ai_family == AF_INET && reinterpret_cast<sockaddr_in *>(AddrInfoIter->ai_addr)->sin_addr.s_addr != INADDR_LOOPBACK && reinterpret_cast<sockaddr_in *>(AddrInfoIter->ai_addr)->sin_addr.s_addr != INADDR_BROADCAST)
 								{
 									ConfigurationParameter.Protocol = AF_INET;
 									ConfigurationParameter.SockAddr_Normal.ss_family = AF_INET;
-									(reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal))->sin_addr = (reinterpret_cast<sockaddr_in *>(AddrInfoIter->ai_addr))->sin_addr;
+									reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_addr = reinterpret_cast<sockaddr_in *>(AddrInfoIter->ai_addr)->sin_addr;
 
 								//Convert binary to address string.
 									ConfigurationParameter.TargetAddressString = CommandString;
