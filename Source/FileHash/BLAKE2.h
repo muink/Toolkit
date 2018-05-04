@@ -1,4 +1,4 @@
-// This code is part of Toolkit(FileHash)
+﻿// This code is part of Toolkit(FileHash)
 // FileHash, a useful and powerful toolkit
 // Copyright (C) 2012-2018 Chengr28
 // 
@@ -20,7 +20,7 @@
 #ifndef TOOLKIT_FILEHASH_BLAKE2_H
 #define TOOLKIT_FILEHASH_BLAKE2_H
 
-#include "Base.h"
+#include "Include.h"
 
 //Hash function ID
 #define HASH_ID_BLAKE2B_160         1U

@@ -17,28 +17,11 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#ifndef TOOLKIT_DNSPING_RESOLVER_H
-#define TOOLKIT_DNSPING_RESOLVER_H
+#ifndef TOOLKIT_DNSPING_CONSOLE_H
+#define TOOLKIT_DNSPING_CONSOLE_H
 
 #include "Include.h"
 
-//Functions
-void PrintFlags(
-	FILE * const FileHandle, 
-	const uint16_t Flags);
-void PrintTypeClassesName(
-	FILE * const FileHandle, 
-	const uint16_t Type, 
-	const uint16_t Classes);
-size_t PrintDomainName(
-	FILE * const FileHandle, 
-	const uint8_t * const Buffer, 
-	const size_t Location);
-void PrintResourseData(
-	FILE * const FileHandle, 
-	const uint16_t Type, 
-	const uint16_t Classes, 
-	const uint8_t * const Buffer, 
-	const size_t Location, 
-	const uint16_t Length);
+//Global variables
+extern ConfigurationTable ConfigurationParameter;
 #endif

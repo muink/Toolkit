@@ -20,7 +20,7 @@
 #ifndef TOOLKIT_FILEHASH_MD4_H
 #define TOOLKIT_FILEHASH_MD4_H
 
-#include "Base.h"
+#include "Include.h"
 
 //Global variables
 extern size_t HashFamilyID;

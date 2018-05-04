@@ -17,7 +17,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#include "Base.h"
+#include "Initialization.h"
 
 //GlobalStatus class constructor
 ConfigurationTable::ConfigurationTable(
@@ -80,7 +80,7 @@ ConfigurationTable::~ConfigurationTable(
 		OutputFile = nullptr;
 	}
 
-//Close all file handles and WinSock cleanup.
+//WinSock cleanup.
 #if defined(PLATFORM_WIN)
 	if (IsInitialized_WinSock)
 	{
@@ -88,6 +88,7 @@ ConfigurationTable::~ConfigurationTable(
 		IsInitialized_WinSock = false;
 	}
 
+//Close all file handles.
 	_fcloseall();
 #elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
 	fcloseall();

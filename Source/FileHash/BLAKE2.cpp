@@ -1,4 +1,4 @@
-// This code is part of Toolkit(FileHash)
+﻿// This code is part of Toolkit(FileHash)
 // FileHash, a useful and powerful toolkit
 // Copyright (C) 2012-2018 Chengr28
 // 
@@ -429,8 +429,8 @@ bool BLAKE2_Hash(
 	}
 
 //Initialization
-	std::unique_ptr<uint8_t[]> StringBuffer(new uint8_t[FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES]());
-	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES);
+	auto StringBuffer = std::make_unique<uint8_t[]>(FILE_BUFFER_SIZE + MEMORY_RESERVED_BYTES);
+	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE + MEMORY_RESERVED_BYTES);
 	size_t ReadLength = 0, DigestSize = 0;
 
 //BLAKE2 initialization
@@ -519,8 +519,8 @@ bool BLAKE2_Hash(
 	}
 
 //Finish hash process.
-	std::unique_ptr<uint8_t[]> Result(new uint8_t[BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS + PADDING_RESERVED_BYTES]());
-	memset(Result.get(), 0, BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS + PADDING_RESERVED_BYTES);
+	auto Result = std::make_unique<uint8_t[]>(BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS + MEMORY_RESERVED_BYTES);
+	memset(Result.get(), 0, BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS + MEMORY_RESERVED_BYTES);
 	if (BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_160 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_256 || 
 		BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_384 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_512) //BLAKE2B
 	{

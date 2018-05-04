@@ -17,11 +17,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#include "Base.h"
-
-//Global variables
-extern size_t HashFamilyID;
-extern bool IsLowerCase;
+#include "Checksum.h"
 
 //Checksum update process
 uint32_t Checksum_Update(
@@ -69,8 +65,8 @@ bool Checksum_Hash(
 	}
 
 //Initialization
-	std::unique_ptr<uint8_t[]> StringBuffer(new uint8_t[FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES]());
-	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES);
+	auto StringBuffer = std::make_unique<uint8_t[]>(FILE_BUFFER_SIZE + MEMORY_RESERVED_BYTES);
+	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE + MEMORY_RESERVED_BYTES);
 	size_t ReadLength = 0;
 
 //Checksum initialization

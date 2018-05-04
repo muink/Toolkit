@@ -20,10 +20,7 @@
 #ifndef TOOLKIT_DNSPING_PROTOCOL_H
 #define TOOLKIT_DNSPING_PROTOCOL_H
 
-#include "Base.h"
-
-//Global variables
-extern ConfigurationTable ConfigurationParameter;
+#include "Include.h"
 
 //Internet Protocol Numbers
 //About this list, visit IANA Assigned Internet Protocol Numbers(https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)
@@ -732,4 +729,7 @@ extern ConfigurationTable ConfigurationParameter;
 #ifndef IPPORT_TELNETS
 	#define IPPORT_TELNETS              992U
 #endif
+
+//Global variables
+extern ConfigurationTable ConfigurationParameter;
 #endif

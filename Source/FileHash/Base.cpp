@@ -56,8 +56,8 @@ bool MBS_To_WCS_String(
 		return false;
 
 //Convert string.
-	std::unique_ptr<wchar_t[]> TargetBuffer(new wchar_t[Length + PADDING_RESERVED_BYTES]());
-	wmemset(TargetBuffer.get(), 0, Length + PADDING_RESERVED_BYTES);
+	auto TargetBuffer = std::make_unique<wchar_t[]>(Length + MEMORY_RESERVED_BYTES);
+	wmemset(TargetBuffer.get(), 0, Length + MEMORY_RESERVED_BYTES);
 #if defined(PLATFORM_WIN)
 	if (MultiByteToWideChar(
 			CP_ACP, 
@@ -181,9 +181,9 @@ void ErrorCodeToMessage(
 		Message.append(L": ");
 		Message.append(InnerMessage);
 		if (Message.back() == ASCII_SPACE)
-			Message.pop_back(); //Delete space.
+			Message.pop_back(); //Remove space.
 		if (Message.back() == ASCII_PERIOD)
-			Message.pop_back(); //Delete period.
+			Message.pop_back(); //Remove period.
 		Message.append(L"[%d]");
 
 	//Free pointer.

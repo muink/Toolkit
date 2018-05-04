@@ -99,17 +99,21 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <TargetName>$(ProjectName)_x86</TargetName>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_XP|Win32'">
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <TargetName>$(ProjectName)_XP</TargetName>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_XP|x64'">
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <TargetName>$(ProjectName)_XP</TargetName>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -166,11 +170,17 @@
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <CompileAsWinRT>false</CompileAsWinRT>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <FloatingPointModel>Strict</FloatingPointModel>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <CreateHotpatchableImage>true</CreateHotpatchableImage>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <LargeAddressAware>true</LargeAddressAware>
+      <Version>0.3</Version>
+      <CreateHotPatchableImage>Enabled</CreateHotPatchableImage>
+      <FixedBaseAddress>false</FixedBaseAddress>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;PLATFORM_WIN;PLATFORM_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -200,12 +210,18 @@
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <CompileAsWinRT>false</CompileAsWinRT>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <FloatingPointModel>Strict</FloatingPointModel>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <CreateHotpatchableImage>true</CreateHotpatchableImage>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <LargeAddressAware>true</LargeAddressAware>
       <SubSystem>Console</SubSystem>
+      <Version>0.3</Version>
+      <CreateHotPatchableImage>Enabled</CreateHotPatchableImage>
+      <FixedBaseAddress>false</FixedBaseAddress>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;PLATFORM_WIN_XP;PLATFORM_WIN;PLATFORM_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -235,11 +251,15 @@
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <CompileAsWinRT>false</CompileAsWinRT>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <FloatingPointModel>Strict</FloatingPointModel>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <LargeAddressAware>true</LargeAddressAware>
+      <Version>0.3</Version>
+      <CreateHotPatchableImage>Enabled</CreateHotPatchableImage>
+      <FixedBaseAddress>false</FixedBaseAddress>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;WIN64;PLATFORM_WIN;PLATFORM_WIN32;PLATFORM_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -269,11 +289,16 @@
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <CompileAsWinRT>false</CompileAsWinRT>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <FloatingPointModel>Strict</FloatingPointModel>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <LargeAddressAware>true</LargeAddressAware>
+      <Version>0.3</Version>
+      <CreateHotPatchableImage>Enabled</CreateHotPatchableImage>
+      <SubSystem>Console</SubSystem>
+      <FixedBaseAddress>false</FixedBaseAddress>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;PLATFORM_WIN_XP;WIN64;PLATFORM_WIN;PLATFORM_WIN32;PLATFORM_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -283,28 +308,36 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Base.h" />
+    <Text Include="CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DNSPing.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Console.h" />
+    <ClInclude Include="Definition.h" />
+    <ClInclude Include="DNSPing.h" />
+    <ClInclude Include="Include.h" />
+    <ClInclude Include="Initialization.h" />
+    <ClInclude Include="Platform.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="Protocol.h" />
+    <ClInclude Include="ReadCommand.h" />
     <ClInclude Include="Resolver.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Structure.h" />
+    <ClInclude Include="Terminal.h" />
+    <ClInclude Include="Type.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Console.cpp" />
-    <ClCompile Include="Initialization.cpp" />
     <ClCompile Include="DNSPing.cpp" />
+    <ClCompile Include="Initialization.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="Protocol.cpp" />
     <ClCompile Include="ReadCommand.cpp" />
     <ClCompile Include="Resolver.cpp" />
     <ClCompile Include="Terminal.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="DNSPing.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

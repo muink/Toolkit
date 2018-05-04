@@ -68,7 +68,7 @@ void PrintHexResponse(
 	}
 
 //Print hex format data(Part 2).
-	if (Length % NUM_HEX > 0)
+	if (Length % NUM_HEX != 0)
 	{
 		fwprintf_s(FileHandle, L"   ");
 		for (Index = Length - Length % NUM_HEX;Index < Length;++Index)
@@ -107,7 +107,7 @@ void PrintResponse(
 	fwprintf_s(FileHandle, L"Additional RR Count: %u\n", ntohs(DNS_Header->Additional));
 
 //Print Questions RRs.
-	if (ntohs(DNS_Header->Question) > 0)
+	if (ntohs(DNS_Header->Question) != 0)
 	{
 		fwprintf_s(FileHandle, L"Questions RR:\n   Name: ");
 		dns_qry *DNS_Query = nullptr;
@@ -130,7 +130,7 @@ void PrintResponse(
 
 //Print Answer RRs.
 	dns_record_standard *DNS_STANDARD_RECORD = nullptr;
-	if (ntohs(DNS_Header->Answer) > 0)
+	if (ntohs(DNS_Header->Answer) != 0)
 	{
 		fwprintf_s(FileHandle, L"Answer RR:\n");
 		for (Index = 0;Index < ntohs(DNS_Header->Answer);++Index)
@@ -157,7 +157,7 @@ void PrintResponse(
 	}
 
 //Print Authority RR.
-	if (ntohs(DNS_Header->Authority) > 0)
+	if (ntohs(DNS_Header->Authority) != 0)
 	{
 		fwprintf_s(FileHandle, L"Authority RR:\n");
 		for (Index = 0;Index < ntohs(DNS_Header->Authority);++Index)
@@ -184,7 +184,7 @@ void PrintResponse(
 	}
 
 //Print Additional RR.
-	if (ntohs(DNS_Header->Additional) > 0)
+	if (ntohs(DNS_Header->Additional) != 0)
 	{
 		fwprintf_s(FileHandle, L"Additional RR:\n");
 		for (Index = 0;Index < ntohs(DNS_Header->Additional);++Index)
@@ -228,7 +228,7 @@ void PrintFlags(
 	const uint16_t Flags)
 {
 //Print Flags
-	if (Flags > 0)
+	if (Flags != 0)
 	{
 		auto FlagsBits = ntohs(Flags);
 
@@ -309,12 +309,12 @@ void PrintTypeClassesName(
 	const uint16_t Classes)
 {
 //Print Classes.
-	if (Classes > 0)
+	if (Classes != 0)
 	{
 	//Cache flush check
 		auto HighBitSet = false;
 		auto ClassesTemp = ntohs(Classes);
-		if (ClassesTemp >> HIGHEST_MOVE_BIT_U16 > 0)
+		if ((ClassesTemp >> HIGHEST_MOVE_BIT_U16) != 0)
 		{
 			HighBitSet = true;
 			ClassesTemp = ntohs(Classes);
@@ -560,15 +560,15 @@ size_t PrintDomainName(
 	}
 
 //Initialization
-	std::unique_ptr<uint8_t[]> BufferTemp(new uint8_t[PACKET_MAXSIZE + PADDING_RESERVED_BYTES]());
-	memset(BufferTemp.get(), 0, PACKET_MAXSIZE + PADDING_RESERVED_BYTES);
+	auto BufferTemp = std::make_unique<uint8_t[]>(PACKET_MAXSIZE + MEMORY_RESERVED_BYTES);
+	memset(BufferTemp.get(), 0, PACKET_MAXSIZE + MEMORY_RESERVED_BYTES);
 	size_t Index = 0, Result = 0;
 	uint16_t TruncateLocation = 0;
 	auto IsMultiplePointer = false;
 
 //Convert.
 	Result = PacketQueryToString(Buffer + Location, BufferTemp.get(), TruncateLocation);
-	if (TruncateLocation > 0)
+	if (TruncateLocation != 0)
 	{
 	//Print once when pointer is not at first.
 		if (Result > sizeof(uint16_t))
@@ -580,7 +580,7 @@ size_t PrintDomainName(
 		}
 
 	//Get pointer.
-		while (TruncateLocation > 0)
+		while (TruncateLocation != 0)
 		{
 			if (IsMultiplePointer)
 				fwprintf_s(FileHandle, L".");

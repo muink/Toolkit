@@ -17,15 +17,12 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#include "Base.h"
+#include "Terminal.h"
 
 #if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-//Global variables
-extern ConfigurationTable ConfigurationParameter;
-
 //Handle the system signal.
-void SIG_Handler(
-	const int Signal)
+void SignalHandler(
+	const int SignalType)
 {
 //Print to screen.
 	fwprintf(stderr, L"[Notice] Get closing signal.\n");

@@ -20,7 +20,7 @@
 #ifndef TOOLKIT_FILEHASH_RIPEMD_H
 #define TOOLKIT_FILEHASH_RIPEMD_H
 
-#include "Base.h"
+#include "Include.h"
 
 //Hash function ID
 #define HASH_ID_RIPEMD_128          1U

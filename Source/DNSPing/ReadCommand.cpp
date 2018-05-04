@@ -17,10 +17,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#include "Base.h"
-
-//Global variables
-extern ConfigurationTable ConfigurationParameter;
+#include "ReadCommand.h"
 
 //Read commands
 #if defined(PLATFORM_WIN)
@@ -699,8 +696,8 @@ bool ReadCommand(
 					PrintErrorToScreen(L"\n[Error] Command (-rawdata raw_data) error", 0);
 					return false;
 				}
-				std::unique_ptr<uint8_t[]> RawDataTemp(new uint8_t[PACKET_MAXSIZE + PADDING_RESERVED_BYTES]());
-				memset(RawDataTemp.get(), 0, PACKET_MAXSIZE + PADDING_RESERVED_BYTES);
+				auto RawDataTemp = std::make_unique<uint8_t[]>(PACKET_MAXSIZE + MEMORY_RESERVED_BYTES);
+				memset(RawDataTemp.get(), 0, PACKET_MAXSIZE + MEMORY_RESERVED_BYTES);
 				std::swap(ConfigurationParameter.RawDataBuffer, RawDataTemp);
 				RawDataTemp.reset();
 				uint8_t BufferStringTemp[5U]{0};
@@ -713,6 +710,13 @@ bool ReadCommand(
 					BufferStringTemp[2U] = RawDataString[InnerIndex];
 					++InnerIndex;
 					BufferStringTemp[3U] = RawDataString[InnerIndex];
+
+				//Format check
+					if (strstr(reinterpret_cast<const char *>(BufferStringTemp), ("-")) != nullptr)
+					{
+						PrintErrorToScreen(L"\n[Error] Command (-rawdata raw_data) error", 0);
+						return false;
+					}
 
 				//Get number.
 					_set_errno(0);
@@ -754,9 +758,8 @@ bool ReadCommand(
 				UnsignedResult = ProtocolNameToBinary(Command);
 				if (UnsignedResult == 0)
 				{
-					_set_errno(0);
-
 				//Get number.
+					_set_errno(0);
 					UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 					if (UnsignedResult == IPPROTO_UDP)
 					{
@@ -879,8 +882,8 @@ bool ReadCommand(
 			#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (Command.length() < PATH_MAX)
 				{
-					std::unique_ptr<uint8_t[]> OutputFileNameBuffer(new uint8_t[Command.length() + PADDING_RESERVED_BYTES]);
-					memset(OutputFileNameBuffer.get(), 0, Command.length() + PADDING_RESERVED_BYTES);
+					auto OutputFileNameBuffer = std::make_unique<uint8_t[]>(Command.length() + MEMORY_RESERVED_BYTES);
+					memset(OutputFileNameBuffer.get(), 0, Command.length() + MEMORY_RESERVED_BYTES);
 					if (wcstombs(reinterpret_cast<char *>(OutputFileNameBuffer.get()), Command.c_str(), Command.length()) == static_cast<size_t>(RETURN_ERROR))
 					{
 						PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -961,7 +964,7 @@ bool ReadCommand(
 					return false;
 				}
 
-			//Mark address.
+			//Register address.
 				ConfigurationParameter.Protocol = AF_INET6;
 				ConfigurationParameter.SockAddr_Normal.ss_family = AF_INET6;
 				if (!AddressStringToBinary(AF_INET6, reinterpret_cast<const uint8_t *>(CommandString.c_str()), &reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr, &SignedResult))
@@ -1071,7 +1074,7 @@ bool ReadCommand(
 							return false;
 						}
 
-					//Mark address.
+					//Register address.
 						ConfigurationParameter.Protocol = AF_INET;
 						ConfigurationParameter.SockAddr_Normal.ss_family = AF_INET;
 						if (!AddressStringToBinary(AF_INET, reinterpret_cast<const uint8_t *>(CommandString.c_str()), &reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_addr, &SignedResult))

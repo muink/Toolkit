@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D91134EA1E59C0BF009AE7B0 /* ReadCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91134E91E59C0BF009AE7B0 /* ReadCommand.cpp */; };
-		D942EC721D12F2E200F7C65A /* Console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942EC671D12F2E200F7C65A /* Console.cpp */; };
-		D942EC731D12F2E200F7C65A /* DNSPing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942EC681D12F2E200F7C65A /* DNSPing.cpp */; };
-		D942EC741D12F2E200F7C65A /* Initialization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942EC691D12F2E200F7C65A /* Initialization.cpp */; };
-		D942EC751D12F2E200F7C65A /* Process.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942EC6A1D12F2E200F7C65A /* Process.cpp */; };
-		D942EC761D12F2E200F7C65A /* Protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942EC6C1D12F2E200F7C65A /* Protocol.cpp */; };
-		D942EC771D12F2E200F7C65A /* Resolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942EC6E1D12F2E200F7C65A /* Resolver.cpp */; };
-		D942EC781D12F2E200F7C65A /* Terminal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D942EC711D12F2E200F7C65A /* Terminal.cpp */; };
+		D9C383D8209CA1B600F85555 /* Console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9C383D3209CA1B600F85555 /* Console.cpp */; };
+		D9C383D9209CA1B600F85555 /* DNSPing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9C383D5209CA1B600F85555 /* DNSPing.cpp */; };
+		D9C383E4209CA1C700F85555 /* ReadCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9C383DB209CA1C600F85555 /* ReadCommand.cpp */; };
+		D9C383E5209CA1C700F85555 /* Initialization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9C383DC209CA1C600F85555 /* Initialization.cpp */; };
+		D9C383E6209CA1C700F85555 /* Protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9C383DD209CA1C600F85555 /* Protocol.cpp */; };
+		D9C383E7209CA1C700F85555 /* Process.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9C383E0209CA1C700F85555 /* Process.cpp */; };
+		D9C383ED209CA1E000F85555 /* Terminal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9C383EC209CA1E000F85555 /* Terminal.cpp */; };
+		D9C383F0209CA1EF00F85555 /* Resolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9C383EE209CA1EF00F85555 /* Resolver.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,20 +30,28 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		D91134E91E59C0BF009AE7B0 /* ReadCommand.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ReadCommand.cpp; path = DNSPing/ReadCommand.cpp; sourceTree = "<group>"; };
-		D942EC671D12F2E200F7C65A /* Console.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Console.cpp; path = DNSPing/Console.cpp; sourceTree = "<group>"; };
-		D942EC681D12F2E200F7C65A /* DNSPing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DNSPing.cpp; path = DNSPing/DNSPing.cpp; sourceTree = "<group>"; };
-		D942EC691D12F2E200F7C65A /* Initialization.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Initialization.cpp; path = DNSPing/Initialization.cpp; sourceTree = "<group>"; };
-		D942EC6A1D12F2E200F7C65A /* Process.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Process.cpp; path = DNSPing/Process.cpp; sourceTree = "<group>"; };
-		D942EC6B1D12F2E200F7C65A /* Process.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Process.h; path = DNSPing/Process.h; sourceTree = "<group>"; };
-		D942EC6C1D12F2E200F7C65A /* Protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Protocol.cpp; path = DNSPing/Protocol.cpp; sourceTree = "<group>"; };
-		D942EC6D1D12F2E200F7C65A /* Protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Protocol.h; path = DNSPing/Protocol.h; sourceTree = "<group>"; };
-		D942EC6E1D12F2E200F7C65A /* Resolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Resolver.cpp; path = DNSPing/Resolver.cpp; sourceTree = "<group>"; };
-		D942EC6F1D12F2E200F7C65A /* Resolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Resolver.h; path = DNSPing/Resolver.h; sourceTree = "<group>"; };
-		D942EC711D12F2E200F7C65A /* Terminal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Terminal.cpp; path = DNSPing/Terminal.cpp; sourceTree = "<group>"; };
-		D942EC791D12F2ED00F7C65A /* Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Base.h; path = DNSPing/Base.h; sourceTree = "<group>"; };
 		D99427BC1D12F0FE00280D91 /* DNSPing */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = DNSPing; sourceTree = BUILT_PRODUCTS_DIR; };
-		D9A033F51DB0E42200F7A96F /* Structure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Structure.h; path = DNSPing/Structure.h; sourceTree = "<group>"; };
+		D9C383D3209CA1B600F85555 /* Console.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Console.cpp; path = DNSPing/Console.cpp; sourceTree = "<group>"; };
+		D9C383D4209CA1B600F85555 /* DNSPing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DNSPing.h; path = DNSPing/DNSPing.h; sourceTree = "<group>"; };
+		D9C383D5209CA1B600F85555 /* DNSPing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DNSPing.cpp; path = DNSPing/DNSPing.cpp; sourceTree = "<group>"; };
+		D9C383D6209CA1B600F85555 /* Console.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Console.h; path = DNSPing/Console.h; sourceTree = "<group>"; };
+		D9C383D7209CA1B600F85555 /* Definition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Definition.h; path = DNSPing/Definition.h; sourceTree = "<group>"; };
+		D9C383DA209CA1C600F85555 /* Initialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Initialization.h; path = DNSPing/Initialization.h; sourceTree = "<group>"; };
+		D9C383DB209CA1C600F85555 /* ReadCommand.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ReadCommand.cpp; path = DNSPing/ReadCommand.cpp; sourceTree = "<group>"; };
+		D9C383DC209CA1C600F85555 /* Initialization.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Initialization.cpp; path = DNSPing/Initialization.cpp; sourceTree = "<group>"; };
+		D9C383DD209CA1C600F85555 /* Protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Protocol.cpp; path = DNSPing/Protocol.cpp; sourceTree = "<group>"; };
+		D9C383DE209CA1C600F85555 /* Include.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Include.h; path = DNSPing/Include.h; sourceTree = "<group>"; };
+		D9C383DF209CA1C600F85555 /* ReadCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReadCommand.h; path = DNSPing/ReadCommand.h; sourceTree = "<group>"; };
+		D9C383E0209CA1C700F85555 /* Process.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Process.cpp; path = DNSPing/Process.cpp; sourceTree = "<group>"; };
+		D9C383E1209CA1C700F85555 /* Process.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Process.h; path = DNSPing/Process.h; sourceTree = "<group>"; };
+		D9C383E2209CA1C700F85555 /* Platform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Platform.h; path = DNSPing/Platform.h; sourceTree = "<group>"; };
+		D9C383E3209CA1C700F85555 /* Protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Protocol.h; path = DNSPing/Protocol.h; sourceTree = "<group>"; };
+		D9C383E9209CA1E000F85555 /* Terminal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Terminal.h; path = DNSPing/Terminal.h; sourceTree = "<group>"; };
+		D9C383EA209CA1E000F85555 /* Structure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Structure.h; path = DNSPing/Structure.h; sourceTree = "<group>"; };
+		D9C383EB209CA1E000F85555 /* Type.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Type.h; path = DNSPing/Type.h; sourceTree = "<group>"; };
+		D9C383EC209CA1E000F85555 /* Terminal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Terminal.cpp; path = DNSPing/Terminal.cpp; sourceTree = "<group>"; };
+		D9C383EE209CA1EF00F85555 /* Resolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Resolver.cpp; path = DNSPing/Resolver.cpp; sourceTree = "<group>"; };
+		D9C383EF209CA1EF00F85555 /* Resolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Resolver.h; path = DNSPing/Resolver.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,19 +84,27 @@
 		D99427E51D12F19D00280D91 /* DNSPing */ = {
 			isa = PBXGroup;
 			children = (
-				D942EC671D12F2E200F7C65A /* Console.cpp */,
-				D942EC681D12F2E200F7C65A /* DNSPing.cpp */,
-				D942EC691D12F2E200F7C65A /* Initialization.cpp */,
-				D942EC6A1D12F2E200F7C65A /* Process.cpp */,
-				D942EC6C1D12F2E200F7C65A /* Protocol.cpp */,
-				D91134E91E59C0BF009AE7B0 /* ReadCommand.cpp */,
-				D942EC6E1D12F2E200F7C65A /* Resolver.cpp */,
-				D942EC711D12F2E200F7C65A /* Terminal.cpp */,
-				D942EC791D12F2ED00F7C65A /* Base.h */,
-				D942EC6B1D12F2E200F7C65A /* Process.h */,
-				D942EC6D1D12F2E200F7C65A /* Protocol.h */,
-				D942EC6F1D12F2E200F7C65A /* Resolver.h */,
-				D9A033F51DB0E42200F7A96F /* Structure.h */,
+				D9C383D3209CA1B600F85555 /* Console.cpp */,
+				D9C383D5209CA1B600F85555 /* DNSPing.cpp */,
+				D9C383DC209CA1C600F85555 /* Initialization.cpp */,
+				D9C383E0209CA1C700F85555 /* Process.cpp */,
+				D9C383DD209CA1C600F85555 /* Protocol.cpp */,
+				D9C383DB209CA1C600F85555 /* ReadCommand.cpp */,
+				D9C383EE209CA1EF00F85555 /* Resolver.cpp */,
+				D9C383EC209CA1E000F85555 /* Terminal.cpp */,
+				D9C383D6209CA1B600F85555 /* Console.h */,
+				D9C383D7209CA1B600F85555 /* Definition.h */,
+				D9C383D4209CA1B600F85555 /* DNSPing.h */,
+				D9C383DE209CA1C600F85555 /* Include.h */,
+				D9C383DA209CA1C600F85555 /* Initialization.h */,
+				D9C383E2209CA1C700F85555 /* Platform.h */,
+				D9C383E1209CA1C700F85555 /* Process.h */,
+				D9C383E3209CA1C700F85555 /* Protocol.h */,
+				D9C383DF209CA1C600F85555 /* ReadCommand.h */,
+				D9C383EF209CA1EF00F85555 /* Resolver.h */,
+				D9C383EA209CA1E000F85555 /* Structure.h */,
+				D9C383E9209CA1E000F85555 /* Terminal.h */,
+				D9C383EB209CA1E000F85555 /* Type.h */,
 			);
 			name = DNSPing;
 			sourceTree = "<group>";
@@ -149,14 +165,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D942EC781D12F2E200F7C65A /* Terminal.cpp in Sources */,
-				D942EC741D12F2E200F7C65A /* Initialization.cpp in Sources */,
-				D942EC771D12F2E200F7C65A /* Resolver.cpp in Sources */,
-				D91134EA1E59C0BF009AE7B0 /* ReadCommand.cpp in Sources */,
-				D942EC721D12F2E200F7C65A /* Console.cpp in Sources */,
-				D942EC731D12F2E200F7C65A /* DNSPing.cpp in Sources */,
-				D942EC761D12F2E200F7C65A /* Protocol.cpp in Sources */,
-				D942EC751D12F2E200F7C65A /* Process.cpp in Sources */,
+				D9C383ED209CA1E000F85555 /* Terminal.cpp in Sources */,
+				D9C383E4209CA1C700F85555 /* ReadCommand.cpp in Sources */,
+				D9C383E7209CA1C700F85555 /* Process.cpp in Sources */,
+				D9C383D8209CA1B600F85555 /* Console.cpp in Sources */,
+				D9C383D9209CA1B600F85555 /* DNSPing.cpp in Sources */,
+				D9C383E6209CA1C700F85555 /* Protocol.cpp in Sources */,
+				D9C383E5209CA1C700F85555 /* Initialization.cpp in Sources */,
+				D9C383F0209CA1EF00F85555 /* Resolver.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,7 +183,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -193,7 +209,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -218,7 +234,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -244,7 +260,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;

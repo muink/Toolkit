@@ -78,6 +78,13 @@ bool ReadCommand_SHA3(
 				Offset = strlen(COMMAND_SHA3_SHAKE_128);
 			#endif
 			SHA3_HashFunctionID = HASH_ID_SHA3_SHAKE_128;
+		
+		//Format check
+			if (Command.find(ASCII_MINUS) != std::string::npos)
+			{
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
+				return false;
+			}
 
 		//SHA-3 SHAKE output length.
 			_set_errno(0);
@@ -99,6 +106,13 @@ bool ReadCommand_SHA3(
 		else if (Command.find(COMMAND_SHA3_SHAKE_256) == 0)
 		{
 			SHA3_HashFunctionID = HASH_ID_SHA3_SHAKE_256;
+		
+		//Format check
+			if (Command.find(ASCII_MINUS) != std::string::npos)
+			{
+				fwprintf_s(stderr, L"[Error] Commands error.\n");
+				return false;
+			}
 
 		//SHA-3 SHAKE output length.
 			_set_errno(0);
@@ -143,10 +157,10 @@ bool SHA3_Hash(
 	}
 
 //Initialization
-	std::unique_ptr<uint8_t[]> Buffer(new uint8_t[FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES]());
-	std::unique_ptr<uint8_t[]> StringBuffer(new uint8_t[FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES]());
-	memset(Buffer.get(), 0, FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES);
-	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES);
+	auto Buffer = std::make_unique<uint8_t[]>(FILE_BUFFER_SIZE + MEMORY_RESERVED_BYTES);
+	auto StringBuffer = std::make_unique<uint8_t[]>(FILE_BUFFER_SIZE + MEMORY_RESERVED_BYTES);
+	memset(Buffer.get(), 0, FILE_BUFFER_SIZE + MEMORY_RESERVED_BYTES);
+	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE + MEMORY_RESERVED_BYTES);
 	size_t ReadLength = 0, DigestSize = 0;
 
 //SHA-3 initialization

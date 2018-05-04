@@ -17,18 +17,15 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#include "Base.h"
+#include "Console.h"
 
 #if defined(PLATFORM_WIN)
-//Global variables
-extern ConfigurationTable ConfigurationParameter;
-
-//Catch Control-C exception from keyboard
-BOOL WINAPI CtrlHandler(
-	const DWORD ControlType)
+//Catch system signal
+BOOL WINAPI SignalHandler(
+	const DWORD SignalType)
 {
 //Print to screen.
-	switch (ControlType)
+	switch (SignalType)
 	{
 	//Handle the CTRL-C signal.
 		case CTRL_C_EVENT:

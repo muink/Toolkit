@@ -98,18 +98,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_XP|x64'">
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <TargetName>$(ProjectName)_XP</TargetName>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <TargetName>$(ProjectName)_x86</TargetName>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_XP|Win32'">
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <TargetName>$(ProjectName)_XP</TargetName>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -166,11 +170,17 @@
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <CompileAsWinRT>false</CompileAsWinRT>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <FloatingPointModel>Strict</FloatingPointModel>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <CreateHotpatchableImage>true</CreateHotpatchableImage>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <LargeAddressAware>true</LargeAddressAware>
+      <Version>0.3</Version>
+      <CreateHotPatchableImage>Enabled</CreateHotPatchableImage>
+      <FixedBaseAddress>false</FixedBaseAddress>
     </Link>
     <ResourceCompile>
       <NullTerminateStrings>true</NullTerminateStrings>
@@ -198,12 +208,18 @@
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <CompileAsWinRT>false</CompileAsWinRT>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <FloatingPointModel>Strict</FloatingPointModel>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <CreateHotpatchableImage>true</CreateHotpatchableImage>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Console</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
+      <Version>0.3</Version>
+      <CreateHotPatchableImage>Enabled</CreateHotPatchableImage>
+      <FixedBaseAddress>false</FixedBaseAddress>
     </Link>
     <ResourceCompile>
       <NullTerminateStrings>true</NullTerminateStrings>
@@ -231,11 +247,15 @@
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <CompileAsWinRT>false</CompileAsWinRT>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <FloatingPointModel>Strict</FloatingPointModel>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <LargeAddressAware>true</LargeAddressAware>
+      <Version>0.3</Version>
+      <CreateHotPatchableImage>Enabled</CreateHotPatchableImage>
+      <FixedBaseAddress>false</FixedBaseAddress>
     </Link>
     <ResourceCompile>
       <NullTerminateStrings>true</NullTerminateStrings>
@@ -263,11 +283,17 @@
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <CompileAsWinRT>false</CompileAsWinRT>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <FloatingPointModel>Strict</FloatingPointModel>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <LargeAddressAware>true</LargeAddressAware>
+      <Version>0.3</Version>
+      <CreateHotPatchableImage>Enabled</CreateHotPatchableImage>
+      <SubSystem>Console</SubSystem>
+      <MinimumRequiredVersion>5.02</MinimumRequiredVersion>
+      <FixedBaseAddress>false</FixedBaseAddress>
     </Link>
     <ResourceCompile>
       <NullTerminateStrings>true</NullTerminateStrings>
@@ -275,10 +301,14 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Base.h" />
     <ClInclude Include="BLAKE.h" />
     <ClInclude Include="BLAKE2.h" />
+    <ClInclude Include="Checksum.h" />
     <ClInclude Include="CRC.h" />
-    <ClInclude Include="Base.h" />
+    <ClInclude Include="Definition.h" />
+    <ClInclude Include="FileHash.h" />
+    <ClInclude Include="Include.h" />
     <ClInclude Include="MD2.h" />
     <ClInclude Include="MD4.h" />
     <ClInclude Include="MD5.h" />
@@ -310,6 +340,7 @@
     <ClCompile Include="MD2.cpp" />
     <ClCompile Include="MD4.cpp" />
     <ClCompile Include="MD5.cpp" />
+    <ClCompile Include="Platform.h" />
     <ClCompile Include="RIPEMD.cpp" />
     <ClCompile Include="SHA-1.cpp" />
     <ClCompile Include="SHA-2.cpp" />

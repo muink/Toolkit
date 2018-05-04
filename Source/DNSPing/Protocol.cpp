@@ -75,8 +75,8 @@ bool MBS_To_WCS_String(
 		return false;
 
 //Convert string.
-	std::unique_ptr<wchar_t[]> TargetBuffer(new wchar_t[Length + PADDING_RESERVED_BYTES]());
-	wmemset(TargetBuffer.get(), 0, Length + PADDING_RESERVED_BYTES);
+	auto TargetBuffer = std::make_unique<wchar_t[]>(Length + MEMORY_RESERVED_BYTES);
+	wmemset(TargetBuffer.get(), 0, Length + MEMORY_RESERVED_BYTES);
 #if defined(PLATFORM_WIN)
 	if (MultiByteToWideChar(
 			CP_ACP, 
@@ -116,8 +116,8 @@ bool WCS_To_MBS_String(
 		return false;
 
 //Convert string.
-	std::unique_ptr<uint8_t[]> TargetBuffer(new uint8_t[Length + PADDING_RESERVED_BYTES]());
-	memset(TargetBuffer.get(), 0, Length + PADDING_RESERVED_BYTES);
+	auto TargetBuffer = std::make_unique<uint8_t[]>(Length + MEMORY_RESERVED_BYTES);
+	memset(TargetBuffer.get(), 0, Length + MEMORY_RESERVED_BYTES);
 #if defined(PLATFORM_WIN)
 	if (WideCharToMultiByte(
 			CP_ACP, 
@@ -277,7 +277,7 @@ bool AddressStringToBinary(
 				++CommaNum;
 		}
 
-	//Delete zeros before whole data.
+	//Remove zeros before whole data.
 		while (AddrString.length() > 1U && AddrString.front() == ASCII_ZERO && AddrString.at(1U) != ASCII_PERIOD)
 			AddrString.erase(0, 1U);
 
@@ -299,7 +299,7 @@ bool AddressStringToBinary(
 			}break;
 		}
 
-	//Delete zeros before data.
+	//Remove zeros before data.
 		while (AddrString.find(".00") != std::string::npos)
 			AddrString.replace(AddrString.find(".00"), 3U, ("."));
 		while (AddrString.find(".0") != std::string::npos)

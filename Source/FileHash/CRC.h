@@ -20,7 +20,7 @@
 #ifndef TOOLKIT_FILEHASH_CRC_H
 #define TOOLKIT_FILEHASH_CRC_H
 
-#include "Base.h"
+#include "Include.h"
 
 //Hash function ID
 #define HASH_ID_CRC_8                 1U

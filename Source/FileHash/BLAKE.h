@@ -20,7 +20,7 @@
 #ifndef TOOLKIT_FILEHASH_BLAKE_H
 #define TOOLKIT_FILEHASH_BLAKE_H
 
-#include "Base.h"
+#include "Include.h"
 
 //Hash function ID
 #define HASH_ID_BLAKE_224           1U

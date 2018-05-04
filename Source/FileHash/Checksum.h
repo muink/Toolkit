@@ -1,6 +1,6 @@
-﻿// This code is part of Toolkit(DNSPing)
-// DNSPing, a useful and powerful toolkit
-// Copyright (C) 2014-2018 Chengr28
+﻿// This code is part of Toolkit(FileHash)
+// FileHash, a useful and powerful toolkit
+// Copyright (C) 2012-2018 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,28 +17,12 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#ifndef TOOLKIT_DNSPING_RESOLVER_H
-#define TOOLKIT_DNSPING_RESOLVER_H
+#ifndef TOOLKIT_FILEHASH_CHECKSUM_H
+#define TOOLKIT_FILEHASH_CHECKSUM_H
 
 #include "Include.h"
 
-//Functions
-void PrintFlags(
-	FILE * const FileHandle, 
-	const uint16_t Flags);
-void PrintTypeClassesName(
-	FILE * const FileHandle, 
-	const uint16_t Type, 
-	const uint16_t Classes);
-size_t PrintDomainName(
-	FILE * const FileHandle, 
-	const uint8_t * const Buffer, 
-	const size_t Location);
-void PrintResourseData(
-	FILE * const FileHandle, 
-	const uint16_t Type, 
-	const uint16_t Classes, 
-	const uint8_t * const Buffer, 
-	const size_t Location, 
-	const uint16_t Length);
+//Global variables
+extern size_t HashFamilyID;
+extern bool IsLowerCase;
 #endif

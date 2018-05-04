@@ -20,7 +20,7 @@
 #ifndef TOOLKIT_DNSPING_PROCESS_H
 #define TOOLKIT_DNSPING_PROCESS_H
 
-#include "Base.h"
+#include "Include.h"
 
 //Global variables
 extern ConfigurationTable ConfigurationParameter;

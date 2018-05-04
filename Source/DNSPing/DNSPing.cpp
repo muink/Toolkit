@@ -17,10 +17,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#include "Base.h"
-
-//Global variables
-ConfigurationTable ConfigurationParameter;
+#include "DNSPing.h"
 
 //Main function of program
 #if defined(PLATFORM_WIN)
@@ -58,7 +55,7 @@ bool ConfigurationInitialization(
 #if defined(PLATFORM_WIN)
 //Handle the system signal.
 	if (SetConsoleCtrlHandler(
-			reinterpret_cast<PHANDLER_ROUTINE>(CtrlHandler), 
+			reinterpret_cast<PHANDLER_ROUTINE>(SignalHandler), 
 			TRUE) == FALSE)
 	{
 		PrintErrorToScreen(L"\n[Error] Set console ctrl handler error", GetLastError());
@@ -91,8 +88,10 @@ bool ConfigurationInitialization(
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 //Handle the system signal.
 	errno = 0;
-	if (signal(SIGHUP, SIG_Handler) == SIG_ERR || signal(SIGINT, SIG_Handler) == SIG_ERR || 
-		signal(SIGQUIT, SIG_Handler) == SIG_ERR || signal(SIGTERM, SIG_Handler) == SIG_ERR)
+	if (signal(SIGHUP, SignalHandler) == SIG_ERR || 
+		signal(SIGINT, SignalHandler) == SIG_ERR || 
+		signal(SIGQUIT, SignalHandler) == SIG_ERR || 
+		signal(SIGTERM, SignalHandler) == SIG_ERR)
 	{
 		PrintErrorToScreen(L"\n[Error] Handle the system signal error", errno);
 		return false;
@@ -122,7 +121,8 @@ bool ParameterCheckAndSetting(
 			PrintErrorToScreen(L"\n[Error] Target is empty", 0);
 			return false;
 		}
-		else { //Mark port.
+	//Register port.
+		else {
 			if (ConfigurationParameter.ServiceType == 0)
 			{
 				ConfigurationParameter.ServiceType = htons(IPPORT_DNS);
@@ -140,7 +140,8 @@ bool ParameterCheckAndSetting(
 			PrintErrorToScreen(L"\n[Error] Target is empty", 0);
 			return false;
 		}
-		else { //Mark port.
+	//Register port.
+		else {
 			if (ConfigurationParameter.ServiceType == 0)
 			{
 				ConfigurationParameter.ServiceType = htons(IPPORT_DNS);

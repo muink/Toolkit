@@ -249,14 +249,14 @@ bool MD4_Hash(
 	}
 
 //Initialization
-	size_t ReadBlockSize = FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES, ReadLength = 0, RoundCount = 0;
+	size_t ReadBlockSize = FILE_BUFFER_SIZE + MEMORY_RESERVED_BYTES, ReadLength = 0, RoundCount = 0;
 	if (HashFamilyID == HASH_ID_ED2K)
 		ReadBlockSize = ED2K_SIZE_BLOCK;
-	std::unique_ptr<uint8_t[]> Buffer(new uint8_t[ReadBlockSize]());
-	std::unique_ptr<uint8_t[]> StringBuffer(new uint8_t[FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES]());
-	std::unique_ptr<uint8_t[]> BufferED2K(new uint8_t[MD4_DIGEST_SIZE]());
+	auto Buffer = std::make_unique<uint8_t[]>(ReadBlockSize);
+	auto StringBuffer = std::make_unique<uint8_t[]>(FILE_BUFFER_SIZE + MEMORY_RESERVED_BYTES);
+	auto BufferED2K = std::make_unique<uint8_t[]>(MD4_DIGEST_SIZE);
 	memset(Buffer.get(), 0, ReadBlockSize);
-	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE + PADDING_RESERVED_BYTES);
+	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE + MEMORY_RESERVED_BYTES);
 	memset(BufferED2K.get(), 0, MD4_DIGEST_SIZE);
 
 //MD4 initialization

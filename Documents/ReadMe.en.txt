@@ -1,5 +1,5 @@
 ﻿### Build in Linux/macOS
-* Run terminal and enter to Toolkit directory.
+* Run terminal and enter to Toolkit/Auxiliary/Scripts directory.
 * Run "chmod 755 CMake_Build.sh" to give running privilege to script.
 * Run "./CMake_Build.sh" to build binary.
 

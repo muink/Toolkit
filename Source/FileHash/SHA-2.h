@@ -20,7 +20,7 @@
 #ifndef TOOLKIT_FILEHASH_SHA_2_H
 #define TOOLKIT_FILEHASH_SHA_2_H
 
-#include "Base.h"
+#include "Include.h"
 
 //Hash function ID
 #define HASH_ID_SHA2_224           1U

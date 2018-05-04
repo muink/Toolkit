@@ -19,14 +19,19 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-# Create release directories.
+# Create release directories and set permissions.
+cd ../..
+rm -Rrf Object
+mkdir Release
+chmod -R 755 Auxiliary/Scripts
+
+# Set thread number variable.
+mv Dependency DependencyTemp
 if (uname -s | grep -iq "Darwin"); then
 	ThreadNum=`sysctl -n hw.ncpu`
 else 
 	ThreadNum=`nproc`
 fi
-rm -Rrf Object
-mkdir Release
 
 # Build DNSPing.
 mkdir Object

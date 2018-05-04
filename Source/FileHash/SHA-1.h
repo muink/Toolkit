@@ -20,7 +20,7 @@
 #ifndef TOOLKIT_FILEHASH_SHA_1_H
 #define TOOLKIT_FILEHASH_SHA_1_H
 
-#include "Base.h"
+#include "Include.h"
 
 //The SHA-1 block size, message digest size in bytes and some useful types.
 #define SHA1_BLOCK_SIZE         64U

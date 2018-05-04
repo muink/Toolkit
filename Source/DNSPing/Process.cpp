@@ -130,10 +130,10 @@ bool SendRequestProcess(
 	}
 
 //Initialization(Part 2)
-	std::unique_ptr<uint8_t[]> SendBuffer(new uint8_t[ConfigurationParameter.BufferSize + PADDING_RESERVED_BYTES]());
-	std::unique_ptr<uint8_t[]> RecvBuffer(new uint8_t[ConfigurationParameter.BufferSize + PADDING_RESERVED_BYTES]());
-	memset(SendBuffer.get(), 0, ConfigurationParameter.BufferSize + PADDING_RESERVED_BYTES);
-	memset(RecvBuffer.get(), 0, ConfigurationParameter.BufferSize + PADDING_RESERVED_BYTES);
+	auto SendBuffer = std::make_unique<uint8_t[]>(ConfigurationParameter.BufferSize + MEMORY_RESERVED_BYTES);
+	auto RecvBuffer = std::make_unique<uint8_t[]>(ConfigurationParameter.BufferSize + MEMORY_RESERVED_BYTES);
+	memset(SendBuffer.get(), 0, ConfigurationParameter.BufferSize + MEMORY_RESERVED_BYTES);
+	memset(RecvBuffer.get(), 0, ConfigurationParameter.BufferSize + MEMORY_RESERVED_BYTES);
 #if defined(PLATFORM_WIN)
 	LARGE_INTEGER CPU_Frequency, BeforeTime, AfterTime;
 	memset(&CPU_Frequency, 0, sizeof(CPU_Frequency));
@@ -774,8 +774,8 @@ void PrintHeaderToScreen(
 	{
 		if (WideTargetAddressString.empty())
 		{
-			std::unique_ptr<uint8_t[]> FQDN_String(new uint8_t[NI_MAXHOST + PADDING_RESERVED_BYTES]());
-			memset(FQDN_String.get(), 0, NI_MAXHOST + PADDING_RESERVED_BYTES);
+			auto FQDN_String = std::make_unique<uint8_t[]>(NI_MAXHOST + MEMORY_RESERVED_BYTES);
+			memset(FQDN_String.get(), 0, NI_MAXHOST + MEMORY_RESERVED_BYTES);
 			if (getnameinfo(reinterpret_cast<sockaddr *>(&ConfigurationParameter.SockAddr_Normal), sizeof(sockaddr_in), reinterpret_cast<char *>(FQDN_String.get()), NI_MAXHOST, nullptr, 0, NI_NUMERICSERV) != 0)
 			{
 				PrintErrorToScreen(L"[Error] Resolve addresses to host names error", WSAGetLastError());
@@ -863,9 +863,9 @@ void ErrorCodeToMessage(
 		Message.append(L": ");
 		Message.append(InnerMessage);
 		if (Message.back() == ASCII_SPACE)
-			Message.pop_back(); //Delete space.
+			Message.pop_back(); //Remove space.
 		if (Message.back() == ASCII_PERIOD)
-			Message.pop_back(); //Delete period.
+			Message.pop_back(); //Remove period.
 		Message.append(L"[%d]");
 
 	//Free pointer.

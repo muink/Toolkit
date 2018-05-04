@@ -20,7 +20,7 @@
 #ifndef TOOLKIT_FILEHASH_SHA_3_H
 #define TOOLKIT_FILEHASH_SHA_3_H
 
-#include "Base.h"
+#include "Include.h"
 #if defined(PLATFORM_WIN)
 	#include "SHA3\\KeccakHash.h"
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))

@@ -20,7 +20,7 @@
 #ifndef TOOLKIT_FILEHASH_MD5_H
 #define TOOLKIT_FILEHASH_MD5_H
 
-#include "Base.h"
+#include "Include.h"
 
 //The MD5 block size and message digest size
 #define MD5_BLOCK_SIZE    64U

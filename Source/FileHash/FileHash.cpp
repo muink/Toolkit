@@ -17,11 +17,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-#include "Base.h"
-
-//Global variables
-size_t HashFamilyID = 0;
-bool IsLowerCase = false;
+#include "FileHash.h"
 
 //Main function of program
 #if defined(PLATFORM_WIN)
@@ -221,7 +217,7 @@ bool ReadCommand(
 		else if (InnerCommand.find(HASH_COMMAND_BLAKE2) == 0) //BLAKE2 family
 		{
 		//Hash family check
-			if (HashFamilyID > 0)
+			if (HashFamilyID != 0)
 			{
 				fwprintf_s(stderr, L"[Error] Commands error.\n");
 				return false;
@@ -235,7 +231,7 @@ bool ReadCommand(
 		else if (InnerCommand.find(HASH_COMMAND_BLAKE) == 0) //BLAKE family
 		{
 		//Hash family check
-			if (HashFamilyID > 0)
+			if (HashFamilyID != 0)
 			{
 				fwprintf_s(stderr, L"[Error] Commands error.\n");
 				return false;
@@ -249,7 +245,7 @@ bool ReadCommand(
 		else if (InnerCommand.find(HASH_COMMAND_CRC) == 0) //CRC family
 		{
 		//Hash family check
-			if (HashFamilyID > 0)
+			if (HashFamilyID != 0)
 			{
 				fwprintf_s(stderr, L"[Error] Commands error.\n");
 				return false;
@@ -263,7 +259,7 @@ bool ReadCommand(
 		else if (InnerCommand == HASH_COMMAND_CHECKSUM) //Internet Protocol Checksum
 		{
 		//Hash family check
-			if (HashFamilyID > 0)
+			if (HashFamilyID != 0)
 			{
 				fwprintf_s(stderr, L"[Error] Commands error.\n");
 				return false;
@@ -275,7 +271,7 @@ bool ReadCommand(
 		else if (InnerCommand == HASH_COMMAND_MD2) //MD2
 		{
 		//Hash family check
-			if (HashFamilyID > 0)
+			if (HashFamilyID != 0)
 			{
 				fwprintf_s(stderr, L"[Error] Commands error.\n");
 				return false;
@@ -287,7 +283,7 @@ bool ReadCommand(
 		else if (InnerCommand == HASH_COMMAND_MD4) //MD4 family
 		{
 		//Hash family check
-			if (HashFamilyID > 0)
+			if (HashFamilyID != 0)
 			{
 				fwprintf_s(stderr, L"[Error] Commands error.\n");
 				return false;
@@ -299,7 +295,7 @@ bool ReadCommand(
 		else if (InnerCommand == HASH_COMMAND_ED2K) //MD4 family
 		{
 		//Hash family check
-			if (HashFamilyID > 0)
+			if (HashFamilyID != 0)
 			{
 				fwprintf_s(stderr, L"[Error] Commands error.\n");
 				return false;
@@ -311,7 +307,7 @@ bool ReadCommand(
 		else if (InnerCommand == HASH_COMMAND_MD || InnerCommand == HASH_COMMAND_MD5) //MD5
 		{
 		//Hash family check
-			if (HashFamilyID > 0)
+			if (HashFamilyID != 0)
 			{
 				fwprintf_s(stderr, L"[Error] Commands error.\n");
 				return false;
@@ -323,7 +319,7 @@ bool ReadCommand(
 		else if (InnerCommand.find(HASH_COMMAND_RIPEMD) == 0) //RIPEMD family
 		{
 		//Hash family check
-			if (HashFamilyID > 0)
+			if (HashFamilyID != 0)
 			{
 				fwprintf_s(stderr, L"[Error] Commands error.\n");
 				return false;
@@ -337,7 +333,7 @@ bool ReadCommand(
 		else if (InnerCommand == HASH_COMMAND_SHA1_UNDERLINE || InnerCommand.find(HASH_COMMAND_SHA1) == 0) //SHA-1
 		{
 		//Hash family check
-			if (HashFamilyID > 0)
+			if (HashFamilyID != 0)
 			{
 				fwprintf_s(stderr, L"[Error] Commands error.\n");
 				return false;
@@ -350,7 +346,7 @@ bool ReadCommand(
 			InnerCommand == HASH_COMMAND_SHA2_UNDERLINE || InnerCommand.find(HASH_COMMAND_SHA2) == 0) //SHA-2 family
 		{
 		//Hash family check
-			if (HashFamilyID > 0)
+			if (HashFamilyID != 0)
 			{
 				fwprintf_s(stderr, L"[Error] Commands error.\n");
 				return false;
@@ -365,7 +361,7 @@ bool ReadCommand(
 			InnerCommand.find(HASH_COMMAND_SHA3) == 0) //SHA-3 family
 		{
 		//Hash family check
-			if (HashFamilyID > 0)
+			if (HashFamilyID != 0)
 			{
 				fwprintf_s(stderr, L"[Error] Commands error.\n");
 				return false;
