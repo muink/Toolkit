@@ -174,7 +174,7 @@ bool ParameterCheckAndSetting(
 	ConfigurationParameter.Statistics_MinTime = ConfigurationParameter.SocketTimeout.tv_sec * SECOND_TO_MILLISECOND + ConfigurationParameter.SocketTimeout.tv_usec / MICROSECOND_TO_MILLISECOND;
 #endif
 
-//Convert multiple byte string to wide char string(Target domain and test domain).
+//Convert multiple byte string to wide char string, target domain and test domain.
 	std::wstring WideTestDomainString, WideTargetAddressString;
 	if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(ConfigurationParameter.TargetString_Normal.c_str()), ConfigurationParameter.TargetString_Normal.length(), ConfigurationParameter.WideTargetString) || 
 		!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(ConfigurationParameter.TestDomainString.c_str()), ConfigurationParameter.TestDomainString.length(), WideTestDomainString))
@@ -183,7 +183,7 @@ bool ParameterCheckAndSetting(
 		return false;
 	}
 
-//Convert multiple byte string to wide char string(Target address).
+//Convert multiple byte string to wide char string, target address.
 	if (!ConfigurationParameter.TargetAddressString.empty())
 	{
 		if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(ConfigurationParameter.TargetAddressString.c_str()), ConfigurationParameter.TargetAddressString.length(), WideTargetAddressString))
@@ -195,7 +195,7 @@ bool ParameterCheckAndSetting(
 
 //Check DNS packet data.
 	if (ConfigurationParameter.Parameter_Header.Flags == 0)
-		ConfigurationParameter.Parameter_Header.Flags = htons(DNS_STANDARD);
+		ConfigurationParameter.Parameter_Header.Flags = htons(DNS_FLAG_REQUEST_STANDARD);
 	if (ConfigurationParameter.Parameter_Header.Question == 0)
 		ConfigurationParameter.Parameter_Header.Question = htons(U16_NUM_ONE);
 	if (ConfigurationParameter.Parameter_Query.Classes == 0)
@@ -216,14 +216,14 @@ bool ParameterCheckAndSetting(
 		ConfigurationParameter.Parameter_Header.Additional = htons(U16_NUM_ONE);
 		ConfigurationParameter.Parameter_EDNS.Type = htons(DNS_TYPE_OPT);
 		if (ConfigurationParameter.EDNSPayloadSize == 0)
-			ConfigurationParameter.Parameter_EDNS.UDPPayloadSize = htons(EDNS_PACKET_MINSIZE);
+			ConfigurationParameter.Parameter_EDNS.UDP_PayloadSize = htons(EDNS_PACKET_MINSIZE);
 		else 
-			ConfigurationParameter.Parameter_EDNS.UDPPayloadSize = htons(static_cast<uint16_t>(ConfigurationParameter.EDNSPayloadSize));
+			ConfigurationParameter.Parameter_EDNS.UDP_PayloadSize = htons(static_cast<uint16_t>(ConfigurationParameter.EDNSPayloadSize));
 		if (ConfigurationParameter.IsDNSSEC)
 		{
-			ConfigurationParameter.Parameter_Header.FlagsBits.AD = ~ConfigurationParameter.Parameter_Header.FlagsBits.AD; //Local DNSSEC Server validated
-//			ConfigurationParameter.Parameter_Header.FlagsBits.CD = ~ConfigurationParameter.Parameter_Header.FlagsBits.CD; //Checking Disabled
-			ConfigurationParameter.Parameter_EDNS.Z_Bits.DO = ~ConfigurationParameter.Parameter_EDNS.Z_Bits.DO; //Accepts DNSSEC security RRs
+			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_AD); //Set Authentic Data bit.
+			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_CD); //Set Checking Disabled bit.
+			ConfigurationParameter.Parameter_EDNS.Z_Field = htons(ntohs(ConfigurationParameter.Parameter_EDNS.Z_Field) | EDNS_FLAG_GET_BIT_DO); //Set Accepts DNSSEC security resource records bit.
 		}
 	}
 

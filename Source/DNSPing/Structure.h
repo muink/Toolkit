@@ -102,12 +102,16 @@
 * RFC 6698, The DNS-Based Authentication of Named Entities (DANE) Transport Layer Security (TLS) Protocol: TLSA(https://tools.ietf.org/html/rfc6698)
 * RFC 6742, DNS Resource Records for the Identifier-Locator Network Protocol (ILNP)(https://tools.ietf.org/html/rfc6742)
 * RFC 6844, DNS Certification Authority Authorization (CAA) Resource Record(https://tools.ietf.org/html/rfc6844)
+* RFC 6891, Extension Mechanisms for DNS (EDNS(0))(https://tools.ietf.org/html/rfc6891)
 * RFC 6975, Signaling Cryptographic Algorithm Understanding in DNS Security Extensions (DNSSEC)(https://tools.ietf.org/html/rfc6975)
 * RFC 7043, Resource Records for EUI-48 and EUI-64 Addresses in the DNS(https://tools.ietf.org/html/rfc7043)
 * RFC 7314, Extension Mechanisms for DNS (EDNS) EXPIRE Option(https://tools.ietf.org/html/rfc7314)
+* RFC 7766, DNS Transport over TCP - Implementation Requirements(https://tools.ietf.org/html/rfc7766)
+* RFC 7871, Client Subnet in DNS Queries(https://tools.ietf.org/html/rfc7871)
+* RFC 7873, Domain Name System (DNS) Cookies(https://tools.ietf.org/html/rfc7873)
 */
 
-//About this list, visit IANA Domain Name System (DNS) Parameters(https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml)
+//About this list, please visit IANA Domain Name System (DNS) Parameters(https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml)
 //Port and Flags definitions
 #ifndef IPPORT_DNS
 	#define IPPORT_DNS                    53U        //Standard DNS(TCP and UDP) Port
@@ -118,32 +122,35 @@
 #ifndef IPPORT_LLMNR
 	#define IPPORT_LLMNR                  5355U      //Link-Local Multicast Name Resolution/LLMNR Port
 #endif
-#define DNS_STANDARD                  0x0100     //System Standard query flag
-#define DNS_SQR_NE                    0x8180     //Standard query response and No Error.
-#define DNS_SQR_NEA                   0x8580     //Standard query response, No Error and Authoritative.
-#define DNS_SQR_NETC                  0x8380     //Standard query response and No Error, but Truncated.
-#define DNS_SQR_FE                    0x8181     //Standard query response, Format Error
-#define DNS_SQR_SF                    0x8182     //Standard query response, Server failure
-#define DNS_SQR_SNH                   0x8183     //Standard query response, No Such Name
-#define DNS_GET_BIT_RESPONSE          0x8000     //Get Response bit in DNS flags.
-#define DNS_GET_BIT_OPCODE            0x7800     //Get OPCode in DNS flags.
-#define DNS_GET_BIT_AA                0x0400     //Get Authoritative bit in DNS flags.
-#define DNS_GET_BIT_TC                0x0200     //Get Truncated bit in DNS flags.
-#define DNS_GET_BIT_RD                0x0100     //Get Recursion Desired bit in DNS flags.
-#define DNS_GET_BIT_Z                 0x0040     //Get Reserved bit in DNS flags.
-#define DNS_GET_BIT_AD                0x0020     //Get Authentic Data bit in DNS flags.
-#define DNS_GET_BIT_CD                0x0010     //Get Checking Disabled bit in DNS flags.
-#define DNS_GET_BIT_RCODE             0x000F     //Get RCode in DNS flags.
-#define DNS_SET_R                     0x8000     //Set Response bit.
-#define DNS_SET_R_TC                  0x8200     //Set Response bit and Truncated bit.
-#define DNS_SER_R_A                   0x8580     //Set Response bit and Authoritative bit.
-#define DNS_SET_R_FE                  0x8001     //Set Response bit and Format Error RCode.
-#define DNS_SET_R_SNH                 0x8003     //Set Response bit and No Such Name RCode.
-#define DNS_POINTER_8_BITS            0xC0       //DNS compression pointer(11000000)
-#define DNS_POINTER_16_BITS           0xC000     //DNS compression pointer(1100000000000000)
-#define DNS_POINTER_8_BITS_STRING     ('\xC0')   //DNS compression pointer string
-#define DNS_POINTER_BITS_GET_LOCATE   0x3FFF     //Get location of DNS compression pointer(00111111111111111)
-#define DNS_POINTER_QUERY             0xC00C     //Pointer of first query
+#define DNS_FLAG_REQUEST_STANDARD        0x0100       //Standard request
+#define DNS_FLAG_SQR_NE                  0x8180       //Standard query response and No Error.
+#define DNS_FLAG_SQR_NEA                 0x8580       //Standard query response, No Error and Authoritative.
+#define DNS_FLAG_SQR_NETC                0x8380       //Standard query response and No Error, but Truncated.
+#define DNS_FLAG_SQR_FE                  0x8181       //Standard query response, Format Error
+#define DNS_FLAG_SQR_SF                  0x8182       //Standard query response, Server failure
+#define DNS_FLAG_SQR_SNH                 0x8183       //Standard query response, No Such Name
+#define DNS_FLAG_GET_BIT_RESPONSE        0x8000       //Get Response bit in DNS flags.
+#define DNS_FLAG_GET_BIT_OPCODE          0x7800       //Get OPCode in DNS flags.
+#define DNS_FLAG_GET_BIT_AA              0x0400       //Get Authoritative bit in DNS flags.
+#define DNS_FLAG_GET_BIT_TC              0x0200       //Get Truncated bit in DNS flags.
+#define DNS_FLAG_GET_BIT_RD              0x0100       //Get Recursion Desired bit in DNS flags.
+#define DNS_FLAG_GET_BIT_RA              0x0080       //Get Recursion Available bit in DNS flags.
+#define DNS_FLAG_GET_BIT_Z               0x0040       //Get Reserved bit in DNS flags.
+#define DNS_FLAG_GET_BIT_AD              0x0020       //Get Authentic Data bit in DNS flags.
+#define DNS_FLAG_GET_BIT_CD              0x0010       //Get Checking Disabled bit in DNS flags.
+#define DNS_FLAG_GET_BIT_RCODE           0x000F       //Get RCode in DNS flags.
+#define DNS_FLAG_GET_BIT_SERVER_FIXED    0xF8C0       //Get all bits without AA/Authoritative Answer, TC/Truncated, RD/Recursion Desired, AD/Authenticated Data, CD/Checking Disabled, and RCode/Return Code in DNS flags.
+#define DNS_FLAG_SET_R                   0x8000       //Set Response bit in DNS flags.
+#define DNS_FLAG_SET_R_TC                0x8200       //Set Response bit and Truncated bit in DNS flags.
+#define DNS_FLAG_SET_R_A                 0x8580       //Set Response bit and Authoritative bit in DNS flags.
+#define DNS_FLAG_SET_R_FE                0x8001       //Set Response bit and Format Error RCode in DNS flags.
+#define DNS_FLAG_SET_R_SNH               0x8003       //Set Response bit and No Such Name RCode in DNS flags.
+#define DNS_POINTER_8_BITS               0xC0         //DNS compression pointer(11000000)
+#define DNS_POINTER_16_BITS              0xC000       //DNS compression pointer(1100000000000000)
+#define DNS_POINTER_8_BIT_STRING         ('\xC0')     //DNS compression pointer string
+#define DNS_POINTER_BIT_GET_LOCATE       0x3FFF       //Get location of DNS compression pointer(00111111111111111)
+#define DNS_POINTER_QUERY                0xC00C       //Pointer of first query
+#define DNS_RECORD_TTL_GET_BIT_HIGHEST   0x80000000   //Get highest 1 bit in TTL.
 
 //OPCode definitions
 #ifndef DNS_OPCODE_QUERY
@@ -169,11 +176,14 @@
 #endif
 
 //Classes definitions
+#ifndef DNS_CLASS_RESERVED
+	#define DNS_CLASS_RESERVED      0                //DNS RESERVED Classes is 0.
+#endif
 #ifndef DNS_CLASS_INTERNET
 	#define DNS_CLASS_INTERNET      0x0001           //DNS INTERNET Classes is 1.
 #endif
 #ifndef DNS_CLASS_CSNET
-	#define DNS_CLASS_CSNET         0x0002           //DNS CSNET Classes is 2.
+	#define DNS_CLASS_CSNET         0x0002           //DNS CSNET Classes is 2(Obsolete).
 #endif
 #ifndef DNS_CLASS_CHAOS
 	#define DNS_CLASS_CHAOS         0x0003           //DNS CHAOS Classes is 3.
@@ -246,6 +256,9 @@
 #ifndef DNS_RCODE_BADTRUNC
 	#define DNS_RCODE_BADTRUNC      0x0016           //RCode Bad Truncation is 22.
 #endif
+#ifndef DNS_RCODE_BADCOOKIE
+	#define DNS_RCODE_BADCOOKIE     0x0017           //RCode Bad Cookie is 23.
+#endif
 #ifndef DNS_RCODE_PRIVATE_A
 	#define DNS_RCODE_PRIVATE_A     0xFF00           //DNS Reserved Private use RCode is begin at 3841.
 #endif
@@ -300,7 +313,7 @@
 	#define DNS_TYPE_MX           0x000F             //DNS Type MX is 15.
 #endif
 #ifndef DNS_TYPE_TEXT
-	#define DNS_TYPE_TEXT          0x0010             //DNS Type TXT is 16.
+	#define DNS_TYPE_TEXT         0x0010             //DNS Type TXT is 16.
 #endif
 #ifndef DNS_TYPE_RP
 	#define DNS_TYPE_RP           0x0011             //DNS Type RP is 17.
@@ -321,7 +334,7 @@
 	#define DNS_TYPE_NSAP         0x0016             //DNS Type NSAP is 22.
 #endif
 #ifndef DNS_TYPE_NSAPPTR
-	#define DNS_TYPE_NSAPPTR     0x0017             //DNS Type NSAPPTR is 23(Obsolete).
+	#define DNS_TYPE_NSAPPTR      0x0017             //DNS Type NSAPPTR is 23(Obsolete).
 #endif
 #ifndef DNS_TYPE_SIG
 	#define DNS_TYPE_SIG          0x0018             //DNS Type SIG is 24.
@@ -529,8 +542,9 @@
 typedef struct _dns_hdr_
 {
 	uint16_t              ID;
-	union {
+//	union {
 		uint16_t          Flags;
+/* No need to define sub structure.
 		struct {
 		#if BYTE_ORDER == LITTLE_ENDIAN
 			uint8_t       RD:1;
@@ -557,7 +571,8 @@ typedef struct _dns_hdr_
 			uint8_t       RCode:4;
 		#endif
 		}FlagsBits;
-	};
+*/
+//	};
 	uint16_t              Question;
 	uint16_t              Answer;
 	uint16_t              Authority;
@@ -585,8 +600,9 @@ typedef struct _dns_tcp_hdr_
 {
 	uint16_t              Length;
 	uint16_t              ID;
-	union {
+//	union {
 		uint16_t          Flags;
+/* No need to define sub structure.
 		struct {
 		#if BYTE_ORDER == LITTLE_ENDIAN
 			uint8_t       RD:1;
@@ -613,7 +629,8 @@ typedef struct _dns_tcp_hdr_
 			uint8_t       RCode:4;
 		#endif
 		}FlagsBits;
-	};
+*/
+//	};
 	uint16_t              Question;
 	uint16_t              Answer;
 	uint16_t              Authority;
@@ -896,29 +913,45 @@ typedef struct _dns_record_srv_
                     1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3
 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-/                                                               /
-/                            Domain                             /
-/                                                               /
+|     Name      |             Type              |UDP PayloadSize|
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|             Type              |       UDP Payload Size        |
+|UDP PayloadSize|Extended RCode | EDNS Version  |D|  Reserved   |   Extended RCode/Higher bits in extended Return Code, D/DO/DNSSEC OK bit
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|Extended RCode |EDNS Version |D|           Reserved            |  Extended RCode/Higher bits in extended Return Code, D/DO bit
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|            Length             |\---------- Z Field -----------/
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|   Reserved    |            Length             |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 */
-#define EDNS_PACKET_MINSIZE    1220U
-#define EDNS_GET_BIT_DO        0x8000        //Get DO bit in Z field.
+//Code definitions
+#define EDNS_VERSION_ZERO          0
+#define EDNS_PACKET_MINSIZE        1220U
+#define EDNS_PACKET_MAXSIZE        4096U
+#define EDNS_FLAG_GET_BIT_DO       0x8000        //Get DO bit in Z field.
+
+//EDNS Code definitions
+#define EDNS_CODE_LLQ              0x0001        //Long-lived query
+#define EDNS_CODE_UL               0x0002        //Update lease
+#define EDNS_CODE_NSID             0x0003        //Name Server Identifier (RFC 5001)
+#define EDNS_CODE_OWNER            0x0004        //Owner, reserved
+#define EDNS_CODE_DAU              0x0005        //DNSSEC Algorithm Understood (RFC 6975)
+#define EDNS_CODE_DHU              0x0006        //DS Hash Understood (RFC 6975)
+#define EDNS_CODE_N3U              0x0007        //DSEC3 Hash Understood (RFC 6975)
+#define EDNS_CODE_CSUBNET          0x0008        //Client subnet (RFC 7871)
+#define EDNS_CODE_EDNS_EXPIRE      0x0009        //EDNS Expire (RFC 7314)
+#define EDNS_CODE_COOKIES          0x000A        //DNS Cookies (RFC 7873)
+
+//Address Family Numbers, please visit https://www.iana.org/assignments/address-family-numbers/address-family-numbers.xhtml.
+#define EDNS_ADDRESS_FAMILY_IPV4   0x0001
+#define EDNS_ADDRESS_FAMILY_IPV6   0x0002
 typedef struct _dns_record_opt_
 {
 	uint8_t               Name;
 	uint16_t              Type;
-	uint16_t              UDPPayloadSize;
+	uint16_t              UDP_PayloadSize;
 	uint8_t               Extended_RCode;
 	uint8_t               Version;
-	union {
+//	union {
 		uint16_t          Z_Field;
+/* No need to define sub structure.
 		struct {
 		#if BYTE_ORDER == LITTLE_ENDIAN
 			uint8_t       Reserved_First:7;
@@ -929,7 +962,8 @@ typedef struct _dns_record_opt_
 		#endif
 			uint8_t       Reserved_Second;
 		}Z_Bits;
-	};
+*/
+//	};
 	uint16_t              DataLength;
 }dns_record_opt, edns_header;
 
@@ -1114,8 +1148,9 @@ typedef struct _dns_record_rrsig_
 #define DNSSEC_DNSKEY_PROTOCOL                 3U
 typedef struct _dns_record_dnskey_
 {
-	union {
+//	union {
 		uint16_t          Flags;
+/* No need to define sub structure.
 		struct {
 		#if BYTE_ORDER == LITTLE_ENDIAN
 			uint8_t       ZoneKey:1;
@@ -1131,7 +1166,8 @@ typedef struct _dns_record_dnskey_
 			uint8_t       KeySigningKey:1;
 		#endif
 		}FlagsBits;
-	};
+*/
+//	};
 	uint8_t               Protocol;
 	uint8_t               Algorithm;
 //	uint8_t               *PublicKey;
@@ -1181,8 +1217,9 @@ typedef struct _dns_record_nsec_
 typedef struct _dns_record_nsec3_
 {
 	uint8_t               Algorithm;
-	union {
+//	union {
 		uint8_t           Flags;
+/* No need to define sub structure.
 		struct {
 		#if BYTE_ORDER == LITTLE_ENDIAN
 			uint8_t       OptOut:1;
@@ -1192,7 +1229,8 @@ typedef struct _dns_record_nsec3_
 			uint8_t       OptOut:1;
 		#endif
 		}FlagsBits;
-	};
+*/
+//	};
 	uint16_t              Iterations;
 	uint8_t               SaltLength;
 //	uint8_t               *Salt;
@@ -1217,8 +1255,9 @@ typedef struct _dns_record_nsec3_
 typedef struct _dns_record_nsec3param_
 {
 	uint8_t               Algorithm;
-	union {
+//	union {
 		uint8_t           Flags;
+/* No need to define sub structure.
 		struct {
 		#if BYTE_ORDER == LITTLE_ENDIAN
 			uint8_t       Reserved:1;
@@ -1228,7 +1267,8 @@ typedef struct _dns_record_nsec3param_
 			uint8_t       Reserved:1;
 		#endif
 		}FlagsBits;
-	};
+*/
+//	};
 	uint16_t              Iterations;
 	uint8_t               SaltLength;
 //	uint8_t               *Salt;
@@ -1252,8 +1292,9 @@ typedef struct _dns_record_nsec3param_
 */
 typedef struct _dns_record_caa_
 {
-	union {
+//	union {
 		uint8_t           Flags;
+/* No need to define sub structure.
 		struct {
 		#if BYTE_ORDER == LITTLE_ENDIAN
 			uint8_t       Zero:7;
@@ -1263,7 +1304,8 @@ typedef struct _dns_record_caa_
 			uint8_t       Zero:7;
 		#endif
 		}FlagsBits;
-	};
+*/
+//	};
 	uint8_t               Length;
 //	uint8_t               *Tag;
 //	uint8_t               *Value;

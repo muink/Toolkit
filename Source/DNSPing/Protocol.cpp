@@ -232,7 +232,7 @@ bool AddressStringToBinary(
 		}
 		else if (AddrString.find(ASCII_COLON) == AddrString.rfind(ASCII_COLON))
 		{
-			AddrString.replace(AddrString.find(ASCII_COLON), 1U, ("::"));
+			AddrString.replace(AddrString.find(ASCII_COLON), 1U, "::");
 		}
 
 	//Convert to binary.
@@ -291,21 +291,21 @@ bool AddressStringToBinary(
 			}break;
 			case 1U:
 			{
-				AddrString.replace(AddrString.find(ASCII_PERIOD), 1U, (".0.0."));
+				AddrString.replace(AddrString.find(ASCII_PERIOD), 1U, ".0.0.");
 			}break;
 			case 2U:
 			{
-				AddrString.replace(AddrString.find(ASCII_PERIOD), 1U, (".0."));
+				AddrString.replace(AddrString.find(ASCII_PERIOD), 1U, ".0.");
 			}break;
 		}
 
 	//Remove zeros before data.
 		while (AddrString.find(".00") != std::string::npos)
-			AddrString.replace(AddrString.find(".00"), 3U, ("."));
+			AddrString.replace(AddrString.find(".00"), 3U, ".");
 		while (AddrString.find(".0") != std::string::npos)
-			AddrString.replace(AddrString.find(".0"), 2U, ("."));
+			AddrString.replace(AddrString.find(".0"), 2U, ".");
 		while (AddrString.find("..") != std::string::npos)
-			AddrString.replace(AddrString.find(".."), 2U, (".0."));
+			AddrString.replace(AddrString.find(".."), 2U, ".0.");
 		if (AddrString.at(AddrString.length() - 1U) == ASCII_PERIOD)
 			AddrString.append("0");
 
@@ -1158,7 +1158,7 @@ size_t PacketQueryToString(
 		{
 			MarkIndex[0] = TName[LocateIndex];
 		}
-		else if (LocateIndex == MarkIndex[0] + MarkIndex[1U] + 1U)
+		else if (LocateIndex == static_cast<size_t>(MarkIndex[0]) + static_cast<size_t>(MarkIndex[1U]) + 1U)
 		{
 			MarkIndex[0] = TName[LocateIndex];
 			if (MarkIndex[0] == 0)
@@ -1202,7 +1202,7 @@ bool ValidatePacket(
 				const auto DNS_OPT_RECORD = reinterpret_cast<const dns_record_opt *>(Buffer + Length - sizeof(dns_record_opt));
 
 			//UDP Payload Size and Z Field of DNSSEC check
-				if (DNS_OPT_RECORD->UDPPayloadSize == 0 || (ConfigurationParameter.IsDNSSEC && DNS_OPT_RECORD->Z_Field == 0))
+				if (DNS_OPT_RECORD->UDP_PayloadSize == 0 || (ConfigurationParameter.IsDNSSEC && DNS_OPT_RECORD->Z_Field == 0))
 					return false;
 			}
 			else {

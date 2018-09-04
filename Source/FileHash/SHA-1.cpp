@@ -106,11 +106,11 @@ static void SHA1_Compress(
 void SHA1_Init(
 	SHA1_State * const sha1)
 {
-	sha1->State[0] = 0x67452301UL;
-	sha1->State[1U] = 0xEFCDAB89UL;
-	sha1->State[2U] = 0x98BADCFEUL;
-	sha1->State[3U] = 0x10325476UL;
-	sha1->State[4U] = 0xC3D2E1F0UL;
+	sha1->State[0] = static_cast<SHA1_INT32>(0x67452301UL);
+	sha1->State[1U] = static_cast<SHA1_INT32>(0xEFCDAB89UL);
+	sha1->State[2U] = static_cast<SHA1_INT32>(0x98BADCFEUL);
+	sha1->State[3U] = static_cast<SHA1_INT32>(0x10325476UL);
+	sha1->State[4U] = static_cast<SHA1_INT32>(0xC3D2E1F0UL);
 	sha1->Curlen = 0;
 	sha1->Length = 0;
 

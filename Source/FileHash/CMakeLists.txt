@@ -20,13 +20,10 @@
 # CMake minimum version
 cmake_minimum_required(VERSION 3.1)
 
-# Project name and build type
+# Project name, build type, list all source files and sub directories.
 project(FileHash)
 set(CMAKE_BUILD_TYPE "Release")
-
-# All source files and sub directories
-add_subdirectory(SHA3)
-set(GENERATOR_SRC_DIR
+set(FILEHASH_SRC_FILES
 		"Base.h"
 		"BLAKE.h"
 		"BLAKE2.h"
@@ -56,21 +53,46 @@ set(GENERATOR_SRC_DIR
 		"SHA-1.cpp"
 		"SHA-2.cpp"
 		"SHA-3.cpp")
+add_subdirectory(SHA3)
+add_executable(FileHash ${FILEHASH_SRC_FILES})
 
 # Compiling and linking flags
-## C++ 14 standard definitions
+## See https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc.
 set(CMAKE_CXX_STANDARD 14)
-## Platform definitions
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+IF(APPLE)
+	add_definitions(-std=c++14)
+ENDIF(APPLE)
+IF(NOT PLATFORM_OPENWRT)
+	IF(CMAKE_VERSION VERSION_LESS "3.9")
+		add_definitions(-flto)
+	ELSE(CMAKE_VERSION VERSION_LESS "3.9")
+		set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+	ENDIF(CMAKE_VERSION VERSION_LESS "3.9")
+	set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+	add_definitions(-D_FORTIFY_SOURCE=2)
+	add_definitions(-D_GLIBCXX_ASSERTIONS)
+	add_definitions(-fasynchronous-unwind-tables)
+#	add_definitions(-fcf-protection=full)
+	add_definitions(-fexceptions)
+	IF(NOT APPLE)
+		add_definitions(-fopenmp)
+#		add_definitions(-fsplit-stack)
+	ENDIF(NOT APPLE)
+#	add_definitions(-fstack-clash-protection)
+	add_definitions(-fstack-protector-strong)
+	add_definitions(-g)
+	add_definitions(-grecord-gcc-switches)
+	add_definitions(-march=native)
+#	add_definitions(-mcet)
+	add_definitions(-pipe)
+	add_definitions(-O3)
+ENDIF(NOT PLATFORM_OPENWRT)
+
+# Platform and library definitions
 IF(PLATFORM_OPENWRT)
 	add_definitions(-DPLATFORM_OPENWRT)
-ELSE(PLATFORM_OPENWRT)
-	add_definitions(-flto -fpic)
-ENDIF(PLATFORM_OPENWRT)
-
-# Executable file name
-add_executable(FileHash ${GENERATOR_SRC_DIR})
-IF(PLATFORM_OPENWRT)
-	INSTALL(TARGETS FileHash RUNTIME DESTINATION sbin)
+	install(TARGETS FileHash RUNTIME DESTINATION sbin)
 ENDIF(PLATFORM_OPENWRT)
 
 # Libraries linking

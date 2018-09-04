@@ -726,7 +726,7 @@ bool OutputResultToFile(
 	SignedResult = _wfopen_s(&ConfigurationParameter.OutputFile, ConfigurationParameter.WideOutputFileName.c_str(), L"a,ccs=UTF-8");
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	errno = 0;
-	ConfigurationParameter.OutputFile = fopen(ConfigurationParameter.OutputFileName.c_str(), ("a"));
+	ConfigurationParameter.OutputFile = fopen(ConfigurationParameter.OutputFileName.c_str(), "a");
 #endif
 	if (ConfigurationParameter.OutputFile == nullptr)
 	{
@@ -857,7 +857,10 @@ void ErrorCodeToMessage(
 
 	//Free pointer.
 		if (InnerMessage != nullptr)
+		{
 			LocalFree(InnerMessage);
+			InnerMessage = nullptr;
+		}
 	}
 	else {
 		Message.append(L": ");
@@ -870,6 +873,7 @@ void ErrorCodeToMessage(
 
 	//Free pointer.
 		LocalFree(InnerMessage);
+		InnerMessage = nullptr;
 	}
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::wstring InnerMessage;

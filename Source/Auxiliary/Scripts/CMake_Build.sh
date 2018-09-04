@@ -26,7 +26,6 @@ mkdir Release
 chmod -R 755 Auxiliary/Scripts
 
 # Set thread number variable.
-mv Dependency DependencyTemp
 if (uname -s | grep -iq "Darwin"); then
 	ThreadNum=`sysctl -n hw.ncpu`
 else 

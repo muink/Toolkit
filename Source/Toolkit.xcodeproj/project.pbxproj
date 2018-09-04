@@ -55,8 +55,8 @@
 		D99427A01D12F00900280D91 = {
 			isa = PBXGroup;
 			children = (
-				D99427E91D12F23B00280D91 /* FileHash.xcodeproj */,
 				D99427C61D12F13900280D91 /* DNSPing.xcodeproj */,
+				D99427E91D12F23B00280D91 /* FileHash.xcodeproj */,
 				D942EC641D12F2D000F7C65A /* Toolkit */,
 			);
 			sourceTree = "<group>";

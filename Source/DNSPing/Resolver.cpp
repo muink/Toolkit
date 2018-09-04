@@ -714,7 +714,7 @@ void PrintResourseData(
 		fwprintf_s(FileHandle, L"   Data: ");
 
 		const auto DNS_OPT_RECORD = reinterpret_cast<const dns_record_opt *>(Buffer + Location);
-		fwprintf_s(FileHandle, L"UDP Playload Size: %u", ntohs(DNS_OPT_RECORD->UDPPayloadSize));
+		fwprintf_s(FileHandle, L"UDP Playload Size: %u", ntohs(DNS_OPT_RECORD->UDP_PayloadSize));
 		fwprintf_s(FileHandle, L"\n         Extended RCode: %x", DNS_OPT_RECORD->Extended_RCode);
 		fwprintf_s(FileHandle, L"\n         EDNS Version: %u", DNS_OPT_RECORD->Version);
 		if (ntohs(DNS_OPT_RECORD->Z_Field) >> HIGHEST_MOVE_BIT_U16 == 0)

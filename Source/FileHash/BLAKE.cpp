@@ -108,12 +108,12 @@ void BLAKE_224_Init(
 void BLAKE_224_Update(
 	state224 * const S, 
 	const uint8_t *in, 
-	uint64_t inlen)
+	uint32_t inlen)
 {
 	int left = S->buflen, fill = 64 - left;
 
 //Data left and data received fill a block
-	if (left && (inlen >= fill))
+	if (left && (static_cast<int64_t>(inlen) >= fill))
 	{
 		memcpy((void *)(S->buf + left), (void *)in, fill);
 		S->t[0] += 512;
@@ -299,12 +299,12 @@ void BLAKE_256_Init(
 void BLAKE_256_Update(
 	state256 * const S, 
 	const uint8_t *in, 
-	uint64_t inlen)
+	uint32_t inlen)
 {
 	int left = S->buflen, fill = 64 - left;
 
 //Data left and data received fill a block
-	if (left && (inlen >= fill))
+	if (left && (static_cast<int64_t>(inlen) >= fill))
 	{
 		memcpy((void *)(S->buf + left), (void *)in, fill);
 		S->t[0] += 512;
@@ -491,12 +491,12 @@ void BLAKE_384_Init(
 void BLAKE_384_Update(
 	state384 * const S, 
 	const uint8_t *in, 
-	uint64_t inlen)
+	uint32_t inlen)
 {
 	int left = S->buflen, fill = 128 - left;
 
 //Data left and data received fill a block
-	if (left && (inlen >= fill))
+	if (left && (static_cast<int64_t>(inlen) >= fill))
 	{
 		memcpy((void *)(S->buf + left), (void *)in, fill);
 		S->t[0] += 1024;
@@ -680,12 +680,12 @@ void BLAKE_512_Init(
 void BLAKE_512_Update(
 	state512 * const S, 
 	const uint8_t *in, 
-	uint64_t inlen)
+	uint32_t inlen)
 {
 	int left = S->buflen, fill = 128 - left;
 
 //Data left and data received fill a block
-	if (left && (inlen >= fill))
+	if (left && (static_cast<int64_t>(inlen) >= fill))
 	{
 		memcpy((void *)(S->buf + left), (void *)in, fill);
 		S->t[0] += 1024;
@@ -892,19 +892,19 @@ bool BLAKE_Hash(
 		else {
 			if (BLAKE_HashFunctionID == HASH_ID_BLAKE_224) //BLAKE 224 bits
 			{
-				BLAKE_224_Update(&State224, Buffer.get(), ReadLength);
+				BLAKE_224_Update(&State224, Buffer.get(), static_cast<uint32_t>(ReadLength));
 			}
 			else if (BLAKE_HashFunctionID == HASH_ID_BLAKE_256) //BLAKE 256 bits
 			{
-				BLAKE_256_Update(&State256, Buffer.get(), ReadLength);
+				BLAKE_256_Update(&State256, Buffer.get(), static_cast<uint32_t>(ReadLength));
 			}
 			else if (BLAKE_HashFunctionID == HASH_ID_BLAKE_384) //BLAKE 384 bits
 			{
-				BLAKE_384_Update(&State384, Buffer.get(), ReadLength);
+				BLAKE_384_Update(&State384, Buffer.get(), static_cast<uint32_t>(ReadLength));
 			}
 			else if (BLAKE_HashFunctionID == HASH_ID_BLAKE_512) //BLAKE 512 bits
 			{
-				BLAKE_512_Update(&State512, Buffer.get(), ReadLength);
+				BLAKE_512_Update(&State512, Buffer.get(), static_cast<uint32_t>(ReadLength));
 			}
 			else { //Commands error
 				fwprintf_s(stderr, L"[Error] Commands error.\n");

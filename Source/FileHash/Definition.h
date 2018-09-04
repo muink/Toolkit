@@ -33,7 +33,7 @@
 	#define MBSTOWCS_NULL_TERMINATE                 (-1)                        //MultiByteToWideChar function find null-terminate.
 #endif
 #define NULL_TERMINATE_LENGTH                   1U                          //Length of C style string null
-#define MEMORY_RESERVED_BYTES                  2U                          //Padding reserved bytes(2 bytes)
+#define MEMORY_RESERVED_BYTES                   2U                          //Padding reserved bytes(2 bytes)
 
 //Character value definitions
 #define ASCII_SPACE                             32                          //" "
@@ -41,7 +41,7 @@
 #define ASCII_PERIOD                            46                          //"."
 
 //Version definitions
-#define FULL_VERSION                            L"0.3.9.1"
+#define FULL_VERSION                            L"0.3.9.2"
 #define COPYRIGHT_MESSAGE                       L"Copyright (C) 2012-2018 Chengr28"
 
 //Command definitions

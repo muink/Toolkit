@@ -216,7 +216,7 @@ bool ReadCommand(
 	//Set DNS header flag: QR
 		else if (Command == L"-qr" || Command == L"--flags-qr")
 		{
-			ConfigurationParameter.Parameter_Header.FlagsBits.QR = ~ConfigurationParameter.Parameter_Header.FlagsBits.QR;
+			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_RESPONSE);
 		}
 	//Specifie DNS header OPCode.
 		else if (Command == L"-opcode" || Command == L"--flags-opcode")
@@ -239,15 +239,8 @@ bool ReadCommand(
 				UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 				if (UnsignedResult > 0 && UnsignedResult <= UINT4_MAX)
 				{
-				#if BYTE_ORDER == LITTLE_ENDIAN
-					auto FlagsTemp = static_cast<uint16_t>(UnsignedResult);
-					FlagsTemp = htons(FlagsTemp << 11U);
-					ConfigurationParameter.Parameter_Header.Flags = ConfigurationParameter.Parameter_Header.Flags | FlagsTemp;
-				#else //BIG_ENDIAN
-					auto FlagsTemp = static_cast<uint8_t>(UnsignedResult);
-					FlagsTemp = FlagsTemp & 15; //0x00001111
-					ConfigurationParameter.Parameter_Header.FlagsBits.OPCode = FlagsTemp;
-				#endif
+					auto FlagsTemp = static_cast<uint16_t>(static_cast<uint16_t>(UnsignedResult) << 11U);
+					ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | FlagsTemp);
 				}
 				else {
 					PrintErrorToScreen(L"\n[Error] Command (-opcode opcode) error", 0);
@@ -262,32 +255,32 @@ bool ReadCommand(
 	//Set DNS header flag: AA
 		else if (Command == L"-aa" || Command == L"--flags-aa")
 		{
-			ConfigurationParameter.Parameter_Header.FlagsBits.AA = ~ConfigurationParameter.Parameter_Header.FlagsBits.AA;
+			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_AA);
 		}
 	//Set DNS header flag: TC
 		else if (Command == L"-tc" || Command == L"--flags-tc")
 		{
-			ConfigurationParameter.Parameter_Header.FlagsBits.TC = ~ConfigurationParameter.Parameter_Header.FlagsBits.TC;
+			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_TC);
 		}
 	//Set DNS header flag: RD
 		else if (Command == L"-rd" || Command == L"--flags-rd")
 		{
-			ConfigurationParameter.Parameter_Header.FlagsBits.RD = ~ConfigurationParameter.Parameter_Header.FlagsBits.RD;
+			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_RD);
 		}
 	//Set DNS header flag: RA
 		else if (Command == L"-ra" || Command == L"--flags-ra")
 		{
-			ConfigurationParameter.Parameter_Header.FlagsBits.RA = ~ConfigurationParameter.Parameter_Header.FlagsBits.RA;
+			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_RA);
 		}
 	//Set DNS header flag: AD
 		else if (Command == L"-ad" || Command == L"--flags-ad")
 		{
-			ConfigurationParameter.Parameter_Header.FlagsBits.AD = ~ConfigurationParameter.Parameter_Header.FlagsBits.AD;
+			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_AD);
 		}
 	//Set DNS header flag: CD
 		else if (Command == L"-cd" || Command == L"--flags-cd")
 		{
-			ConfigurationParameter.Parameter_Header.FlagsBits.CD = ~ConfigurationParameter.Parameter_Header.FlagsBits.CD;
+			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_CD);
 		}
 	//Specifie DNS header RCode.
 		else if (Command == L"-rcode" || Command == L"--flags-rcode")
@@ -310,15 +303,8 @@ bool ReadCommand(
 				UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 				if (UnsignedResult > 0 && UnsignedResult <= UINT4_MAX)
 				{
-				#if BYTE_ORDER == LITTLE_ENDIAN
 					auto FlagsTemp = static_cast<uint16_t>(UnsignedResult);
-					FlagsTemp = htons(FlagsTemp);
-					ConfigurationParameter.Parameter_Header.Flags = ConfigurationParameter.Parameter_Header.Flags | FlagsTemp;
-				#else //BIG_ENDIAN
-					auto FlagsTemp = static_cast<uint8_t>(UnsignedResult);
-					FlagsTemp = FlagsTemp & 15; //0x00001111
-					ConfigurationParameter.Parameter_Header.FlagsBits.RCode = FlagsTemp;
-				#endif
+					ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | FlagsTemp);
 				}
 				else {
 					PrintErrorToScreen(L"\n[Error] Command (-rcode rcode) error", 0);
@@ -712,7 +698,7 @@ bool ReadCommand(
 					BufferStringTemp[3U] = RawDataString[InnerIndex];
 
 				//Format check
-					if (strstr(reinterpret_cast<const char *>(BufferStringTemp), ("-")) != nullptr)
+					if (strstr(reinterpret_cast<const char *>(BufferStringTemp), "-") != nullptr)
 					{
 						PrintErrorToScreen(L"\n[Error] Command (-rawdata raw_data) error", 0);
 						return false;
@@ -915,7 +901,7 @@ bool ReadCommand(
 			ConfigurationParameter.Protocol = AF_INET;
 		}
 	//Specifie Query Domain.
-		else if (!ConfigurationParameter.RawDataBuffer && ConfigurationParameter.TestDomainString.empty() && Index == static_cast<size_t>(argc - 2))
+		else if (!ConfigurationParameter.RawDataBuffer && ConfigurationParameter.TestDomainString.empty() && Index == static_cast<size_t>(argc) - 2U)
 		{
 		//Check parameter.
 			if (Command.length() <= DOMAIN_MINSIZE || Command.length() > DOMAIN_MAXSIZE)
@@ -932,7 +918,7 @@ bool ReadCommand(
 			}
 		}
 	//Specifie target.
-		else if (Index == static_cast<size_t>(argc - 1))
+		else if (Index == static_cast<size_t>(argc) - 1U)
 		{
 		//Check parameter.
 			if (Command.length() < DOMAIN_MINSIZE || Command.length() > DOMAIN_MAXSIZE)

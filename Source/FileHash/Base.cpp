@@ -175,7 +175,10 @@ void ErrorCodeToMessage(
 
 	//Free pointer.
 		if (InnerMessage != nullptr)
+		{
 			LocalFree(InnerMessage);
+			InnerMessage = nullptr;
+		}
 	}
 	else {
 		Message.append(L": ");
@@ -188,6 +191,7 @@ void ErrorCodeToMessage(
 
 	//Free pointer.
 		LocalFree(InnerMessage);
+		InnerMessage = nullptr;
 	}
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::wstring InnerMessage;

@@ -78,7 +78,7 @@ bool ReadCommand_SHA3(
 				Offset = strlen(COMMAND_SHA3_SHAKE_128);
 			#endif
 			SHA3_HashFunctionID = HASH_ID_SHA3_SHAKE_128;
-		
+
 		//Format check
 			if (Command.find(ASCII_MINUS) != std::string::npos)
 			{
@@ -106,7 +106,7 @@ bool ReadCommand_SHA3(
 		else if (Command.find(COMMAND_SHA3_SHAKE_256) == 0)
 		{
 			SHA3_HashFunctionID = HASH_ID_SHA3_SHAKE_256;
-		
+
 		//Format check
 			if (Command.find(ASCII_MINUS) != std::string::npos)
 			{

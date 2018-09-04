@@ -88,7 +88,7 @@ int main(
 	Result = _wfopen_s(&FileHandle, FileName.c_str(), L"rb");
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	errno = 0;
-	FileHandle = fopen(FileName.c_str(), ("rb"));
+	FileHandle = fopen(FileName.c_str(), "rb");
 #endif
 	if (FileHandle == nullptr)
 	{
@@ -113,7 +113,7 @@ int main(
 		Result = _wfopen_s(&OutputFileHandle, OutputFile.c_str(), L"a,ccs=UTF-8");
 	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		errno = 0;
-		OutputFileHandle = fopen(OutputFile.c_str(), ("a"));
+		OutputFileHandle = fopen(OutputFile.c_str(), "a");
 	#endif
 		if (OutputFileHandle == nullptr)
 		{
