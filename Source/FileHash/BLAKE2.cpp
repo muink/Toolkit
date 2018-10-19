@@ -519,17 +519,17 @@ bool BLAKE2_Hash(
 	}
 
 //Finish hash process.
-	auto Result = std::make_unique<uint8_t[]>(BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS + MEMORY_RESERVED_BYTES);
-	memset(Result.get(), 0, BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS + MEMORY_RESERVED_BYTES);
+	auto ResultBuffer = std::make_unique<uint8_t[]>(BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS + MEMORY_RESERVED_BYTES);
+	memset(ResultBuffer.get(), 0, BLAKE2_DIGEST_SIZE_512 / BYTES_TO_BITS + MEMORY_RESERVED_BYTES);
 	if (BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_160 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_256 || 
 		BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_384 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2B_512) //BLAKE2B
 	{
-		BLAKE_2B_Final(&CTX_2B, Result.get());
+		BLAKE_2B_Final(&CTX_2B, ResultBuffer.get());
 	}
 	else if (BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_128 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_160 || 
 		BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_224 || BLAKE2_HashFunctionID == HASH_ID_BLAKE2S_256) //BLAKE2S
 	{
-		BLAKE_2S_Final(&CTX_2S, Result.get());
+		BLAKE_2S_Final(&CTX_2S, ResultBuffer.get());
 	}
 	else { //Commands error
 		fwprintf_s(stderr, L"[Error] Commands error.\n");
@@ -538,7 +538,7 @@ bool BLAKE2_Hash(
 
 //Binary to hex
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
-	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, Result.get(), DigestSize / BYTES_TO_BITS) == nullptr)
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, ResultBuffer.get(), DigestSize / BYTES_TO_BITS) == nullptr)
 	{
 		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;

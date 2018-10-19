@@ -207,7 +207,7 @@ bool AddressStringToBinary(
 	memset(&SockAddr, 0, sizeof(SockAddr));
 	socklen_t SockLength = 0;
 #else
-	ssize_t Result = 0;
+	ssize_t ResultValue = 0;
 #endif
 	if (Protocol == AF_INET6)
 	{
@@ -253,10 +253,10 @@ bool AddressStringToBinary(
 
 		memcpy_s(OriginalAddr, sizeof(reinterpret_cast<sockaddr_in6 *>(&SockAddr)->sin6_addr), &reinterpret_cast<sockaddr_in6 *>(&SockAddr)->sin6_addr, sizeof(reinterpret_cast<sockaddr_in6 *>(&SockAddr)->sin6_addr));
 	#else
-		Result = inet_pton(AF_INET6, AddrString.c_str(), OriginalAddr);
-		if (Result == SOCKET_ERROR || Result == 0)
+		ResultValue = inet_pton(AF_INET6, AddrString.c_str(), OriginalAddr);
+		if (ResultValue == SOCKET_ERROR || ResultValue == 0)
 		{
-			if (Result != 0 && ErrorCode != nullptr)
+			if (ResultValue != 0 && ErrorCode != nullptr)
 				*ErrorCode = WSAGetLastError();
 
 			return false;
@@ -327,10 +327,10 @@ bool AddressStringToBinary(
 
 		memcpy_s(OriginalAddr, sizeof(reinterpret_cast<sockaddr_in *>(&SockAddr)->sin_addr), &reinterpret_cast<sockaddr_in *>(&SockAddr)->sin_addr, sizeof(reinterpret_cast<sockaddr_in *>(&SockAddr)->sin_addr));
 	#else
-		Result = inet_pton(AF_INET, AddrString.c_str(), OriginalAddr);
-		if (Result == SOCKET_ERROR || Result == 0)
+		ResultValue = inet_pton(AF_INET, AddrString.c_str(), OriginalAddr);
+		if (ResultValue == SOCKET_ERROR || ResultValue == 0)
 		{
-			if (Result != 0 && ErrorCode != nullptr)
+			if (ResultValue != 0 && ErrorCode != nullptr)
 				*ErrorCode = WSAGetLastError();
 
 			return false;
@@ -708,183 +708,183 @@ uint16_t ServiceNameToBinary(
 
 //Server name
 	if (InnerBuffer == (L"TCPMUX"))
-		return htons(IPPORT_TCPMUX);
+		return hton16(IPPORT_TCPMUX);
 	else if (InnerBuffer == (L"ECHO"))
-		return htons(IPPORT_ECHO);
+		return hton16(IPPORT_ECHO);
 	else if (InnerBuffer == (L"DISCARD"))
-		return htons(IPPORT_DISCARD);
+		return hton16(IPPORT_DISCARD);
 	else if (InnerBuffer == (L"SYSTAT"))
-		return htons(IPPORT_SYSTAT);
+		return hton16(IPPORT_SYSTAT);
 	else if (InnerBuffer == (L"DAYTIME"))
-		return htons(IPPORT_DAYTIME);
+		return hton16(IPPORT_DAYTIME);
 	else if (InnerBuffer == (L"NETSTAT"))
-		return htons(IPPORT_NETSTAT);
+		return hton16(IPPORT_NETSTAT);
 	else if (InnerBuffer == (L"QOTD"))
-		return htons(IPPORT_QOTD);
+		return hton16(IPPORT_QOTD);
 	else if (InnerBuffer == (L"MSP"))
-		return htons(IPPORT_MSP);
+		return hton16(IPPORT_MSP);
 	else if (InnerBuffer == (L"CHARGEN"))
-		return htons(IPPORT_CHARGEN);
+		return hton16(IPPORT_CHARGEN);
 	else if (InnerBuffer == (L"FTPDATA"))
-		return htons(IPPORT_FTP_DATA);
+		return hton16(IPPORT_FTP_DATA);
 	else if (InnerBuffer == (L"FTP"))
-		return htons(IPPORT_FTP);
+		return hton16(IPPORT_FTP);
 	else if (InnerBuffer == (L"SSH"))
-		return htons(IPPORT_SSH);
+		return hton16(IPPORT_SSH);
 	else if (InnerBuffer == (L"TELNET"))
-		return htons(IPPORT_TELNET);
+		return hton16(IPPORT_TELNET);
 	else if (InnerBuffer == (L"SMTP"))
-		return htons(IPPORT_SMTP);
+		return hton16(IPPORT_SMTP);
 	else if (InnerBuffer == (L"TIMESERVER"))
-		return htons(IPPORT_TIMESERVER);
+		return hton16(IPPORT_TIMESERVER);
 	else if (InnerBuffer == (L"RAP"))
-		return htons(IPPORT_RAP);
+		return hton16(IPPORT_RAP);
 	else if (InnerBuffer == (L"RLP"))
-		return htons(IPPORT_RLP);
+		return hton16(IPPORT_RLP);
 	else if (InnerBuffer == (L"NAMESERVER"))
-		return htons(IPPORT_NAMESERVER);
+		return hton16(IPPORT_NAMESERVER);
 	else if (InnerBuffer == (L"WHOIS"))
-		return htons(IPPORT_WHOIS);
+		return hton16(IPPORT_WHOIS);
 	else if (InnerBuffer == (L"TACACS"))
-		return htons(IPPORT_TACACS);
+		return hton16(IPPORT_TACACS);
 	else if (InnerBuffer == (L"DNS"))
-		return htons(IPPORT_DNS);
+		return hton16(IPPORT_DNS);
 	else if (InnerBuffer == (L"XNSAUTH"))
-		return htons(IPPORT_XNSAUTH);
+		return hton16(IPPORT_XNSAUTH);
 	else if (InnerBuffer == (L"MTP"))
-		return htons(IPPORT_MTP);
+		return hton16(IPPORT_MTP);
 	else if (InnerBuffer == (L"BOOTPS"))
-		return htons(IPPORT_BOOTPS);
+		return hton16(IPPORT_BOOTPS);
 	else if (InnerBuffer == (L"BOOTPC"))
-		return htons(IPPORT_BOOTPC);
+		return hton16(IPPORT_BOOTPC);
 	else if (InnerBuffer == (L"TFTP"))
-		return htons(IPPORT_TFTP);
+		return hton16(IPPORT_TFTP);
 	else if (InnerBuffer == (L"RJE"))
-		return htons(IPPORT_RJE);
+		return hton16(IPPORT_RJE);
 	else if (InnerBuffer == (L"FINGER"))
-		return htons(IPPORT_FINGER);
+		return hton16(IPPORT_FINGER);
 	else if (InnerBuffer == (L"HTTP"))
-		return htons(IPPORT_HTTP);
+		return hton16(IPPORT_HTTP);
 	else if (InnerBuffer == (L"HTTPBACKUP"))
-		return htons(IPPORT_HTTPBACKUP);
+		return hton16(IPPORT_HTTPBACKUP);
 	else if (InnerBuffer == (L"TTYLINK"))
-		return htons(IPPORT_TTYLINK);
+		return hton16(IPPORT_TTYLINK);
 	else if (InnerBuffer == (L"SUPDUP"))
-		return htons(IPPORT_SUPDUP);
+		return hton16(IPPORT_SUPDUP);
 	else if (InnerBuffer == (L"POP3"))
-		return htons(IPPORT_POP3);
+		return hton16(IPPORT_POP3);
 	else if (InnerBuffer == (L"SUNRPC"))
-		return htons(IPPORT_SUNRPC);
+		return hton16(IPPORT_SUNRPC);
 	else if (InnerBuffer == (L"SQL"))
-		return htons(IPPORT_SQL);
+		return hton16(IPPORT_SQL);
 	else if (InnerBuffer == (L"NTP"))
-		return htons(IPPORT_NTP);
+		return hton16(IPPORT_NTP);
 	else if (InnerBuffer == (L"EPMAP"))
-		return htons(IPPORT_EPMAP);
+		return hton16(IPPORT_EPMAP);
 	else if (InnerBuffer == (L"NETBIOS_NS"))
-		return htons(IPPORT_NETBIOS_NS);
+		return hton16(IPPORT_NETBIOS_NS);
 	else if (InnerBuffer == (L"NETBIOS_DGM"))
-		return htons(IPPORT_NETBIOS_DGM);
+		return hton16(IPPORT_NETBIOS_DGM);
 	else if (InnerBuffer == (L"NETBIOS_SSN"))
-		return htons(IPPORT_NETBIOS_SSN);
+		return hton16(IPPORT_NETBIOS_SSN);
 	else if (InnerBuffer == (L"IMAP"))
-		return htons(IPPORT_IMAP);
+		return hton16(IPPORT_IMAP);
 	else if (InnerBuffer == (L"BFTP"))
-		return htons(IPPORT_BFTP);
+		return hton16(IPPORT_BFTP);
 	else if (InnerBuffer == (L"SGMP"))
-		return htons(IPPORT_SGMP);
+		return hton16(IPPORT_SGMP);
 	else if (InnerBuffer == (L"SQLSRV"))
-		return htons(IPPORT_SQLSRV);
+		return hton16(IPPORT_SQLSRV);
 	else if (InnerBuffer == (L"DMSP"))
-		return htons(IPPORT_DMSP);
+		return hton16(IPPORT_DMSP);
 	else if (InnerBuffer == (L"SNMP"))
-		return htons(IPPORT_SNMP);
+		return hton16(IPPORT_SNMP);
 	else if (InnerBuffer == (L"SNMP_TRAP"))
-		return htons(IPPORT_SNMP_TRAP);
+		return hton16(IPPORT_SNMP_TRAP);
 	else if (InnerBuffer == (L"ATRTMP"))
-		return htons(IPPORT_ATRTMP);
+		return hton16(IPPORT_ATRTMP);
 	else if (InnerBuffer == (L"ATHBP"))
-		return htons(IPPORT_ATHBP);
+		return hton16(IPPORT_ATHBP);
 	else if (InnerBuffer == (L"QMTP"))
-		return htons(IPPORT_QMTP);
+		return hton16(IPPORT_QMTP);
 	else if (InnerBuffer == (L"IPX"))
-		return htons(IPPORT_IPX);
+		return hton16(IPPORT_IPX);
 	else if (InnerBuffer == (L"IMAP3"))
-		return htons(IPPORT_IMAP3);
+		return hton16(IPPORT_IMAP3);
 	else if (InnerBuffer == (L"BGMP"))
-		return htons(IPPORT_BGMP);
+		return hton16(IPPORT_BGMP);
 	else if (InnerBuffer == (L"TSP"))
-		return htons(IPPORT_TSP);
+		return hton16(IPPORT_TSP);
 	else if (InnerBuffer == (L"IMMP"))
-		return htons(IPPORT_IMMP);
+		return hton16(IPPORT_IMMP);
 	else if (InnerBuffer == (L"ODMR"))
-		return htons(IPPORT_ODMR);
+		return hton16(IPPORT_ODMR);
 	else if (InnerBuffer == (L"RPC2PORTMAP"))
-		return htons(IPPORT_RPC2PORTMAP);
+		return hton16(IPPORT_RPC2PORTMAP);
 	else if (InnerBuffer == (L"CLEARCASE"))
-		return htons(IPPORT_CLEARCASE);
+		return hton16(IPPORT_CLEARCASE);
 	else if (InnerBuffer == (L"HPALARMMGR"))
-		return htons(IPPORT_HPALARMMGR);
+		return hton16(IPPORT_HPALARMMGR);
 	else if (InnerBuffer == (L"ARNS"))
-		return htons(IPPORT_ARNS);
+		return hton16(IPPORT_ARNS);
 	else if (InnerBuffer == (L"AURP"))
-		return htons(IPPORT_AURP);
+		return hton16(IPPORT_AURP);
 	else if (InnerBuffer == (L"LDAP"))
-		return htons(IPPORT_LDAP);
+		return hton16(IPPORT_LDAP);
 	else if (InnerBuffer == (L"UPS"))
-		return htons(IPPORT_UPS);
+		return hton16(IPPORT_UPS);
 	else if (InnerBuffer == (L"SLP"))
-		return htons(IPPORT_SLP);
+		return hton16(IPPORT_SLP);
 	else if (InnerBuffer == (L"HTTPS"))
-		return htons(IPPORT_HTTPS);
+		return hton16(IPPORT_HTTPS);
 	else if (InnerBuffer == (L"SNPP"))
-		return htons(IPPORT_SNPP);
+		return hton16(IPPORT_SNPP);
 	else if (InnerBuffer == (L"MICROSOFTDS"))
-		return htons(IPPORT_MICROSOFT_DS);
+		return hton16(IPPORT_MICROSOFT_DS);
 	else if (InnerBuffer == (L"KPASSWD"))
-		return htons(IPPORT_KPASSWD);
+		return hton16(IPPORT_KPASSWD);
 	else if (InnerBuffer == (L"TCPNETHASPSRV"))
-		return htons(IPPORT_TCPNETHASPSRV);
+		return hton16(IPPORT_TCPNETHASPSRV);
 	else if (InnerBuffer == (L"RETROSPECT"))
-		return htons(IPPORT_RETROSPECT);
+		return hton16(IPPORT_RETROSPECT);
 	else if (InnerBuffer == (L"ISAKMP"))
-		return htons(IPPORT_ISAKMP);
+		return hton16(IPPORT_ISAKMP);
 	else if (InnerBuffer == (L"BIFFUDP"))
-		return htons(IPPORT_BIFFUDP);
+		return hton16(IPPORT_BIFFUDP);
 	else if (InnerBuffer == (L"WHOSERVER"))
-		return htons(IPPORT_WHOSERVER);
+		return hton16(IPPORT_WHOSERVER);
 	else if (InnerBuffer == (L"SYSLOG"))
-		return htons(IPPORT_SYSLOG);
+		return hton16(IPPORT_SYSLOG);
 	else if (InnerBuffer == (L"ROUTERSERVER"))
-		return htons(IPPORT_ROUTESERVER);
+		return hton16(IPPORT_ROUTESERVER);
 	else if (InnerBuffer == (L"NCP"))
-		return htons(IPPORT_NCP);
+		return hton16(IPPORT_NCP);
 	else if (InnerBuffer == (L"COURIER"))
-		return htons(IPPORT_COURIER);
+		return hton16(IPPORT_COURIER);
 	else if (InnerBuffer == (L"COMMERCE"))
-		return htons(IPPORT_COMMERCE);
+		return hton16(IPPORT_COMMERCE);
 	else if (InnerBuffer == (L"RTSP"))
-		return htons(IPPORT_RTSP);
+		return hton16(IPPORT_RTSP);
 	else if (InnerBuffer == (L"NNTP"))
-		return htons(IPPORT_NNTP);
+		return hton16(IPPORT_NNTP);
 	else if (InnerBuffer == (L"HTTPRPCEPMAP"))
-		return htons(IPPORT_HTTPRPCEPMAP);
+		return hton16(IPPORT_HTTPRPCEPMAP);
 	else if (InnerBuffer == (L"IPP"))
-		return htons(IPPORT_IPP);
+		return hton16(IPPORT_IPP);
 	else if (InnerBuffer == (L"LDAPS"))
-		return htons(IPPORT_LDAPS);
+		return hton16(IPPORT_LDAPS);
 	else if (InnerBuffer == (L"MSDP"))
-		return htons(IPPORT_MSDP);
+		return hton16(IPPORT_MSDP);
 	else if (InnerBuffer == (L"AODV"))
-		return htons(IPPORT_AODV);
+		return hton16(IPPORT_AODV);
 	else if (InnerBuffer == (L"FTPSDATA"))
-		return htons(IPPORT_FTPSDATA);
+		return hton16(IPPORT_FTPSDATA);
 	else if (InnerBuffer == (L"FTPS"))
-		return htons(IPPORT_FTPS);
+		return hton16(IPPORT_FTPS);
 	else if (InnerBuffer == (L"NAS"))
-		return htons(IPPORT_NAS);
+		return hton16(IPPORT_NAS);
 	else if (InnerBuffer == (L"TELNETS"))
-		return htons(IPPORT_TELNETS);
+		return hton16(IPPORT_TELNETS);
 
 //No match.
 	return 0;
@@ -899,19 +899,19 @@ uint16_t DNSClassesNameToBinary(
 
 //DNS classes name
 	if (InnerBuffer == L"INTERNET")
-		return htons(DNS_CLASS_INTERNET);
+		return hton16(DNS_CLASS_INTERNET);
 	else if (InnerBuffer == L"CSNET")
-		return htons(DNS_CLASS_CSNET);
+		return hton16(DNS_CLASS_CSNET);
 	else if (InnerBuffer == L"CHAOS")
-		return htons(DNS_CLASS_CHAOS);
+		return hton16(DNS_CLASS_CHAOS);
 	else if (InnerBuffer == L"HESIOD")
-		return htons(DNS_CLASS_HESIOD);
+		return hton16(DNS_CLASS_HESIOD);
 	else if (InnerBuffer == L"NONE")
-		return htons(DNS_CLASS_NONE);
+		return hton16(DNS_CLASS_NONE);
 	else if (InnerBuffer == L"ALL")
-		return htons(DNS_CLASS_ALL);
+		return hton16(DNS_CLASS_ALL);
 	else if (InnerBuffer == L"ANY")
-		return htons(DNS_CLASS_ANY);
+		return hton16(DNS_CLASS_ANY);
 
 //No match.
 	return 0;
@@ -926,173 +926,173 @@ uint16_t DNSTypeNameToBinary(
 
 //DNS type name
 	if (InnerBuffer == (L"A"))
-		return htons(DNS_TYPE_A);
+		return hton16(DNS_TYPE_A);
 	else if (InnerBuffer == (L"NS"))
-		return htons(DNS_TYPE_NS);
+		return hton16(DNS_TYPE_NS);
 	else if (InnerBuffer == (L"MD"))
-		return htons(DNS_TYPE_MD);
+		return hton16(DNS_TYPE_MD);
 	else if (InnerBuffer == (L"MF"))
-		return htons(DNS_TYPE_MF);
+		return hton16(DNS_TYPE_MF);
 	else if (InnerBuffer == (L"CNAME"))
-		return htons(DNS_TYPE_CNAME);
+		return hton16(DNS_TYPE_CNAME);
 	else if (InnerBuffer == (L"SOA"))
-		return htons(DNS_TYPE_SOA);
+		return hton16(DNS_TYPE_SOA);
 	else if (InnerBuffer == (L"MB"))
-		return htons(DNS_TYPE_MB);
+		return hton16(DNS_TYPE_MB);
 	else if (InnerBuffer == (L"MG"))
-		return htons(DNS_TYPE_MG);
+		return hton16(DNS_TYPE_MG);
 	else if (InnerBuffer == (L"MR"))
-		return htons(DNS_TYPE_MR);
+		return hton16(DNS_TYPE_MR);
 	else if (InnerBuffer == (L"PTR"))
-		return htons(DNS_TYPE_PTR);
+		return hton16(DNS_TYPE_PTR);
 	else if (InnerBuffer == (L"NULL"))
-		return htons(DNS_TYPE_NULL);
+		return hton16(DNS_TYPE_NULL);
 	else if (InnerBuffer == (L"WKS"))
-		return htons(DNS_TYPE_WKS);
+		return hton16(DNS_TYPE_WKS);
 	else if (InnerBuffer == (L"HINFO"))
-		return htons(DNS_TYPE_HINFO);
+		return hton16(DNS_TYPE_HINFO);
 	else if (InnerBuffer == (L"MINFO"))
-		return htons(DNS_TYPE_MINFO);
+		return hton16(DNS_TYPE_MINFO);
 	else if (InnerBuffer == (L"MX"))
-		return htons(DNS_TYPE_MX);
+		return hton16(DNS_TYPE_MX);
 	else if (InnerBuffer == (L"TXT"))
-		return htons(DNS_TYPE_TEXT);
+		return hton16(DNS_TYPE_TEXT);
 	else if (InnerBuffer == (L"RP"))
-		return htons(DNS_TYPE_RP);
+		return hton16(DNS_TYPE_RP);
 	else if (InnerBuffer == (L"SIG"))
-		return htons(DNS_TYPE_SIG);
+		return hton16(DNS_TYPE_SIG);
 	else if (InnerBuffer == (L"AFSDB"))
-		return htons(DNS_TYPE_AFSDB);
+		return hton16(DNS_TYPE_AFSDB);
 	else if (InnerBuffer == (L"X25"))
-		return htons(DNS_TYPE_X25);
+		return hton16(DNS_TYPE_X25);
 	else if (InnerBuffer == (L"ISDN"))
-		return htons(DNS_TYPE_ISDN);
+		return hton16(DNS_TYPE_ISDN);
 	else if (InnerBuffer == (L"RT"))
-		return htons(DNS_TYPE_RT);
+		return hton16(DNS_TYPE_RT);
 	else if (InnerBuffer == (L"NSAP"))
-		return htons(DNS_TYPE_NSAP);
+		return hton16(DNS_TYPE_NSAP);
 	else if (InnerBuffer == (L"NSAPPTR"))
-		return htons(DNS_TYPE_NSAPPTR);
+		return hton16(DNS_TYPE_NSAPPTR);
 	else if (InnerBuffer == (L"SIG"))
-		return htons(DNS_TYPE_SIG);
+		return hton16(DNS_TYPE_SIG);
 	else if (InnerBuffer == (L"KEY"))
-		return htons(DNS_TYPE_KEY);
+		return hton16(DNS_TYPE_KEY);
 	else if (InnerBuffer == (L"AAAA"))
-		return htons(DNS_TYPE_AAAA);
+		return hton16(DNS_TYPE_AAAA);
 	else if (InnerBuffer == (L"PX"))
-		return htons(DNS_TYPE_PX);
+		return hton16(DNS_TYPE_PX);
 	else if (InnerBuffer == (L"GPOS"))
-		return htons(DNS_TYPE_GPOS);
+		return hton16(DNS_TYPE_GPOS);
 	else if (InnerBuffer == (L"LOC"))
-		return htons(DNS_TYPE_LOC);
+		return hton16(DNS_TYPE_LOC);
 	else if (InnerBuffer == (L"NXT"))
-		return htons(DNS_TYPE_NXT);
+		return hton16(DNS_TYPE_NXT);
 	else if (InnerBuffer == (L"EID"))
-		return htons(DNS_TYPE_EID);
+		return hton16(DNS_TYPE_EID);
 	else if (InnerBuffer == (L"NIMLOC"))
-		return htons(DNS_TYPE_NIMLOC);
+		return hton16(DNS_TYPE_NIMLOC);
 	else if (InnerBuffer == (L"SRV"))
-		return htons(DNS_TYPE_SRV);
+		return hton16(DNS_TYPE_SRV);
 	else if (InnerBuffer == (L"ATMA"))
-		return htons(DNS_TYPE_ATMA);
+		return hton16(DNS_TYPE_ATMA);
 	else if (InnerBuffer == (L"NAPTR"))
-		return htons(DNS_TYPE_NAPTR);
+		return hton16(DNS_TYPE_NAPTR);
 	else if (InnerBuffer == (L"KX"))
-		return htons(DNS_TYPE_KX);
+		return hton16(DNS_TYPE_KX);
 	else if (InnerBuffer == (L"CERT"))
-		return htons(DNS_TYPE_CERT);
+		return hton16(DNS_TYPE_CERT);
 	else if (InnerBuffer == (L"A6"))
-		return htons(DNS_TYPE_A6);
+		return hton16(DNS_TYPE_A6);
 	else if (InnerBuffer == (L"DNAME"))
-		return htons(DNS_TYPE_DNAME);
+		return hton16(DNS_TYPE_DNAME);
 	else if (InnerBuffer == (L"SINK"))
-		return htons(DNS_TYPE_SINK);
+		return hton16(DNS_TYPE_SINK);
 	else if (InnerBuffer == (L"OPT"))
-		return htons(DNS_TYPE_OPT);
+		return hton16(DNS_TYPE_OPT);
 	else if (InnerBuffer == (L"APL"))
-		return htons(DNS_TYPE_APL);
+		return hton16(DNS_TYPE_APL);
 	else if (InnerBuffer == (L"DS"))
-		return htons(DNS_TYPE_DS);
+		return hton16(DNS_TYPE_DS);
 	else if (InnerBuffer == (L"SSHFP"))
-		return htons(DNS_TYPE_SSHFP);
+		return hton16(DNS_TYPE_SSHFP);
 	else if (InnerBuffer == (L"IPSECKEY"))
-		return htons(DNS_TYPE_IPSECKEY);
+		return hton16(DNS_TYPE_IPSECKEY);
 	else if (InnerBuffer == (L"RRSIG"))
-		return htons(DNS_TYPE_RRSIG);
+		return hton16(DNS_TYPE_RRSIG);
 	else if (InnerBuffer == (L"NSEC"))
-		return htons(DNS_TYPE_NSEC);
+		return hton16(DNS_TYPE_NSEC);
 	else if (InnerBuffer == (L"DNSKEY"))
-		return htons(DNS_TYPE_DNSKEY);
+		return hton16(DNS_TYPE_DNSKEY);
 	else if (InnerBuffer == (L"DHCID"))
-		return htons(DNS_TYPE_DHCID);
+		return hton16(DNS_TYPE_DHCID);
 	else if (InnerBuffer == (L"NSEC3"))
-		return htons(DNS_TYPE_NSEC3);
+		return hton16(DNS_TYPE_NSEC3);
 	else if (InnerBuffer == (L"NSEC3PARAM"))
-		return htons(DNS_TYPE_NSEC3PARAM);
+		return hton16(DNS_TYPE_NSEC3PARAM);
 	else if (InnerBuffer == (L"TLSA"))
-		return htons(DNS_TYPE_TLSA);
+		return hton16(DNS_TYPE_TLSA);
 	else if (InnerBuffer == (L"HIP"))
-		return htons(DNS_TYPE_HIP);
+		return hton16(DNS_TYPE_HIP);
 	else if (InnerBuffer == (L"HINFO"))
-		return htons(DNS_TYPE_HINFO);
+		return hton16(DNS_TYPE_HINFO);
 	else if (InnerBuffer == (L"RKEY"))
-		return htons(DNS_TYPE_RKEY);
+		return hton16(DNS_TYPE_RKEY);
 	else if (InnerBuffer == (L"TALINK"))
-		return htons(DNS_TYPE_TALINK);
+		return hton16(DNS_TYPE_TALINK);
 	else if (InnerBuffer == (L"CDS"))
-		return htons(DNS_TYPE_CDS);
+		return hton16(DNS_TYPE_CDS);
 	else if (InnerBuffer == (L"CDNSKEY"))
-		return htons(DNS_TYPE_CDNSKEY);
+		return hton16(DNS_TYPE_CDNSKEY);
 	else if (InnerBuffer == (L"OPENPGPKEY"))
-		return htons(DNS_TYPE_OPENPGPKEY);
+		return hton16(DNS_TYPE_OPENPGPKEY);
 	else if (InnerBuffer == (L"SPF"))
-		return htons(DNS_TYPE_SPF);
+		return hton16(DNS_TYPE_SPF);
 	else if (InnerBuffer == (L"UINFO"))
-		return htons(DNS_TYPE_UINFO);
+		return hton16(DNS_TYPE_UINFO);
 	else if (InnerBuffer == (L"UID"))
-		return htons(DNS_TYPE_UID);
+		return hton16(DNS_TYPE_UID);
 	else if (InnerBuffer == (L"GID"))
-		return htons(DNS_TYPE_GID);
+		return hton16(DNS_TYPE_GID);
 	else if (InnerBuffer == (L"UNSPEC"))
-		return htons(DNS_TYPE_UNSPEC);
+		return hton16(DNS_TYPE_UNSPEC);
 	else if (InnerBuffer == (L"NID"))
-		return htons(DNS_TYPE_NID);
+		return hton16(DNS_TYPE_NID);
 	else if (InnerBuffer == (L"L32"))
-		return htons(DNS_TYPE_L32);
+		return hton16(DNS_TYPE_L32);
 	else if (InnerBuffer == (L"L64"))
-		return htons(DNS_TYPE_L64);
+		return hton16(DNS_TYPE_L64);
 	else if (InnerBuffer == (L"LP"))
-		return htons(DNS_TYPE_LP);
+		return hton16(DNS_TYPE_LP);
 	else if (InnerBuffer == (L"EUI48"))
-		return htons(DNS_TYPE_EUI48);
+		return hton16(DNS_TYPE_EUI48);
 	else if (InnerBuffer == (L"EUI64"))
-		return htons(DNS_TYPE_EUI64);
+		return hton16(DNS_TYPE_EUI64);
 	else if (InnerBuffer == (L"ADDRS"))
-		return htons(DNS_TYPE_ADDRS);
+		return hton16(DNS_TYPE_ADDRS);
 	else if (InnerBuffer == (L"TKEY"))
-		return htons(DNS_TYPE_TKEY);
+		return hton16(DNS_TYPE_TKEY);
 	else if (InnerBuffer == (L"TSIG"))
-		return htons(DNS_TYPE_TSIG);
+		return hton16(DNS_TYPE_TSIG);
 	else if (InnerBuffer == (L"IXFR"))
-		return htons(DNS_TYPE_IXFR);
+		return hton16(DNS_TYPE_IXFR);
 	else if (InnerBuffer == (L"AXFR"))
-		return htons(DNS_TYPE_AXFR);
+		return hton16(DNS_TYPE_AXFR);
 	else if (InnerBuffer == (L"MAILB"))
-		return htons(DNS_TYPE_MAILB);
+		return hton16(DNS_TYPE_MAILB);
 	else if (InnerBuffer == (L"MAILA"))
-		return htons(DNS_TYPE_MAILA);
+		return hton16(DNS_TYPE_MAILA);
 	else if (InnerBuffer == (L"ANY"))
-		return htons(DNS_TYPE_ANY);
+		return hton16(DNS_TYPE_ANY);
 	else if (InnerBuffer == (L"URI"))
-		return htons(DNS_TYPE_URI);
+		return hton16(DNS_TYPE_URI);
 	else if (InnerBuffer == (L"CAA"))
-		return htons(DNS_TYPE_CAA);
+		return hton16(DNS_TYPE_CAA);
 	else if (InnerBuffer == (L"TA"))
-		return htons(DNS_TYPE_TA);
+		return hton16(DNS_TYPE_TA);
 	else if (InnerBuffer == (L"DLV"))
-		return htons(DNS_TYPE_DLV);
+		return hton16(DNS_TYPE_DLV);
 	else if (InnerBuffer == (L"RESERVED"))
-		return htons(DNS_TYPE_RESERVED);
+		return hton16(DNS_TYPE_RESERVED);
 
 //No match.
 	return 0;
@@ -1104,32 +1104,33 @@ size_t StringToPacketQuery(
 	uint8_t * const TName)
 {
 //Initialization
-	int Index[]{static_cast<int>(strnlen_s(reinterpret_cast<const char *>(FName), DOMAIN_MAXSIZE)), 0, 0};
-	if (Index[0] <= 0)
+	std::array<int, 3U> Index{};
+	Index.at(0) = static_cast<int>(strnlen_s(reinterpret_cast<const char *>(FName), DOMAIN_MAXSIZE));
+	if (Index.at(0) <= 0)
 	{
 		return 0;
 	}
 	else {
-		--Index[0];
-		Index[2U] = Index[0] + 1;
-		*(TName + Index[0] + 2) = 0;
+		--Index.at(0);
+		Index.at(2U) = Index.at(0) + 1;
+		*(TName + Index.at(0) + 2) = 0;
 	}
 
 //Convert domain.
-	for (;Index[0] >= 0;--Index[0], --Index[2U])
+	for (;Index.at(0) >= 0;--Index.at(0), --Index.at(2U))
 	{
-		if (FName[Index[0]] == ASCII_PERIOD)
+		if (FName[Index.at(0)] == ASCII_PERIOD)
 		{
-			*(TName + Index[2U]) = static_cast<uint8_t>(Index[1U]);
-			Index[1U] = 0;
+			*(TName + Index.at(2U)) = static_cast<uint8_t>(Index.at(1U));
+			Index.at(1U) = 0;
 		}
 		else {
-			*(TName + Index[2U]) = FName[Index[0]];
-			++Index[1U];
+			*(TName + Index.at(2U)) = FName[Index.at(0)];
+			++Index.at(1U);
 		}
 	}
 
-	*(TName + Index[2U]) = static_cast<uint8_t>(Index[1U]);
+	*(TName + Index.at(2U)) = static_cast<uint8_t>(Index.at(1U));
 	return strnlen_s(reinterpret_cast<const char *>(TName), DOMAIN_MAXSIZE - 1U) + NULL_TERMINATE_LENGTH;
 }
 
@@ -1141,7 +1142,7 @@ size_t PacketQueryToString(
 {
 //Initialization
 	size_t LocateIndex = 0;
-	int MarkIndex[]{0, 0};
+	std::array<int, 2U> MarkIndex{};
 
 //Convert domain.
 	for (LocateIndex = 0;LocateIndex < DOMAIN_MAXSIZE;++LocateIndex)
@@ -1156,14 +1157,14 @@ size_t PacketQueryToString(
 		}
 		else if (LocateIndex == 0)
 		{
-			MarkIndex[0] = TName[LocateIndex];
+			MarkIndex.at(0) = TName[LocateIndex];
 		}
-		else if (LocateIndex == static_cast<size_t>(MarkIndex[0]) + static_cast<size_t>(MarkIndex[1U]) + 1U)
+		else if (LocateIndex == static_cast<size_t>(MarkIndex.at(0)) + static_cast<size_t>(MarkIndex.at(1U)) + 1U)
 		{
-			MarkIndex[0] = TName[LocateIndex];
-			if (MarkIndex[0] == 0)
+			MarkIndex.at(0) = TName[LocateIndex];
+			if (MarkIndex.at(0) == 0)
 				break;
-			MarkIndex[1U] = static_cast<int>(LocateIndex);
+			MarkIndex.at(1U) = static_cast<int>(LocateIndex);
 
 			FName[LocateIndex - 1U] = ASCII_PERIOD;
 		}

@@ -167,11 +167,11 @@ bool SendRequestProcess(
 		{
 			DNS_Header = reinterpret_cast<dns_hdr *>(SendBuffer.get() + DataLength);
 		#if defined(PLATFORM_WIN)
-			DNS_Header->ID = htons(static_cast<uint16_t>(GetCurrentProcessId()));
+			DNS_Header->ID = hton16(static_cast<uint16_t>(GetCurrentProcessId()));
 		#elif defined(PLATFORM_LINUX)
-			DNS_Header->ID = htons(static_cast<uint16_t>(pthread_self()));
+			DNS_Header->ID = hton16(static_cast<uint16_t>(pthread_self()));
 		#elif defined(PLATFORM_MACOS)
-			DNS_Header->ID = htons(*reinterpret_cast<uint16_t *>(pthread_self()));
+			DNS_Header->ID = hton16(*reinterpret_cast<uint16_t *>(pthread_self()));
 		#endif
 		}
 		DataLength += sizeof(dns_hdr);
@@ -254,11 +254,11 @@ bool SendRequestProcess(
 
 //Get waiting time.
 #if defined(PLATFORM_WIN)
-	auto Result = ResultTimeCalculator(CPU_Frequency, BeforeTime, AfterTime);
+	auto ResultValue = ResultTimeCalculator(CPU_Frequency, BeforeTime, AfterTime);
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-	auto Result = ResultTimeCalculator(BeforeTime, AfterTime);
+	auto ResultValue = ResultTimeCalculator(BeforeTime, AfterTime);
 #endif
-	if (Result == 0)
+	if (ResultValue == 0)
 	{
 		PrintErrorToScreen(L"[Error] Interval time calculating error", 0);
 
@@ -273,9 +273,9 @@ bool SendRequestProcess(
 	{
 	//Print send result.
 	#if defined(PLATFORM_WIN)
-		if (!PrintSendResult(Socket_Normal, DNS_Header, RecvBuffer, DataLength, Result, IsContinue, CPU_Frequency, BeforeTime, AfterTime))
+		if (!PrintSendResult(Socket_Normal, DNS_Header, RecvBuffer, DataLength, ResultValue, IsContinue, CPU_Frequency, BeforeTime, AfterTime))
 	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-		if (!PrintSendResult(Socket_Normal, DNS_Header, RecvBuffer, DataLength, Result, IsContinue, BeforeTime, AfterTime))
+		if (!PrintSendResult(Socket_Normal, DNS_Header, RecvBuffer, DataLength, ResultValue, IsContinue, BeforeTime, AfterTime))
 	#endif
 			return false;
 
@@ -290,21 +290,21 @@ bool SendRequestProcess(
 	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		Message.append(L"%Lf ms.\n");
 	#endif
-		fwprintf_s(stderr, Message.c_str(), static_cast<int>(DataLength), WSAGetLastError(), Result);
+		fwprintf_s(stderr, Message.c_str(), static_cast<int>(DataLength), WSAGetLastError(), ResultValue);
 		if (ConfigurationParameter.OutputFile != nullptr)
-			fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), static_cast<int>(DataLength), WSAGetLastError(), Result);
+			fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), static_cast<int>(DataLength), WSAGetLastError(), ResultValue);
 	}
 
 //Transmission interval
 	if (!IsLastSend)
 	{
-		if (ConfigurationParameter.TransmissionInterval != 0 && ConfigurationParameter.TransmissionInterval > Result)
+		if (ConfigurationParameter.TransmissionInterval != 0 && ConfigurationParameter.TransmissionInterval > ResultValue)
 		#if defined(PLATFORM_WIN)
-			Sleep(static_cast<DWORD>(ConfigurationParameter.TransmissionInterval - Result));
+			Sleep(static_cast<DWORD>(ConfigurationParameter.TransmissionInterval - ResultValue));
 		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-			usleep(ConfigurationParameter.TransmissionInterval - Result);
+			usleep(ConfigurationParameter.TransmissionInterval - ResultValue);
 		#endif
-		else if (Result <= STANDARD_TIMEOUT)
+		else if (ResultValue <= STANDARD_TIMEOUT)
 		#if defined(PLATFORM_WIN)
 			Sleep(STANDARD_TIMEOUT);
 		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
@@ -323,7 +323,7 @@ bool PrintSendResult(
 	const dns_hdr * const DNS_Header, 
 	std::unique_ptr<uint8_t[]> &RecvBuffer, 
 	ssize_t &DataLength, 
-	long double &Result, 
+	long double &ResultValue, 
 	bool &IsContinue, 
 #if defined(PLATFORM_WIN)
 	LARGE_INTEGER &CPU_Frequency, 
@@ -349,19 +349,19 @@ bool PrintSendResult(
 	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		Message.append(L"%Lf ms.\n");
 	#endif
-		fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), Result);
+		fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), ResultValue);
 		if (ConfigurationParameter.OutputFile != nullptr)
-			fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), Result);
+			fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), ResultValue);
 
 	//Try to waiting correct packet.
 		for (;;)
 		{
 		//Timeout
 		#if defined(PLATFORM_WIN)
-			if (Result >= ConfigurationParameter.SocketTimeout)
+			if (ResultValue >= ConfigurationParameter.SocketTimeout)
 				break;
 		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-			if (Result >= ConfigurationParameter.SocketTimeout.tv_usec / MICROSECOND_TO_MILLISECOND + ConfigurationParameter.SocketTimeout.tv_sec * SECOND_TO_MILLISECOND)
+			if (ResultValue >= ConfigurationParameter.SocketTimeout.tv_usec / MICROSECOND_TO_MILLISECOND + ConfigurationParameter.SocketTimeout.tv_sec * SECOND_TO_MILLISECOND)
 				break;
 		#endif
 
@@ -382,11 +382,11 @@ bool PrintSendResult(
 
 		//Get waiting time.
 		#if defined(PLATFORM_WIN)
-			Result = ResultTimeCalculator(CPU_Frequency, BeforeTime, AfterTime);
+			ResultValue = ResultTimeCalculator(CPU_Frequency, BeforeTime, AfterTime);
 		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-			Result = ResultTimeCalculator(BeforeTime, AfterTime);
+			ResultValue = ResultTimeCalculator(BeforeTime, AfterTime);
 		#endif
-			if (Result == 0)
+			if (ResultValue == 0)
 			{
 				PrintErrorToScreen(L"[Error] Interval time calculating error", 0);
 
@@ -408,9 +408,9 @@ bool PrintSendResult(
 			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				Message.append(L"%Lf ms.\n");
 			#endif
-				fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), Result);
+				fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), ResultValue);
 				if (ConfigurationParameter.OutputFile != nullptr)
-					fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), Result);
+					fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), ResultValue);
 			}
 			else {
 				break;
@@ -426,9 +426,9 @@ bool PrintSendResult(
 		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 			Message.append(L"%Lf ms).\n");
 		#endif
-			fwprintf_s(stderr, Message.c_str(), static_cast<int>(DataLength), WSAGetLastError(), Result);
+			fwprintf_s(stderr, Message.c_str(), static_cast<int>(DataLength), WSAGetLastError(), ResultValue);
 			if (ConfigurationParameter.OutputFile != nullptr)
-				fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), static_cast<int>(DataLength), WSAGetLastError(), Result);
+				fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), static_cast<int>(DataLength), WSAGetLastError(), ResultValue);
 
 			shutdown(Socket_Normal, SD_BOTH);
 			closesocket(Socket_Normal);
@@ -441,9 +441,9 @@ bool PrintSendResult(
 		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 			Message.append(L"%Lf ms.\n");
 		#endif
-			fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), Result);
+			fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), ResultValue);
 			if (ConfigurationParameter.OutputFile != nullptr)
-				fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), Result);
+				fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), ResultValue);
 		}
 	}
 	else {
@@ -453,17 +453,17 @@ bool PrintSendResult(
 	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		Message.append(L"%Lf ms.\n");
 	#endif
-		fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), Result);
+		fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), ResultValue);
 		if (ConfigurationParameter.OutputFile != nullptr)
-			fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), Result);
+			fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), ResultValue);
 	}
 
 //Print response result or data.
 	if (ConfigurationParameter.IsShowResponse)
 	{
-		PrintResponse(stderr, RecvBuffer.get(), DataLength);
+		PrintFormattedResponse(stderr, RecvBuffer.get(), DataLength);
 		if (ConfigurationParameter.OutputFile != nullptr)
-			PrintResponse(ConfigurationParameter.OutputFile, RecvBuffer.get(), DataLength);
+			PrintFormattedResponse(ConfigurationParameter.OutputFile, RecvBuffer.get(), DataLength);
 	}
 	if (ConfigurationParameter.IsShowHexResponse)
 	{
@@ -473,22 +473,22 @@ bool PrintSendResult(
 	}
 
 //Calculate time.
-	ConfigurationParameter.Statistics_TotalTime += Result;
+	ConfigurationParameter.Statistics_TotalTime += ResultValue;
 	++ConfigurationParameter.Statistics_RecvNum;
 
 //Mark time.
 	if (ConfigurationParameter.Statistics_MaxTime == 0)
 	{
-		ConfigurationParameter.Statistics_MinTime = Result;
-		ConfigurationParameter.Statistics_MaxTime = Result;
+		ConfigurationParameter.Statistics_MinTime = ResultValue;
+		ConfigurationParameter.Statistics_MaxTime = ResultValue;
 	}
-	else if (Result < ConfigurationParameter.Statistics_MinTime)
+	else if (ResultValue < ConfigurationParameter.Statistics_MinTime)
 	{
-		ConfigurationParameter.Statistics_MinTime = Result;
+		ConfigurationParameter.Statistics_MinTime = ResultValue;
 	}
-	else if (Result > ConfigurationParameter.Statistics_MaxTime)
+	else if (ResultValue > ConfigurationParameter.Statistics_MaxTime)
 	{
-		ConfigurationParameter.Statistics_MaxTime = Result;
+		ConfigurationParameter.Statistics_MaxTime = ResultValue;
 	}
 
 	IsContinue = true;
@@ -779,16 +779,16 @@ void PrintHeaderToScreen(
 			if (getnameinfo(reinterpret_cast<sockaddr *>(&ConfigurationParameter.SockAddr_Normal), sizeof(sockaddr_in), reinterpret_cast<char *>(FQDN_String.get()), NI_MAXHOST, nullptr, 0, NI_NUMERICSERV) != 0)
 			{
 				PrintErrorToScreen(L"[Error] Resolve addresses to host names error", WSAGetLastError());
-				fwprintf_s(stderr, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
+				fwprintf_s(stderr, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
 				if (ConfigurationParameter.OutputFile != nullptr)
-					fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
+					fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
 			}
 			else {
 				if (ConfigurationParameter.TargetString_Normal == reinterpret_cast<const char *>(FQDN_String.get()))
 				{
-					fwprintf_s(stderr, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
+					fwprintf_s(stderr, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
 					if (ConfigurationParameter.OutputFile != nullptr)
-						fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
+						fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
 				}
 				else {
 					std::wstring Wide_FQDN;
@@ -798,31 +798,31 @@ void PrintHeaderToScreen(
 						return;
 					}
 					else {
-						fwprintf_s(stderr, L"DNSPing %ls:%u [%ls] with %ls:\n", Wide_FQDN.c_str(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.WideTargetString.c_str(), WideTestDomainString.c_str());
+						fwprintf_s(stderr, L"DNSPing %ls:%u [%ls] with %ls:\n", Wide_FQDN.c_str(), ntoh16(ConfigurationParameter.ServiceType), ConfigurationParameter.WideTargetString.c_str(), WideTestDomainString.c_str());
 						if (ConfigurationParameter.OutputFile != nullptr)
-							fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u [%ls] with %ls:\n", Wide_FQDN.c_str(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.WideTargetString.c_str(), WideTestDomainString.c_str());
+							fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u [%ls] with %ls:\n", Wide_FQDN.c_str(), ntoh16(ConfigurationParameter.ServiceType), ConfigurationParameter.WideTargetString.c_str(), WideTestDomainString.c_str());
 					}
 				}
 			}
 		}
 		else {
-			fwprintf_s(stderr, L"DNSPing %ls:%u [%ls] with %ls:\n", WideTargetAddressString.c_str(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.WideTargetString.c_str(), WideTestDomainString.c_str());
+			fwprintf_s(stderr, L"DNSPing %ls:%u [%ls] with %ls:\n", WideTargetAddressString.c_str(), ntoh16(ConfigurationParameter.ServiceType), ConfigurationParameter.WideTargetString.c_str(), WideTestDomainString.c_str());
 			if (ConfigurationParameter.OutputFile != nullptr)
-				fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u [%ls] with %ls:\n", WideTargetAddressString.c_str(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.WideTargetString.c_str(), WideTestDomainString.c_str());
+				fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u [%ls] with %ls:\n", WideTargetAddressString.c_str(), ntoh16(ConfigurationParameter.ServiceType), ConfigurationParameter.WideTargetString.c_str(), WideTestDomainString.c_str());
 		}
 	}
 //Normal mode
 	else {
 		if (!ConfigurationParameter.TargetAddressString.empty())
 		{
-			fwprintf_s(stderr, L"DNSPing %ls:%u [%ls] with %ls:\n", WideTargetAddressString.c_str(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.WideTargetString.c_str(), WideTestDomainString.c_str());
+			fwprintf_s(stderr, L"DNSPing %ls:%u [%ls] with %ls:\n", WideTargetAddressString.c_str(), ntoh16(ConfigurationParameter.ServiceType), ConfigurationParameter.WideTargetString.c_str(), WideTestDomainString.c_str());
 			if (ConfigurationParameter.OutputFile != nullptr)
-				fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u [%ls] with %ls:\n", WideTargetAddressString.c_str(), ntohs(ConfigurationParameter.ServiceType), ConfigurationParameter.WideTargetString.c_str(), WideTestDomainString.c_str());
+				fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u [%ls] with %ls:\n", WideTargetAddressString.c_str(), ntoh16(ConfigurationParameter.ServiceType), ConfigurationParameter.WideTargetString.c_str(), WideTestDomainString.c_str());
 		}
 		else {
-			fwprintf_s(stderr, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
+			fwprintf_s(stderr, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
 			if (ConfigurationParameter.OutputFile != nullptr)
-				fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntohs(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
+				fwprintf_s(ConfigurationParameter.OutputFile, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
 		}
 	}
 

@@ -2096,7 +2096,7 @@ bool ReadCommand_CRC(
 	}
 	else if (Command == COMMAND_CRC_64_1B) //CRC 64 bits 1B
 	{
-		CRC_HashFunctionID = HASH_ID_CRC_64;
+		CRC_HashFunctionID = HASH_ID_CRC_64_1B;
 	}
 	else if (Command == COMMAND_CRC_64_WE) //CRC 64 bits WE
 	{
@@ -2165,8 +2165,8 @@ bool CRC_Hash(
 	{
 		ResultCRC32 = CRC32_Init(CRC_HashFunctionID);
 	}
-	else if (CRC_HashFunctionID == HASH_ID_CRC_64 || CRC_HashFunctionID == HASH_ID_CRC_64_1B || CRC_HashFunctionID == HASH_ID_CRC_64_WE || 
-		CRC_HashFunctionID == HASH_ID_CRC_64_JONES)
+	else if (CRC_HashFunctionID == HASH_ID_CRC_40 || CRC_HashFunctionID == HASH_ID_CRC_64 || CRC_HashFunctionID == HASH_ID_CRC_64_1B || 
+		CRC_HashFunctionID == HASH_ID_CRC_64_WE || CRC_HashFunctionID == HASH_ID_CRC_64_JONES)
 	{
 		ResultCRC64 = CRC64_Init(CRC_HashFunctionID);
 	}
@@ -2261,13 +2261,13 @@ bool CRC_Hash(
 	{
 		ResultCRC16 = CRC16_Final(ResultCRC16, &ParameterA, &ParameterB, CRC_HashFunctionID);
 		if (CRC_HashFunctionID != HASH_ID_CRC_16_DNP && CRC_HashFunctionID != HASH_ID_CRC_16_KERMIT)
-			ResultCRC16 = ntohs(ResultCRC16);
+			ResultCRC16 = ntoh16(ResultCRC16);
 		Result = &ResultCRC16;
 		DigestSize = CRC16_BLOCK_SIZE;
 	}
 	else if (CRC_HashFunctionID == HASH_ID_CRC_24_FLEXRAY_A || CRC_HashFunctionID == HASH_ID_CRC_24_FLEXRAY_B || CRC_HashFunctionID == HASH_ID_CRC_24_R64)
 	{
-		ResultCRC32 = ntohl(ResultCRC32 << 8U) & ntohl(0xFFFFFF00);
+		ResultCRC32 = ntoh32(ResultCRC32 << 8U) & ntoh32(0xFFFFFF00);
 		Result = &ResultCRC32;
 		DigestSize = CRC24_BLOCK_SIZE;
 	}
@@ -2277,7 +2277,7 @@ bool CRC_Hash(
 		CRC_HashFunctionID == HASH_ID_CRC_32_XFER)
 	{
 		ResultCRC32 = CRC32_Final(ResultCRC32, CRC_HashFunctionID);
-		ResultCRC32 = ntohl(ResultCRC32);
+		ResultCRC32 = ntoh32(ResultCRC32);
 		Result = &ResultCRC32;
 		DigestSize = CRC32_BLOCK_SIZE;
 	}

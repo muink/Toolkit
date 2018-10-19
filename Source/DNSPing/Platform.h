@@ -344,6 +344,7 @@
 // Base header
 // 
 //C Standard Library and C++ Standard Template Library/STL Headers
+#include <array>                   //Container that encapsulates fixed size arrays support
 #include <cstring>                 //C-Style String support
 #include <ctime>                   //Get and manipulate date and time information support
 #include <memory>                  //Manage dynamic memory support
@@ -411,5 +412,20 @@
 	#define SOCKET_ERROR             (-1)
 	#define RETURN_ERROR             (-1)
 	typedef int                      SOCKET;
+
+//Linux and macOS compatible
+	#define SD_BOTH                                                          SHUT_RDWR
+	#define SD_RECV                                                          SHUT_RD
+	#define SD_SEND                                                          SHUT_WR
+	#define closesocket                                                      close
+	#define fwprintf_s                                                       fwprintf
+	#define GetLastError()                                                   errno
+	#define _set_errno(Value)                                                errno = (Value)
+	#define strnlen_s                                                        strnlen
+	#define wcsnlen_s                                                        wcsnlen
+	#define WSAGetLastError()                                                errno
+	#define localtime_s(TimeStructure, TimeValue)                            localtime_r(TimeValue, TimeStructure)
+	#define memcpy_s(Dst, DstSize, Src, Size)                                memcpy(Dst, Src, Size)
+	#define memmove_s(Dst, DstSize, Src, Size)                               memmove(Dst, Src, Size)
 #endif
 #endif

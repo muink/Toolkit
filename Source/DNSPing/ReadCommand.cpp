@@ -201,7 +201,7 @@ bool ReadCommand(
 				UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 				if (UnsignedResult > 0 && UnsignedResult <= UINT16_MAX)
 				{
-					ConfigurationParameter.Parameter_Header.ID = htons(static_cast<uint16_t>(UnsignedResult));
+					ConfigurationParameter.Parameter_Header.ID = hton16(static_cast<uint16_t>(UnsignedResult));
 				}
 				else {
 					PrintErrorToScreen(L"\n[Error] Command (-id dns_id) error", 0);
@@ -216,7 +216,7 @@ bool ReadCommand(
 	//Set DNS header flag: QR
 		else if (Command == L"-qr" || Command == L"--flags-qr")
 		{
-			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_RESPONSE);
+			ConfigurationParameter.Parameter_Header.Flags = hton16(ntoh16(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_RESPONSE);
 		}
 	//Specifie DNS header OPCode.
 		else if (Command == L"-opcode" || Command == L"--flags-opcode")
@@ -240,7 +240,7 @@ bool ReadCommand(
 				if (UnsignedResult > 0 && UnsignedResult <= UINT4_MAX)
 				{
 					auto FlagsTemp = static_cast<uint16_t>(static_cast<uint16_t>(UnsignedResult) << 11U);
-					ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | FlagsTemp);
+					ConfigurationParameter.Parameter_Header.Flags = hton16(ntoh16(ConfigurationParameter.Parameter_Header.Flags) | FlagsTemp);
 				}
 				else {
 					PrintErrorToScreen(L"\n[Error] Command (-opcode opcode) error", 0);
@@ -255,32 +255,32 @@ bool ReadCommand(
 	//Set DNS header flag: AA
 		else if (Command == L"-aa" || Command == L"--flags-aa")
 		{
-			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_AA);
+			ConfigurationParameter.Parameter_Header.Flags = hton16(ntoh16(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_AA);
 		}
 	//Set DNS header flag: TC
 		else if (Command == L"-tc" || Command == L"--flags-tc")
 		{
-			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_TC);
+			ConfigurationParameter.Parameter_Header.Flags = hton16(ntoh16(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_TC);
 		}
 	//Set DNS header flag: RD
 		else if (Command == L"-rd" || Command == L"--flags-rd")
 		{
-			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_RD);
+			ConfigurationParameter.Parameter_Header.Flags = hton16(ntoh16(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_RD);
 		}
 	//Set DNS header flag: RA
 		else if (Command == L"-ra" || Command == L"--flags-ra")
 		{
-			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_RA);
+			ConfigurationParameter.Parameter_Header.Flags = hton16(ntoh16(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_RA);
 		}
 	//Set DNS header flag: AD
 		else if (Command == L"-ad" || Command == L"--flags-ad")
 		{
-			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_AD);
+			ConfigurationParameter.Parameter_Header.Flags = hton16(ntoh16(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_AD);
 		}
 	//Set DNS header flag: CD
 		else if (Command == L"-cd" || Command == L"--flags-cd")
 		{
-			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_CD);
+			ConfigurationParameter.Parameter_Header.Flags = hton16(ntoh16(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_CD);
 		}
 	//Specifie DNS header RCode.
 		else if (Command == L"-rcode" || Command == L"--flags-rcode")
@@ -304,7 +304,7 @@ bool ReadCommand(
 				if (UnsignedResult > 0 && UnsignedResult <= UINT4_MAX)
 				{
 					auto FlagsTemp = static_cast<uint16_t>(UnsignedResult);
-					ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | FlagsTemp);
+					ConfigurationParameter.Parameter_Header.Flags = hton16(ntoh16(ConfigurationParameter.Parameter_Header.Flags) | FlagsTemp);
 				}
 				else {
 					PrintErrorToScreen(L"\n[Error] Command (-rcode rcode) error", 0);
@@ -337,7 +337,7 @@ bool ReadCommand(
 				UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 				if (UnsignedResult > 0 && UnsignedResult <= UINT16_MAX)
 				{
-					ConfigurationParameter.Parameter_Header.Question = htons(static_cast<uint16_t>(UnsignedResult));
+					ConfigurationParameter.Parameter_Header.Question = hton16(static_cast<uint16_t>(UnsignedResult));
 				}
 				else {
 					PrintErrorToScreen(L"\n[Error] Command (-qn count) error", 0);
@@ -370,7 +370,7 @@ bool ReadCommand(
 				UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 				if (UnsignedResult > 0 && UnsignedResult <= UINT16_MAX)
 				{
-					ConfigurationParameter.Parameter_Header.Answer = htons(static_cast<uint16_t>(UnsignedResult));
+					ConfigurationParameter.Parameter_Header.Answer = hton16(static_cast<uint16_t>(UnsignedResult));
 				}
 				else {
 					PrintErrorToScreen(L"\n[Error] Command (-ann count) error", 0);
@@ -403,7 +403,7 @@ bool ReadCommand(
 				UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 				if (UnsignedResult > 0 && UnsignedResult <= UINT16_MAX)
 				{
-					ConfigurationParameter.Parameter_Header.Authority = htons(static_cast<uint16_t>(UnsignedResult));
+					ConfigurationParameter.Parameter_Header.Authority = hton16(static_cast<uint16_t>(UnsignedResult));
 				}
 				else {
 					PrintErrorToScreen(L"\n[Error] Command (-aun count) error", 0);
@@ -436,7 +436,7 @@ bool ReadCommand(
 				UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 				if (UnsignedResult > 0 && UnsignedResult <= UINT16_MAX)
 				{
-					ConfigurationParameter.Parameter_Header.Additional = htons(static_cast<uint16_t>(UnsignedResult));
+					ConfigurationParameter.Parameter_Header.Additional = hton16(static_cast<uint16_t>(UnsignedResult));
 				}
 				else {
 					PrintErrorToScreen(L"\n[Error] Command (-adn count) error", 0);
@@ -556,7 +556,7 @@ bool ReadCommand(
 					UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 					if (UnsignedResult > 0 && UnsignedResult <= UINT16_MAX)
 					{
-						ConfigurationParameter.Parameter_Query.Type = htons(static_cast<uint16_t>(UnsignedResult));
+						ConfigurationParameter.Parameter_Query.Type = hton16(static_cast<uint16_t>(UnsignedResult));
 					}
 					else {
 						PrintErrorToScreen(L"\n[Error] Command (-qt type) error", 0);
@@ -597,7 +597,7 @@ bool ReadCommand(
 					UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 					if (UnsignedResult > 0 && UnsignedResult <= UINT16_MAX)
 					{
-						ConfigurationParameter.Parameter_Query.Classes = htons(static_cast<uint16_t>(UnsignedResult));
+						ConfigurationParameter.Parameter_Query.Classes = hton16(static_cast<uint16_t>(UnsignedResult));
 					}
 					else {
 						PrintErrorToScreen(L"\n[Error] Command (-qc classes) error", 0);
@@ -638,7 +638,7 @@ bool ReadCommand(
 					UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 					if (UnsignedResult > 0 && UnsignedResult <= UINT16_MAX)
 					{
-						ConfigurationParameter.ServiceType = htons(static_cast<uint16_t>(UnsignedResult));
+						ConfigurationParameter.ServiceType = hton16(static_cast<uint16_t>(UnsignedResult));
 					}
 					else {
 						PrintErrorToScreen(L"\n[Error] Command (-p service_type/protocol) error", 0);
@@ -686,19 +686,19 @@ bool ReadCommand(
 				memset(RawDataTemp.get(), 0, PACKET_MAXSIZE + MEMORY_RESERVED_BYTES);
 				std::swap(ConfigurationParameter.RawDataBuffer, RawDataTemp);
 				RawDataTemp.reset();
-				uint8_t BufferStringTemp[5U]{0};
-				BufferStringTemp[0] = ASCII_ZERO;
-				BufferStringTemp[1U] = ASCII_LOWERCASE_X;
+				std::array<uint8_t, 5U> BufferStringTemp{};
+				BufferStringTemp.at(0) = ASCII_ZERO;
+				BufferStringTemp.at(1U) = ASCII_LOWERCASE_X;
 
 			//Read raw data.
 				for (size_t InnerIndex = 0;InnerIndex < RawDataString.length();++InnerIndex)
 				{
-					BufferStringTemp[2U] = RawDataString[InnerIndex];
+					BufferStringTemp.at(2U) = RawDataString[InnerIndex];
 					++InnerIndex;
-					BufferStringTemp[3U] = RawDataString[InnerIndex];
+					BufferStringTemp.at(3U) = RawDataString[InnerIndex];
 
 				//Format check
-					if (strstr(reinterpret_cast<const char *>(BufferStringTemp), "-") != nullptr)
+					if (strstr(reinterpret_cast<const char *>(BufferStringTemp.data()), "-") != nullptr)
 					{
 						PrintErrorToScreen(L"\n[Error] Command (-rawdata raw_data) error", 0);
 						return false;
@@ -706,7 +706,7 @@ bool ReadCommand(
 
 				//Get number.
 					_set_errno(0);
-					UnsignedResult = strtoul(reinterpret_cast<const char *>(BufferStringTemp), nullptr, 0);
+					UnsignedResult = strtoul(reinterpret_cast<const char *>(BufferStringTemp.data()), nullptr, 0);
 					if (UnsignedResult > 0 && UnsignedResult <= UINT8_MAX)
 					{
 						ConfigurationParameter.RawDataBuffer.get()[ConfigurationParameter.RawDataLen] = static_cast<uint8_t>(UnsignedResult);
@@ -989,47 +989,47 @@ bool ReadCommand(
 					//Get address from result.
 						if (AddrInfo != nullptr)
 						{
-							for (auto AddrInfoIter = AddrInfo;AddrInfoIter != nullptr;AddrInfoIter = AddrInfoIter->ai_next)
+							for (auto AddrInfoItem = AddrInfo;AddrInfoItem != nullptr;AddrInfoItem = AddrInfoItem->ai_next)
 							{
 							//IPv6
-								if (AddrInfoIter->ai_family == AF_INET6 && !IN6_IS_ADDR_LINKLOCAL(reinterpret_cast<in6_addr *>(AddrInfoIter->ai_addr)) && !(reinterpret_cast<sockaddr_in6 *>(AddrInfoIter->ai_addr)->sin6_scope_id == 0)) //Get port from first(Main) IPv6 device
+								if (AddrInfoItem->ai_family == AF_INET6 && !IN6_IS_ADDR_LINKLOCAL(reinterpret_cast<in6_addr *>(AddrInfoItem->ai_addr)) && !(reinterpret_cast<sockaddr_in6 *>(AddrInfoItem->ai_addr)->sin6_scope_id == 0)) //Get port from first(Main) IPv6 device
 								{
 									ConfigurationParameter.Protocol = AF_INET6;
 									ConfigurationParameter.SockAddr_Normal.ss_family = AF_INET6;
-									reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr = reinterpret_cast<sockaddr_in6 *>(AddrInfoIter->ai_addr)->sin6_addr;
+									reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr = reinterpret_cast<sockaddr_in6 *>(AddrInfoItem->ai_addr)->sin6_addr;
 
 								//Convert binary to address string.
 									ConfigurationParameter.TargetAddressString = CommandString;
-									uint8_t AddrBuffer[ADDRESS_STRING_MAXSIZE]{0};
-									if (!BinaryToAddressString(AF_INET6, &reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr, AddrBuffer, ADDRESS_STRING_MAXSIZE, &SignedResult))
+									std::array<uint8_t, ADDRESS_STRING_MAXSIZE> AddrBuffer{};
+									if (!BinaryToAddressString(AF_INET6, &reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr, AddrBuffer.data(), AddrBuffer.max_size(), &SignedResult))
 									{
 										PrintErrorToScreen(L"\n[Error] IPv6 address format error error", SignedResult);
 										return false;
 									}
 
-									CaseConvert(true, AddrBuffer, strnlen_s(reinterpret_cast<const char *>(AddrBuffer), ADDRESS_STRING_MAXSIZE));
+									CaseConvert(true, AddrBuffer.data(), strnlen_s(reinterpret_cast<const char *>(AddrBuffer.data()), AddrBuffer.max_size()));
 									ConfigurationParameter.TargetString_Normal.append("[");
-									ConfigurationParameter.TargetString_Normal.append(reinterpret_cast<const char *>(AddrBuffer));
+									ConfigurationParameter.TargetString_Normal.append(reinterpret_cast<const char *>(AddrBuffer.data()));
 									ConfigurationParameter.TargetString_Normal.append("]");
 									break;
 								}
 							//IPv4
-								else if (AddrInfoIter->ai_family == AF_INET && reinterpret_cast<sockaddr_in *>(AddrInfoIter->ai_addr)->sin_addr.s_addr != INADDR_LOOPBACK && reinterpret_cast<sockaddr_in *>(AddrInfoIter->ai_addr)->sin_addr.s_addr != INADDR_BROADCAST)
+								else if (AddrInfoItem->ai_family == AF_INET && reinterpret_cast<sockaddr_in *>(AddrInfoItem->ai_addr)->sin_addr.s_addr != INADDR_LOOPBACK && reinterpret_cast<sockaddr_in *>(AddrInfoItem->ai_addr)->sin_addr.s_addr != INADDR_BROADCAST)
 								{
 									ConfigurationParameter.Protocol = AF_INET;
 									ConfigurationParameter.SockAddr_Normal.ss_family = AF_INET;
-									reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_addr = reinterpret_cast<sockaddr_in *>(AddrInfoIter->ai_addr)->sin_addr;
+									reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_addr = reinterpret_cast<sockaddr_in *>(AddrInfoItem->ai_addr)->sin_addr;
 
 								//Convert binary to address string.
 									ConfigurationParameter.TargetAddressString = CommandString;
-									uint8_t AddrBuffer[ADDRESS_STRING_MAXSIZE]{0};
-									if (!BinaryToAddressString(AF_INET, &reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_addr, AddrBuffer, ADDRESS_STRING_MAXSIZE, &SignedResult))
+									std::array<uint8_t, ADDRESS_STRING_MAXSIZE> AddrBuffer{};
+									if (!BinaryToAddressString(AF_INET, &reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_addr, AddrBuffer.data(), AddrBuffer.max_size(), &SignedResult))
 									{
 										PrintErrorToScreen(L"\n[Error] IPv4 address format error error", SignedResult);
 										return false;
 									}
 
-									ConfigurationParameter.TargetString_Normal = reinterpret_cast<const char *>(AddrBuffer);
+									ConfigurationParameter.TargetString_Normal = reinterpret_cast<const char *>(AddrBuffer.data());
 									break;
 								}
 							}

@@ -83,9 +83,9 @@ int main(
 
 //Open file.
 	FILE *FileHandle = nullptr;
-	ssize_t Result = 0;
+	ssize_t ResultValue = 0;
 #if defined(PLATFORM_WIN)
-	Result = _wfopen_s(&FileHandle, FileName.c_str(), L"rb");
+	ResultValue = _wfopen_s(&FileHandle, FileName.c_str(), L"rb");
 #elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	errno = 0;
 	FileHandle = fopen(FileName.c_str(), "rb");
@@ -93,14 +93,14 @@ int main(
 	if (FileHandle == nullptr)
 	{
 	#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-		Result = errno;
+		ResultValue = errno;
 	#endif
 		std::wstring Message(L"[Error] Read file error");
-		ErrorCodeToMessage(Result, Message);
-		if (Result == 0)
+		ErrorCodeToMessage(ResultValue, Message);
+		if (ResultValue == 0)
 			fwprintf_s(stderr, Message.c_str());
 		else 
-			fwprintf_s(stderr, Message.c_str(), Result);
+			fwprintf_s(stderr, Message.c_str(), ResultValue);
 
 		return EXIT_FAILURE;
 	}
@@ -110,7 +110,7 @@ int main(
 	if (!OutputFile.empty())
 	{
 	#if defined(PLATFORM_WIN)
-		Result = _wfopen_s(&OutputFileHandle, OutputFile.c_str(), L"a,ccs=UTF-8");
+		ResultValue = _wfopen_s(&OutputFileHandle, OutputFile.c_str(), L"a,ccs=UTF-8");
 	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		errno = 0;
 		OutputFileHandle = fopen(OutputFile.c_str(), "a");
@@ -118,14 +118,14 @@ int main(
 		if (OutputFileHandle == nullptr)
 		{
 		#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-			Result = errno;
+			ResultValue = errno;
 		#endif
 			std::wstring Message(L"[Error] Read file error");
-			ErrorCodeToMessage(Result, Message);
-			if (Result == 0)
+			ErrorCodeToMessage(ResultValue, Message);
+			if (ResultValue == 0)
 				fwprintf_s(stderr, Message.c_str());
 			else 
-				fwprintf_s(stderr, Message.c_str(), Result);
+				fwprintf_s(stderr, Message.c_str(), ResultValue);
 
 		//Close all file and network handles.
 			fclose(FileHandle);

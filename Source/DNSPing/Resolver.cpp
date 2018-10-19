@@ -86,8 +86,8 @@ void PrintHexResponse(
 	return;
 }
 
-//Print response result or data to file
-void PrintResponse(
+//Print formatted response result or data to file
+void PrintFormattedResponse(
 	FILE * const FileHandle, 
 	const uint8_t * const Buffer, 
 	const size_t Length)
@@ -98,20 +98,20 @@ void PrintResponse(
 	fwprintf_s(FileHandle, L"-------------------------------- Response --------------------------------\n");
 
 //Print DNS header.
-	fwprintf_s(FileHandle, L"ID: 0x%04x\n", ntohs(DNS_Header->ID));
-	fwprintf_s(FileHandle, L"Flags: 0x%04x", ntohs(DNS_Header->Flags));
-	PrintFlags(FileHandle, DNS_Header->Flags);
-	fwprintf_s(FileHandle, L"Questions RR Count: %u\n", ntohs(DNS_Header->Question));
-	fwprintf_s(FileHandle, L"Answer RR Count: %u\n", ntohs(DNS_Header->Answer));
-	fwprintf_s(FileHandle, L"Authority RR Count: %u\n", ntohs(DNS_Header->Authority));
-	fwprintf_s(FileHandle, L"Additional RR Count: %u\n", ntohs(DNS_Header->Additional));
+	fwprintf_s(FileHandle, L"ID: 0x%04x\n", ntoh16(DNS_Header->ID));
+	fwprintf_s(FileHandle, L"Flags: 0x%04x", ntoh16(DNS_Header->Flags));
+	PrintFlagsData(FileHandle, DNS_Header->Flags);
+	fwprintf_s(FileHandle, L"Questions RR Count: %u\n", ntoh16(DNS_Header->Question));
+	fwprintf_s(FileHandle, L"Answer RR Count: %u\n", ntoh16(DNS_Header->Answer));
+	fwprintf_s(FileHandle, L"Authority RR Count: %u\n", ntoh16(DNS_Header->Authority));
+	fwprintf_s(FileHandle, L"Additional RR Count: %u\n", ntoh16(DNS_Header->Additional));
 
 //Print Questions RRs.
-	if (ntohs(DNS_Header->Question) != 0)
+	if (ntoh16(DNS_Header->Question) != 0)
 	{
 		fwprintf_s(FileHandle, L"Questions RR:\n   Name: ");
 		dns_qry *DNS_Query = nullptr;
-		for (Index = 0;Index < ntohs(DNS_Header->Question);++Index)
+		for (Index = 0;Index < ntoh16(DNS_Header->Question);++Index)
 		{
 		//Print Name.
 			PrintDomainName(FileHandle, Buffer, CurrentLength);
@@ -120,9 +120,9 @@ void PrintResponse(
 
 		//Print Type and Classes.
 			DNS_Query = const_cast<dns_qry *>(reinterpret_cast<const dns_qry *>(Buffer + CurrentLength));
-			fwprintf_s(FileHandle, L"   Type: 0x%04x", ntohs(DNS_Query->Type));
+			fwprintf_s(FileHandle, L"   Type: 0x%04x", ntoh16(DNS_Query->Type));
 			PrintTypeClassesName(FileHandle, DNS_Query->Type, 0);
-			fwprintf_s(FileHandle, L"   Classes: 0x%04x", ntohs(DNS_Query->Classes));
+			fwprintf_s(FileHandle, L"   Classes: 0x%04x", ntoh16(DNS_Query->Classes));
 			PrintTypeClassesName(FileHandle, 0, DNS_Query->Classes);
 			CurrentLength += sizeof(dns_qry);
 		}
@@ -130,10 +130,10 @@ void PrintResponse(
 
 //Print Answer RRs.
 	dns_record_standard *DNS_STANDARD_RECORD = nullptr;
-	if (ntohs(DNS_Header->Answer) != 0)
+	if (ntoh16(DNS_Header->Answer) != 0)
 	{
 		fwprintf_s(FileHandle, L"Answer RR:\n");
-		for (Index = 0;Index < ntohs(DNS_Header->Answer);++Index)
+		for (Index = 0;Index < ntoh16(DNS_Header->Answer);++Index)
 		{
 		//Print Name.
 			fwprintf_s(FileHandle, L" RR(%u)\n   Name: ", static_cast<unsigned int>(Index + 1U));
@@ -142,25 +142,25 @@ void PrintResponse(
 
 		//Print Type, Classes, TTL and Length.
 			DNS_STANDARD_RECORD = const_cast<dns_record_standard *>(reinterpret_cast<const dns_record_standard *>(Buffer + CurrentLength));
-			fwprintf_s(FileHandle, L"   Type: 0x%04x", ntohs(DNS_STANDARD_RECORD->Type));
+			fwprintf_s(FileHandle, L"   Type: 0x%04x", ntoh16(DNS_STANDARD_RECORD->Type));
 			PrintTypeClassesName(FileHandle, DNS_STANDARD_RECORD->Type, 0);
-			fwprintf_s(FileHandle, L"   Classes: 0x%04x", ntohs(DNS_STANDARD_RECORD->Classes));
+			fwprintf_s(FileHandle, L"   Classes: 0x%04x", ntoh16(DNS_STANDARD_RECORD->Classes));
 			PrintTypeClassesName(FileHandle, 0, DNS_STANDARD_RECORD->Classes);
-			fwprintf_s(FileHandle, L"   TTL: %u", ntohl(DNS_STANDARD_RECORD->TTL));
-			PrintSecondsInDateTime(FileHandle, ntohl(DNS_STANDARD_RECORD->TTL));
+			fwprintf_s(FileHandle, L"   TTL: %u", ntoh32(DNS_STANDARD_RECORD->TTL));
+			PrintSecondsInDateTime(FileHandle, ntoh32(DNS_STANDARD_RECORD->TTL));
 			fwprintf_s(FileHandle, L"\n");
-			fwprintf_s(FileHandle, L"   Length: %u", ntohs(DNS_STANDARD_RECORD->Length));
+			fwprintf_s(FileHandle, L"   Length: %u", ntoh16(DNS_STANDARD_RECORD->Length));
 			CurrentLength += sizeof(dns_record_standard);
-			PrintResourseData(FileHandle, DNS_STANDARD_RECORD->Type, DNS_STANDARD_RECORD->Classes, Buffer, CurrentLength, ntohs(DNS_STANDARD_RECORD->Length));
-			CurrentLength += ntohs(DNS_STANDARD_RECORD->Length);
+			PrintResourseData(FileHandle, DNS_STANDARD_RECORD->Type, DNS_STANDARD_RECORD->Classes, Buffer, CurrentLength, ntoh16(DNS_STANDARD_RECORD->Length));
+			CurrentLength += ntoh16(DNS_STANDARD_RECORD->Length);
 		}
 	}
 
 //Print Authority RR.
-	if (ntohs(DNS_Header->Authority) != 0)
+	if (ntoh16(DNS_Header->Authority) != 0)
 	{
 		fwprintf_s(FileHandle, L"Authority RR:\n");
-		for (Index = 0;Index < ntohs(DNS_Header->Authority);++Index)
+		for (Index = 0;Index < ntoh16(DNS_Header->Authority);++Index)
 		{
 		//Print Name.
 			fwprintf_s(FileHandle, L" RR(%u)\n   Name: ", static_cast<unsigned int>(Index + 1U));
@@ -169,25 +169,25 @@ void PrintResponse(
 
 		//Print Type, Classes, TTL and Length.
 			DNS_STANDARD_RECORD = const_cast<dns_record_standard *>(reinterpret_cast<const dns_record_standard *>(Buffer + CurrentLength));
-			fwprintf_s(FileHandle, L"   Type: 0x%04x", ntohs(DNS_STANDARD_RECORD->Type));
+			fwprintf_s(FileHandle, L"   Type: 0x%04x", ntoh16(DNS_STANDARD_RECORD->Type));
 			PrintTypeClassesName(FileHandle, DNS_STANDARD_RECORD->Type, 0);
-			fwprintf_s(FileHandle, L"   Classes: 0x%04x", ntohs(DNS_STANDARD_RECORD->Classes));
+			fwprintf_s(FileHandle, L"   Classes: 0x%04x", ntoh16(DNS_STANDARD_RECORD->Classes));
 			PrintTypeClassesName(FileHandle, 0, DNS_STANDARD_RECORD->Classes);
-			fwprintf_s(FileHandle, L"   TTL: %u", ntohl(DNS_STANDARD_RECORD->TTL));
-			PrintSecondsInDateTime(FileHandle, ntohl(DNS_STANDARD_RECORD->TTL));
+			fwprintf_s(FileHandle, L"   TTL: %u", ntoh32(DNS_STANDARD_RECORD->TTL));
+			PrintSecondsInDateTime(FileHandle, ntoh32(DNS_STANDARD_RECORD->TTL));
 			fwprintf_s(FileHandle, L"\n");
-			fwprintf_s(FileHandle, L"   Length: %u", ntohs(DNS_STANDARD_RECORD->Length));
+			fwprintf_s(FileHandle, L"   Length: %u", ntoh16(DNS_STANDARD_RECORD->Length));
 			CurrentLength += sizeof(dns_record_standard);
-			PrintResourseData(FileHandle, DNS_STANDARD_RECORD->Type, DNS_STANDARD_RECORD->Classes, Buffer, CurrentLength, ntohs(DNS_STANDARD_RECORD->Length));
-			CurrentLength += ntohs(DNS_STANDARD_RECORD->Length);
+			PrintResourseData(FileHandle, DNS_STANDARD_RECORD->Type, DNS_STANDARD_RECORD->Classes, Buffer, CurrentLength, ntoh16(DNS_STANDARD_RECORD->Length));
+			CurrentLength += ntoh16(DNS_STANDARD_RECORD->Length);
 		}
 	}
 
 //Print Additional RR.
-	if (ntohs(DNS_Header->Additional) != 0)
+	if (ntoh16(DNS_Header->Additional) != 0)
 	{
 		fwprintf_s(FileHandle, L"Additional RR:\n");
-		for (Index = 0;Index < ntohs(DNS_Header->Additional);++Index)
+		for (Index = 0;Index < ntoh16(DNS_Header->Additional);++Index)
 		{
 		//Print Name.
 			fwprintf_s(FileHandle, L" RR(%u)\n   Name: ", static_cast<unsigned int>(Index + 1U));
@@ -196,23 +196,23 @@ void PrintResponse(
 
 		//Print Type, Classes, TTL and Length.
 			DNS_STANDARD_RECORD = const_cast<dns_record_standard *>(reinterpret_cast<const dns_record_standard *>(Buffer + CurrentLength));
-			fwprintf_s(FileHandle, L"   Type: 0x%04x", ntohs(DNS_STANDARD_RECORD->Type));
+			fwprintf_s(FileHandle, L"   Type: 0x%04x", ntoh16(DNS_STANDARD_RECORD->Type));
 			PrintTypeClassesName(FileHandle, DNS_STANDARD_RECORD->Type, 0);
-			if (ntohs(DNS_STANDARD_RECORD->Type) == DNS_TYPE_OPT) //EDNS Label
+			if (ntoh16(DNS_STANDARD_RECORD->Type) == DNS_TYPE_OPT) //EDNS Label
 			{
-				PrintResourseData(FileHandle, DNS_STANDARD_RECORD->Type, DNS_STANDARD_RECORD->Classes, Buffer, CurrentLength - 1U, ntohs(DNS_STANDARD_RECORD->Length));
-				CurrentLength += sizeof(dns_record_standard) + ntohs(DNS_STANDARD_RECORD->Length);
+				PrintResourseData(FileHandle, DNS_STANDARD_RECORD->Type, DNS_STANDARD_RECORD->Classes, Buffer, CurrentLength - 1U, ntoh16(DNS_STANDARD_RECORD->Length));
+				CurrentLength += sizeof(dns_record_standard) + ntoh16(DNS_STANDARD_RECORD->Length);
 			}
 			else {
-				fwprintf_s(FileHandle, L"   Classes: 0x%04x", ntohs(DNS_STANDARD_RECORD->Classes));
+				fwprintf_s(FileHandle, L"   Classes: 0x%04x", ntoh16(DNS_STANDARD_RECORD->Classes));
 				PrintTypeClassesName(FileHandle, 0, DNS_STANDARD_RECORD->Classes);
-				fwprintf_s(FileHandle, L"   TTL: %u", ntohl(DNS_STANDARD_RECORD->TTL));
-				PrintSecondsInDateTime(FileHandle, ntohl(DNS_STANDARD_RECORD->TTL));
+				fwprintf_s(FileHandle, L"   TTL: %u", ntoh32(DNS_STANDARD_RECORD->TTL));
+				PrintSecondsInDateTime(FileHandle, ntoh32(DNS_STANDARD_RECORD->TTL));
 				fwprintf_s(FileHandle, L"\n");
-				fwprintf_s(FileHandle, L"   Length: %u", ntohs(DNS_STANDARD_RECORD->Length));
+				fwprintf_s(FileHandle, L"   Length: %u", ntoh16(DNS_STANDARD_RECORD->Length));
 				CurrentLength += sizeof(dns_record_standard);
-				PrintResourseData(FileHandle, DNS_STANDARD_RECORD->Type, DNS_STANDARD_RECORD->Classes, Buffer, CurrentLength, ntohs(DNS_STANDARD_RECORD->Length));
-				CurrentLength += ntohs(DNS_STANDARD_RECORD->Length);
+				PrintResourseData(FileHandle, DNS_STANDARD_RECORD->Type, DNS_STANDARD_RECORD->Classes, Buffer, CurrentLength, ntoh16(DNS_STANDARD_RECORD->Length));
+				CurrentLength += ntoh16(DNS_STANDARD_RECORD->Length);
 			}
 		}
 	}
@@ -223,14 +223,14 @@ void PrintResponse(
 }
 
 //Print Header Flags to file
-void PrintFlags(
+void PrintFlagsData(
 	FILE * const FileHandle, 
 	const uint16_t Flags)
 {
 //Print Flags
 	if (Flags != 0)
 	{
-		auto FlagsBits = ntohs(Flags);
+		auto FlagsBits = ntoh16(Flags);
 
 	//Print OPCode
 		fwprintf_s(FileHandle, L"(OPCode: ");
@@ -251,7 +251,7 @@ void PrintFlags(
 
 	//Print RCode.
 		fwprintf_s(FileHandle, L"/RCode: ");
-		FlagsBits = ntohs(Flags);
+		FlagsBits = ntoh16(Flags);
 		FlagsBits = FlagsBits & UINT4_MAX;
 		if (FlagsBits == DNS_RCODE_NOERROR)
 			fwprintf_s(FileHandle, L"No Error");
@@ -313,11 +313,11 @@ void PrintTypeClassesName(
 	{
 	//Cache flush check
 		auto HighBitSet = false;
-		auto ClassesTemp = ntohs(Classes);
+		auto ClassesTemp = ntoh16(Classes);
 		if ((ClassesTemp >> HIGHEST_MOVE_BIT_U16) != 0)
 		{
 			HighBitSet = true;
-			ClassesTemp = ntohs(Classes);
+			ClassesTemp = ntoh16(Classes);
 			ClassesTemp = ClassesTemp & HIGHEST_BIT_U16;
 		}
 
@@ -374,171 +374,171 @@ void PrintTypeClassesName(
 	}
 //Print Type.
 	else {
-		if (ntohs(Type) == DNS_TYPE_A)
+		if (ntoh16(Type) == DNS_TYPE_A)
 			fwprintf_s(FileHandle, L"(A Record)");
-		else if (ntohs(Type) == DNS_TYPE_NS)
+		else if (ntoh16(Type) == DNS_TYPE_NS)
 			fwprintf_s(FileHandle, L"(NS Record)");
-		else if (ntohs(Type) == DNS_TYPE_MD)
+		else if (ntoh16(Type) == DNS_TYPE_MD)
 			fwprintf_s(FileHandle, L"(MD Record)");
-		else if (ntohs(Type) == DNS_TYPE_MF)
+		else if (ntoh16(Type) == DNS_TYPE_MF)
 			fwprintf_s(FileHandle, L"(MF Record)");
-		else if (ntohs(Type) == DNS_TYPE_CNAME)
+		else if (ntoh16(Type) == DNS_TYPE_CNAME)
 			fwprintf_s(FileHandle, L"(CNAME Record)");
-		else if (ntohs(Type) == DNS_TYPE_SOA)
+		else if (ntoh16(Type) == DNS_TYPE_SOA)
 			fwprintf_s(FileHandle, L"(SOA Record)");
-		else if (ntohs(Type) == DNS_TYPE_MB)
+		else if (ntoh16(Type) == DNS_TYPE_MB)
 			fwprintf_s(FileHandle, L"(MB Record)");
-		else if (ntohs(Type) == DNS_TYPE_MG)
+		else if (ntoh16(Type) == DNS_TYPE_MG)
 			fwprintf_s(FileHandle, L"(MG Record)");
-		else if (ntohs(Type) == DNS_TYPE_MR)
+		else if (ntoh16(Type) == DNS_TYPE_MR)
 			fwprintf_s(FileHandle, L"(MR Record)");
-		else if (ntohs(Type) == DNS_TYPE_NULL)
+		else if (ntoh16(Type) == DNS_TYPE_NULL)
 			fwprintf_s(FileHandle, L"(NULL Record)");
-		else if (ntohs(Type) == DNS_TYPE_WKS)
+		else if (ntoh16(Type) == DNS_TYPE_WKS)
 			fwprintf_s(FileHandle, L"(WKS Record)");
-		else if (ntohs(Type) == DNS_TYPE_PTR)
+		else if (ntoh16(Type) == DNS_TYPE_PTR)
 			fwprintf_s(FileHandle, L"(PTR Record)");
-		else if (ntohs(Type) == DNS_TYPE_HINFO)
+		else if (ntoh16(Type) == DNS_TYPE_HINFO)
 			fwprintf_s(FileHandle, L"(HINFO Record)");
-		else if (ntohs(Type) == DNS_TYPE_MINFO)
+		else if (ntoh16(Type) == DNS_TYPE_MINFO)
 			fwprintf_s(FileHandle, L"(MINFO Record)");
-		else if (ntohs(Type) == DNS_TYPE_MX)
+		else if (ntoh16(Type) == DNS_TYPE_MX)
 			fwprintf_s(FileHandle, L"(MX Record)");
-		else if (ntohs(Type) == DNS_TYPE_TEXT)
+		else if (ntoh16(Type) == DNS_TYPE_TEXT)
 			fwprintf_s(FileHandle, L"(TXT Record)");
-		else if (ntohs(Type) == DNS_TYPE_RP)
+		else if (ntoh16(Type) == DNS_TYPE_RP)
 			fwprintf_s(FileHandle, L"(RP Record)");
-		else if (ntohs(Type) == DNS_TYPE_RP)
+		else if (ntoh16(Type) == DNS_TYPE_RP)
 			fwprintf_s(FileHandle, L"(RP Record)");
-		else if (ntohs(Type) == DNS_TYPE_AFSDB)
+		else if (ntoh16(Type) == DNS_TYPE_AFSDB)
 			fwprintf_s(FileHandle, L"(AFSDB Record)");
-		else if (ntohs(Type) == DNS_TYPE_X25)
+		else if (ntoh16(Type) == DNS_TYPE_X25)
 			fwprintf_s(FileHandle, L"(X25 Record)");
-		else if (ntohs(Type) == DNS_TYPE_ISDN)
+		else if (ntoh16(Type) == DNS_TYPE_ISDN)
 			fwprintf_s(FileHandle, L"(ISDN Record)");
-		else if (ntohs(Type) == DNS_TYPE_RT)
+		else if (ntoh16(Type) == DNS_TYPE_RT)
 			fwprintf_s(FileHandle, L"(RT Record)");
-		else if (ntohs(Type) == DNS_TYPE_NSAP)
+		else if (ntoh16(Type) == DNS_TYPE_NSAP)
 			fwprintf_s(FileHandle, L"(NSAP Record)");
-		else if (ntohs(Type) == DNS_TYPE_NSAPPTR)
+		else if (ntoh16(Type) == DNS_TYPE_NSAPPTR)
 			fwprintf_s(FileHandle, L"(NSAP PTR Record)");
-		else if (ntohs(Type) == DNS_TYPE_SIG)
+		else if (ntoh16(Type) == DNS_TYPE_SIG)
 			fwprintf_s(FileHandle, L"(SIG Record)");
-		else if (ntohs(Type) == DNS_TYPE_KEY)
+		else if (ntoh16(Type) == DNS_TYPE_KEY)
 			fwprintf_s(FileHandle, L"(KEY Record)");
-		else if (ntohs(Type) == DNS_TYPE_PX)
+		else if (ntoh16(Type) == DNS_TYPE_PX)
 			fwprintf_s(FileHandle, L"(PX Record)");
-		else if (ntohs(Type) == DNS_TYPE_GPOS)
+		else if (ntoh16(Type) == DNS_TYPE_GPOS)
 			fwprintf_s(FileHandle, L"(GPOS Record)");
-		else if (ntohs(Type) == DNS_TYPE_AAAA)
+		else if (ntoh16(Type) == DNS_TYPE_AAAA)
 			fwprintf_s(FileHandle, L"(AAAA Record)");
-		else if (ntohs(Type) == DNS_TYPE_LOC)
+		else if (ntoh16(Type) == DNS_TYPE_LOC)
 			fwprintf_s(FileHandle, L"(LOC Record)");
-		else if (ntohs(Type) == DNS_TYPE_NXT)
+		else if (ntoh16(Type) == DNS_TYPE_NXT)
 			fwprintf_s(FileHandle, L"(NXT Record)");
-		else if (ntohs(Type) == DNS_TYPE_EID)
+		else if (ntoh16(Type) == DNS_TYPE_EID)
 			fwprintf_s(FileHandle, L"(EID Record)");
-		else if (ntohs(Type) == DNS_TYPE_NIMLOC)
+		else if (ntoh16(Type) == DNS_TYPE_NIMLOC)
 			fwprintf_s(FileHandle, L"(NIMLOC Record)");
-		else if (ntohs(Type) == DNS_TYPE_SRV)
+		else if (ntoh16(Type) == DNS_TYPE_SRV)
 			fwprintf_s(FileHandle, L"(SRV Record)");
-		else if (ntohs(Type) == DNS_TYPE_ATMA)
+		else if (ntoh16(Type) == DNS_TYPE_ATMA)
 			fwprintf_s(FileHandle, L"(ATMA Record)");
-		else if (ntohs(Type) == DNS_TYPE_NAPTR)
+		else if (ntoh16(Type) == DNS_TYPE_NAPTR)
 			fwprintf_s(FileHandle, L"(NAPTR Record)");
-		else if (ntohs(Type) == DNS_TYPE_KX)
+		else if (ntoh16(Type) == DNS_TYPE_KX)
 			fwprintf_s(FileHandle, L"(KX Record)");
-		else if (ntohs(Type) == DNS_TYPE_CERT)
+		else if (ntoh16(Type) == DNS_TYPE_CERT)
 			fwprintf_s(FileHandle, L"(CERT Record)");
-		else if (ntohs(Type) == DNS_TYPE_DNAME)
+		else if (ntoh16(Type) == DNS_TYPE_DNAME)
 			fwprintf_s(FileHandle, L"(DNAME Record)");
-		else if (ntohs(Type) == DNS_TYPE_SINK)
+		else if (ntoh16(Type) == DNS_TYPE_SINK)
 			fwprintf_s(FileHandle, L"(SINK Record)");
-		else if (ntohs(Type) == DNS_TYPE_OPT)
+		else if (ntoh16(Type) == DNS_TYPE_OPT)
 			fwprintf_s(FileHandle, L"(OPT/EDNS Record)");
-		else if (ntohs(Type) == DNS_TYPE_APL)
+		else if (ntoh16(Type) == DNS_TYPE_APL)
 			fwprintf_s(FileHandle, L"(APL Record)");
-		else if (ntohs(Type) == DNS_TYPE_DS)
+		else if (ntoh16(Type) == DNS_TYPE_DS)
 			fwprintf_s(FileHandle, L"(DS Record)");
-		else if (ntohs(Type) == DNS_TYPE_SSHFP)
+		else if (ntoh16(Type) == DNS_TYPE_SSHFP)
 			fwprintf_s(FileHandle, L"(SSHFP Record)");
-		else if (ntohs(Type) == DNS_TYPE_IPSECKEY)
+		else if (ntoh16(Type) == DNS_TYPE_IPSECKEY)
 			fwprintf_s(FileHandle, L"(IPSECKEY Record)");
-		else if (ntohs(Type) == DNS_TYPE_RRSIG)
+		else if (ntoh16(Type) == DNS_TYPE_RRSIG)
 			fwprintf_s(FileHandle, L"(RRSIG Record)");
-		else if (ntohs(Type) == DNS_TYPE_NSEC)
+		else if (ntoh16(Type) == DNS_TYPE_NSEC)
 			fwprintf_s(FileHandle, L"(NSEC Record)");
-		else if (ntohs(Type) == DNS_TYPE_DNSKEY)
+		else if (ntoh16(Type) == DNS_TYPE_DNSKEY)
 			fwprintf_s(FileHandle, L"(DNSKEY Record)");
-		else if (ntohs(Type) == DNS_TYPE_DHCID)
+		else if (ntoh16(Type) == DNS_TYPE_DHCID)
 			fwprintf_s(FileHandle, L"(DHCID Record)");
-		else if (ntohs(Type) == DNS_TYPE_NSEC3)
+		else if (ntoh16(Type) == DNS_TYPE_NSEC3)
 			fwprintf_s(FileHandle, L"(NSEC3 Record)");
-		else if (ntohs(Type) == DNS_TYPE_NSEC3PARAM)
+		else if (ntoh16(Type) == DNS_TYPE_NSEC3PARAM)
 			fwprintf_s(FileHandle, L"(NSEC3PARAM Record)");
-		else if (ntohs(Type) == DNS_TYPE_TLSA)
+		else if (ntoh16(Type) == DNS_TYPE_TLSA)
 			fwprintf_s(FileHandle, L"(TLSA Record)");
-		else if (ntohs(Type) == DNS_TYPE_HIP)
+		else if (ntoh16(Type) == DNS_TYPE_HIP)
 			fwprintf_s(FileHandle, L"(HIP Record)");
-		else if (ntohs(Type) == DNS_TYPE_NINFO)
+		else if (ntoh16(Type) == DNS_TYPE_NINFO)
 			fwprintf_s(FileHandle, L"(NINFO Record)");
-		else if (ntohs(Type) == DNS_TYPE_RKEY)
+		else if (ntoh16(Type) == DNS_TYPE_RKEY)
 			fwprintf_s(FileHandle, L"(RKEY Record)");
-		else if (ntohs(Type) == DNS_TYPE_TALINK)
+		else if (ntoh16(Type) == DNS_TYPE_TALINK)
 			fwprintf_s(FileHandle, L"(TALINK Record)");
-		else if (ntohs(Type) == DNS_TYPE_CDS)
+		else if (ntoh16(Type) == DNS_TYPE_CDS)
 			fwprintf_s(FileHandle, L"(CDS Record)");
-		else if (ntohs(Type) == DNS_TYPE_CDNSKEY)
+		else if (ntoh16(Type) == DNS_TYPE_CDNSKEY)
 			fwprintf_s(FileHandle, L"(CDNSKEY Record)");
-		else if (ntohs(Type) == DNS_TYPE_OPENPGPKEY)
+		else if (ntoh16(Type) == DNS_TYPE_OPENPGPKEY)
 			fwprintf_s(FileHandle, L"(OPENPGPKEY Record)");
-		else if (ntohs(Type) == DNS_TYPE_SPF)
+		else if (ntoh16(Type) == DNS_TYPE_SPF)
 			fwprintf_s(FileHandle, L"(SPF Record)");
-		else if (ntohs(Type) == DNS_TYPE_UID)
+		else if (ntoh16(Type) == DNS_TYPE_UID)
 			fwprintf_s(FileHandle, L"(UID Record)");
-		else if (ntohs(Type) == DNS_TYPE_GID)
+		else if (ntoh16(Type) == DNS_TYPE_GID)
 			fwprintf_s(FileHandle, L"(GID Record)");
-		else if (ntohs(Type) == DNS_TYPE_UNSPEC)
+		else if (ntoh16(Type) == DNS_TYPE_UNSPEC)
 			fwprintf_s(FileHandle, L"(UNSPEC Record)");
-		else if (ntohs(Type) == DNS_TYPE_NID)
+		else if (ntoh16(Type) == DNS_TYPE_NID)
 			fwprintf_s(FileHandle, L"(NID Record)");
-		else if (ntohs(Type) == DNS_TYPE_L32)
+		else if (ntoh16(Type) == DNS_TYPE_L32)
 			fwprintf_s(FileHandle, L"(L32 Record)");
-		else if (ntohs(Type) == DNS_TYPE_L64)
+		else if (ntoh16(Type) == DNS_TYPE_L64)
 			fwprintf_s(FileHandle, L"(L64 Record)");
-		else if (ntohs(Type) == DNS_TYPE_LP)
+		else if (ntoh16(Type) == DNS_TYPE_LP)
 			fwprintf_s(FileHandle, L"(LP Record)");
-		else if (ntohs(Type) == DNS_TYPE_EUI48)
+		else if (ntoh16(Type) == DNS_TYPE_EUI48)
 			fwprintf_s(FileHandle, L"(EUI48 Record)");
-		else if (ntohs(Type) == DNS_TYPE_EUI64)
+		else if (ntoh16(Type) == DNS_TYPE_EUI64)
 			fwprintf_s(FileHandle, L"(EUI64 Record)");
-		else if (ntohs(Type) == DNS_TYPE_ADDRS)
+		else if (ntoh16(Type) == DNS_TYPE_ADDRS)
 			fwprintf_s(FileHandle, L"(ADDRS Record)");
-		else if (ntohs(Type) == DNS_TYPE_TKEY)
+		else if (ntoh16(Type) == DNS_TYPE_TKEY)
 			fwprintf_s(FileHandle, L"(TKEY Record)");
-		else if (ntohs(Type) == DNS_TYPE_TSIG)
+		else if (ntoh16(Type) == DNS_TYPE_TSIG)
 			fwprintf_s(FileHandle, L"(TSIG Record)");
-		else if (ntohs(Type) == DNS_TYPE_IXFR)
+		else if (ntoh16(Type) == DNS_TYPE_IXFR)
 			fwprintf_s(FileHandle, L"(IXFR Record)");
-		else if (ntohs(Type) == DNS_TYPE_AXFR)
+		else if (ntoh16(Type) == DNS_TYPE_AXFR)
 			fwprintf_s(FileHandle, L"(AXFR Record)");
-		else if (ntohs(Type) == DNS_TYPE_MAILB)
+		else if (ntoh16(Type) == DNS_TYPE_MAILB)
 			fwprintf_s(FileHandle, L"(MAILB Record)");
-		else if (ntohs(Type) == DNS_TYPE_MAILA)
+		else if (ntoh16(Type) == DNS_TYPE_MAILA)
 			fwprintf_s(FileHandle, L"(MAILA Record)");
-		else if (ntohs(Type) == DNS_TYPE_ANY)
+		else if (ntoh16(Type) == DNS_TYPE_ANY)
 			fwprintf_s(FileHandle, L"(ANY Record)");
-		else if (ntohs(Type) == DNS_TYPE_URI)
+		else if (ntoh16(Type) == DNS_TYPE_URI)
 			fwprintf_s(FileHandle, L"(URI Record)");
-		else if (ntohs(Type) == DNS_TYPE_CAA)
+		else if (ntoh16(Type) == DNS_TYPE_CAA)
 			fwprintf_s(FileHandle, L"(CAA Record)");
-		else if (ntohs(Type) == DNS_TYPE_TA)
+		else if (ntoh16(Type) == DNS_TYPE_TA)
 			fwprintf_s(FileHandle, L"(TA Record)");
-		else if (ntohs(Type) == DNS_TYPE_DLV)
+		else if (ntoh16(Type) == DNS_TYPE_DLV)
 			fwprintf_s(FileHandle, L"(DLV Record)");
-		else if (ntohs(Type) >= DNS_TYPE_PRIVATE_A && ntohs(Type) <= DNS_TYPE_PRIVATE_B)
+		else if (ntoh16(Type) >= DNS_TYPE_PRIVATE_A && ntoh16(Type) <= DNS_TYPE_PRIVATE_B)
 			fwprintf_s(FileHandle, L"(Reserved Private use Record)");
-		else if (ntohs(Type) == DNS_TYPE_RESERVED)
+		else if (ntoh16(Type) == DNS_TYPE_RESERVED)
 			fwprintf_s(FileHandle, L"(Reserved Record)");
 	}
 
@@ -562,16 +562,16 @@ size_t PrintDomainName(
 //Initialization
 	auto BufferTemp = std::make_unique<uint8_t[]>(PACKET_MAXSIZE + MEMORY_RESERVED_BYTES);
 	memset(BufferTemp.get(), 0, PACKET_MAXSIZE + MEMORY_RESERVED_BYTES);
-	size_t Index = 0, Result = 0;
+	size_t Index = 0, ResultValue = 0;
 	uint16_t TruncateLocation = 0;
 	auto IsMultiplePointer = false;
 
 //Convert.
-	Result = PacketQueryToString(Buffer + Location, BufferTemp.get(), TruncateLocation);
+	ResultValue = PacketQueryToString(Buffer + Location, BufferTemp.get(), TruncateLocation);
 	if (TruncateLocation != 0)
 	{
 	//Print once when pointer is not at first.
-		if (Result > sizeof(uint16_t))
+		if (ResultValue > sizeof(uint16_t))
 		{
 			for (Index = 0;Index < strnlen_s(reinterpret_cast<const char *>(BufferTemp.get()), PACKET_MAXSIZE);++Index)
 				fwprintf_s(FileHandle, L"%c", BufferTemp.get()[Index]);
@@ -592,13 +592,13 @@ size_t PrintDomainName(
 		}
 	}
 	else {
-		++Result;
+		++ResultValue;
 	}
 
 //Print last.
 	for (Index = 0;Index < strnlen_s(reinterpret_cast<const char *>(BufferTemp.get()), PACKET_MAXSIZE);++Index)
 		fwprintf_s(FileHandle, L"%c", BufferTemp.get()[Index]);
-	return Result;
+	return ResultValue;
 }
 
 //Print Resourse data to file
@@ -611,12 +611,12 @@ void PrintResourseData(
 	const uint16_t Length)
 {
 //Length and Type check
-	if ((Length == 0 && ntohs(Type) != DNS_TYPE_OPT) || Classes == 0)
+	if ((Length == 0 && ntoh16(Type) != DNS_TYPE_OPT) || Classes == 0)
 		return;
 	size_t Index = 0, CurrentLength = 0;
 
 //A Record(IPv4 address)
-	if (ntohs(Type) == DNS_TYPE_A && Length == sizeof(in_addr))
+	if (ntoh16(Type) == DNS_TYPE_A && Length == sizeof(in_addr))
 	{
 		fwprintf_s(FileHandle, L"\n   Data: ");
 		const auto Addr = reinterpret_cast<const in_addr *>(Buffer + Location);
@@ -626,13 +626,13 @@ void PrintResourseData(
 		fwprintf_s(FileHandle, L"%u", *(reinterpret_cast<const uint8_t *>(&Addr->s_addr) + sizeof(uint8_t) * 3U));
 	}
 //NS Record(Authoritative Name Server) and CNAME Record(Canonical Name)
-	else if (ntohs(Type) == DNS_TYPE_NS || ntohs(Type) == DNS_TYPE_CNAME)
+	else if (ntoh16(Type) == DNS_TYPE_NS || ntoh16(Type) == DNS_TYPE_CNAME)
 	{
 		fwprintf_s(FileHandle, L"\n   Data: ");
 		PrintDomainName(FileHandle, Buffer, Location);
 	}
 //SOA Record(Start Of a zone of Authority)
-	else if (ntohs(Type) == DNS_TYPE_SOA)
+	else if (ntoh16(Type) == DNS_TYPE_SOA)
 	{
 		fwprintf_s(FileHandle, L"\n   Data: ");
 
@@ -641,34 +641,34 @@ void PrintResourseData(
 		fwprintf_s(FileHandle, L"\n         Responsible authority's mailbox: ");
 		CurrentLength += PrintDomainName(FileHandle, Buffer, Location + CurrentLength);
 		const auto DNS_SOA_RECORD = reinterpret_cast<const dns_record_soa *>(Buffer + Location + CurrentLength);
-		fwprintf_s(FileHandle, L"\n         Serial Number: %u", ntohl(DNS_SOA_RECORD->Serial));
-		fwprintf_s(FileHandle, L"\n         Refresh Interval: %u", ntohl(DNS_SOA_RECORD->RefreshInterval));
-		PrintSecondsInDateTime(FileHandle, ntohl(DNS_SOA_RECORD->RefreshInterval));
-		fwprintf_s(FileHandle, L"\n         Retry Interval: %u", ntohl(DNS_SOA_RECORD->RetryInterval));
-		PrintSecondsInDateTime(FileHandle, ntohl(DNS_SOA_RECORD->RetryInterval));
-		fwprintf_s(FileHandle, L"\n         Expire Limit: %u", ntohl(DNS_SOA_RECORD->ExpireLimit));
-		PrintSecondsInDateTime(FileHandle, ntohl(DNS_SOA_RECORD->ExpireLimit));
-		fwprintf_s(FileHandle, L"\n         Minimum TTL: %u", ntohl(DNS_SOA_RECORD->MinimumTTL));
-		PrintSecondsInDateTime(FileHandle, ntohl(DNS_SOA_RECORD->MinimumTTL));
+		fwprintf_s(FileHandle, L"\n         Serial Number: %u", ntoh32(DNS_SOA_RECORD->Serial));
+		fwprintf_s(FileHandle, L"\n         Refresh Interval: %u", ntoh32(DNS_SOA_RECORD->RefreshInterval));
+		PrintSecondsInDateTime(FileHandle, ntoh32(DNS_SOA_RECORD->RefreshInterval));
+		fwprintf_s(FileHandle, L"\n         Retry Interval: %u", ntoh32(DNS_SOA_RECORD->RetryInterval));
+		PrintSecondsInDateTime(FileHandle, ntoh32(DNS_SOA_RECORD->RetryInterval));
+		fwprintf_s(FileHandle, L"\n         Expire Limit: %u", ntoh32(DNS_SOA_RECORD->ExpireLimit));
+		PrintSecondsInDateTime(FileHandle, ntoh32(DNS_SOA_RECORD->ExpireLimit));
+		fwprintf_s(FileHandle, L"\n         Minimum TTL: %u", ntoh32(DNS_SOA_RECORD->MinimumTTL));
+		PrintSecondsInDateTime(FileHandle, ntoh32(DNS_SOA_RECORD->MinimumTTL));
 	}
 //PTR Record(domain name PoinTeR)
-	else if (ntohs(Type) == DNS_TYPE_PTR)
+	else if (ntoh16(Type) == DNS_TYPE_PTR)
 	{
 		fwprintf_s(FileHandle, L"\n   Data: ");
 		PrintDomainName(FileHandle, Buffer, Location);
 	}
 //MX Record(Mail eXchange)
-	else if (ntohs(Type) == DNS_TYPE_MX)
+	else if (ntoh16(Type) == DNS_TYPE_MX)
 	{
 		fwprintf_s(FileHandle, L"\n   Data: ");
 
 		const auto DNS_MX_RECORD = reinterpret_cast<const dns_record_mx *>(Buffer + Location);
-		fwprintf_s(FileHandle, L"Preference: %u", ntohs(DNS_MX_RECORD->Preference));
+		fwprintf_s(FileHandle, L"Preference: %u", ntoh16(DNS_MX_RECORD->Preference));
 		fwprintf_s(FileHandle, L"\n         Mail Exchange: ");
 		PrintDomainName(FileHandle, Buffer, Location + sizeof(dns_record_mx));
 	}
 //TXT Record(Text strings)
-	else if (ntohs(Type) == DNS_TYPE_TEXT)
+	else if (ntoh16(Type) == DNS_TYPE_TEXT)
 	{
 		fwprintf_s(FileHandle, L"\n   Data: ");
 
@@ -680,44 +680,44 @@ void PrintResourseData(
 		fwprintf_s(FileHandle, L"\"");
 	}
 //AAAA Record(IPv6 address)
-	else if (ntohs(Type) == DNS_TYPE_AAAA && Length == sizeof(in6_addr))
+	else if (ntoh16(Type) == DNS_TYPE_AAAA && Length == sizeof(in6_addr))
 	{
 		fwprintf_s(FileHandle, L"\n   Data: ");
 
-		uint8_t BufferTemp[ADDRESS_STRING_MAXSIZE]{0};
+		std::array<uint8_t, ADDRESS_STRING_MAXSIZE> AddrBuffer{};
 		ssize_t ErrorCode = 0;
-		if (!BinaryToAddressString(AF_INET6, Buffer + Location, BufferTemp, ADDRESS_STRING_MAXSIZE, &ErrorCode))
+		if (!BinaryToAddressString(AF_INET6, Buffer + Location, AddrBuffer.data(), AddrBuffer.max_size(), &ErrorCode))
 		{
 			PrintErrorToScreen(L"\n[Error] IPv4 address format error error", ErrorCode);
 			return;
 		}
 
-		CaseConvert(true, BufferTemp, strnlen_s(reinterpret_cast<const char *>(BufferTemp), ADDRESS_STRING_MAXSIZE));
-		for (Index = 0;Index < strnlen_s(reinterpret_cast<const char *>(BufferTemp), ADDRESS_STRING_MAXSIZE);++Index)
-			fwprintf_s(FileHandle, L"%c", BufferTemp[Index]);
+		CaseConvert(true, AddrBuffer.data(), strnlen_s(reinterpret_cast<const char *>(AddrBuffer.data()), AddrBuffer.max_size()));
+		for (Index = 0;Index < strnlen_s(reinterpret_cast<const char *>(AddrBuffer.data()), AddrBuffer.max_size());++Index)
+			fwprintf_s(FileHandle, L"%c", AddrBuffer.at(Index));
 	}
 //SRV Record(Server Selection)
-	else if (ntohs(Type) == DNS_TYPE_SRV)
+	else if (ntoh16(Type) == DNS_TYPE_SRV)
 	{
 		fwprintf_s(FileHandle, L"\n   Data: ");
 
 		const auto DNS_SRV_RECORD = reinterpret_cast<const dns_record_srv *>(Buffer + Location);
-		fwprintf_s(FileHandle, L"Priority: %x", ntohs(DNS_SRV_RECORD->Priority));
-		fwprintf_s(FileHandle, L"\n         Weight: %u", ntohs(DNS_SRV_RECORD->Weight));
-		fwprintf_s(FileHandle, L"\n         Port: %u", ntohs(DNS_SRV_RECORD->Port));
+		fwprintf_s(FileHandle, L"Priority: %x", ntoh16(DNS_SRV_RECORD->Priority));
+		fwprintf_s(FileHandle, L"\n         Weight: %u", ntoh16(DNS_SRV_RECORD->Weight));
+		fwprintf_s(FileHandle, L"\n         Port: %u", ntoh16(DNS_SRV_RECORD->Port));
 		fwprintf_s(FileHandle, L"\n         Target: ");
 		PrintDomainName(FileHandle, Buffer, Location + sizeof(dns_record_srv));
 	}
 //OPT/EDNS Record(Extension Mechanisms for Domain Name System)
-	else if (ntohs(Type) == DNS_TYPE_OPT)
+	else if (ntoh16(Type) == DNS_TYPE_OPT)
 	{
 		fwprintf_s(FileHandle, L"   Data: ");
 
 		const auto DNS_OPT_RECORD = reinterpret_cast<const dns_record_opt *>(Buffer + Location);
-		fwprintf_s(FileHandle, L"UDP Playload Size: %u", ntohs(DNS_OPT_RECORD->UDP_PayloadSize));
+		fwprintf_s(FileHandle, L"UDP Playload Size: %u", ntoh16(DNS_OPT_RECORD->UDP_PayloadSize));
 		fwprintf_s(FileHandle, L"\n         Extended RCode: %x", DNS_OPT_RECORD->Extended_RCode);
 		fwprintf_s(FileHandle, L"\n         EDNS Version: %u", DNS_OPT_RECORD->Version);
-		if (ntohs(DNS_OPT_RECORD->Z_Field) >> HIGHEST_MOVE_BIT_U16 == 0)
+		if (ntoh16(DNS_OPT_RECORD->Z_Field) >> HIGHEST_MOVE_BIT_U16 == 0)
 			fwprintf_s(FileHandle, L"\n         Server cannot handle DNSSEC security RRs.");
 		else 
 			fwprintf_s(FileHandle, L"\n         Server can handle DNSSEC security RRs.");
@@ -728,36 +728,36 @@ void PrintResourseData(
 			fwprintf_s(FileHandle, L"\n         EDNS Option:\n                         Code: ");
 
 			const auto DNS_OPT_OPTION = reinterpret_cast<const dns_edns_option *>(Buffer + Location + sizeof(dns_record_opt));
-			if (ntohs(DNS_OPT_OPTION->Code) == EDNS_CODE_LLQ)
+			if (ntoh16(DNS_OPT_OPTION->Code) == EDNS_CODE_LLQ)
 				fwprintf_s(FileHandle, L"LLQ");
-			else if (ntohs(DNS_OPT_OPTION->Code) == EDNS_CODE_UL)
+			else if (ntoh16(DNS_OPT_OPTION->Code) == EDNS_CODE_UL)
 				fwprintf_s(FileHandle, L"UL");
-			else if (ntohs(DNS_OPT_OPTION->Code) == EDNS_CODE_NSID)
+			else if (ntoh16(DNS_OPT_OPTION->Code) == EDNS_CODE_NSID)
 				fwprintf_s(FileHandle, L"ONSID");
-			else if (ntohs(DNS_OPT_OPTION->Code) == EDNS_CODE_OWNER)
+			else if (ntoh16(DNS_OPT_OPTION->Code) == EDNS_CODE_OWNER)
 				fwprintf_s(FileHandle, L"OWNER");
-			else if (ntohs(DNS_OPT_OPTION->Code) == EDNS_CODE_DAU)
+			else if (ntoh16(DNS_OPT_OPTION->Code) == EDNS_CODE_DAU)
 				fwprintf_s(FileHandle, L"DAU");
-			else if (ntohs(DNS_OPT_OPTION->Code) == EDNS_CODE_DHU)
+			else if (ntoh16(DNS_OPT_OPTION->Code) == EDNS_CODE_DHU)
 				fwprintf_s(FileHandle, L"DHU");
-			else if (ntohs(DNS_OPT_OPTION->Code) == EDNS_CODE_N3U)
+			else if (ntoh16(DNS_OPT_OPTION->Code) == EDNS_CODE_N3U)
 				fwprintf_s(FileHandle, L"N3U");
-			else if (ntohs(DNS_OPT_OPTION->Code) == EDNS_CODE_CSUBNET)
+			else if (ntoh16(DNS_OPT_OPTION->Code) == EDNS_CODE_CSUBNET)
 				fwprintf_s(FileHandle, L"CLIENT_SUBNET");
-			else if (ntohs(DNS_OPT_OPTION->Code) == EDNS_CODE_EDNS_EXPIRE)
+			else if (ntoh16(DNS_OPT_OPTION->Code) == EDNS_CODE_EDNS_EXPIRE)
 				fwprintf_s(FileHandle, L"EDNS_EXPIRE");
 			else 
-				fwprintf_s(FileHandle, L"%x", ntohs(DNS_OPT_OPTION->Code));
-			fwprintf_s(FileHandle, L"\n                         Length: %x", ntohs(DNS_OPT_OPTION->Length));
+				fwprintf_s(FileHandle, L"%x", ntoh16(DNS_OPT_OPTION->Code));
+			fwprintf_s(FileHandle, L"\n                         Length: %x", ntoh16(DNS_OPT_OPTION->Length));
 		}
 	}
 //RRSIG Record(Resource Record digital SIGnature)
-	else if (ntohs(Type) == DNS_TYPE_RRSIG)
+	else if (ntoh16(Type) == DNS_TYPE_RRSIG)
 	{
 		fwprintf_s(FileHandle, L"\n   Data: ");
 
 		const auto DNS_RRSIG_RECORD = reinterpret_cast<const dns_record_rrsig *>(Buffer + Location);
-		fwprintf_s(FileHandle, L"Type Covered: 0x%04x", ntohs(DNS_RRSIG_RECORD->TypeCovered));
+		fwprintf_s(FileHandle, L"Type Covered: 0x%04x", ntoh16(DNS_RRSIG_RECORD->TypeCovered));
 		PrintTypeClassesName(FileHandle, DNS_RRSIG_RECORD->TypeCovered, 0);
 		fwprintf_s(FileHandle, L"         Algorithm: ");
 		if (DNS_RRSIG_RECORD->Algorithm == DNSSEC_AlGORITHM_RESERVED_0)
@@ -805,13 +805,13 @@ void PrintResourseData(
 		else 
 			fwprintf_s(FileHandle, L"%u", DNS_RRSIG_RECORD->Algorithm);
 		fwprintf_s(FileHandle, L"\n         Labels: %u", DNS_RRSIG_RECORD->Labels);
-		fwprintf_s(FileHandle, L"\n         Original TTL: %u", ntohl(DNS_RRSIG_RECORD->TTL));
-		PrintSecondsInDateTime(FileHandle, ntohl(DNS_RRSIG_RECORD->TTL));
+		fwprintf_s(FileHandle, L"\n         Original TTL: %u", ntoh32(DNS_RRSIG_RECORD->TTL));
+		PrintSecondsInDateTime(FileHandle, ntoh32(DNS_RRSIG_RECORD->TTL));
 		fwprintf_s(FileHandle, L"\n         Signature Expiration: ");
-		PrintDateTime(FileHandle, ntohl(DNS_RRSIG_RECORD->Expiration));
+		PrintDateTime(FileHandle, ntoh32(DNS_RRSIG_RECORD->Expiration));
 		fwprintf_s(FileHandle, L"\n         Signature Inception: ");
-		PrintDateTime(FileHandle, ntohl(DNS_RRSIG_RECORD->Inception));
-		fwprintf_s(FileHandle, L"\n         Key Tag: %u", ntohs(DNS_RRSIG_RECORD->KeyTag));
+		PrintDateTime(FileHandle, ntoh32(DNS_RRSIG_RECORD->Inception));
+		fwprintf_s(FileHandle, L"\n         Key Tag: %u", ntoh16(DNS_RRSIG_RECORD->KeyTag));
 		fwprintf_s(FileHandle, L"\n         Signer's name: ");
 		CurrentLength = PrintDomainName(FileHandle, Buffer, Location + sizeof(dns_record_rrsig)) + NULL_TERMINATE_LENGTH;
 		CurrentLength += sizeof(dns_record_rrsig);
@@ -820,7 +820,7 @@ void PrintResourseData(
 			fwprintf_s(FileHandle, L"%02x", Buffer[Index]);
 	}
 //NSEC Record(Next-SECure)
-	else if (ntohs(Type) == DNS_TYPE_NSEC)
+	else if (ntoh16(Type) == DNS_TYPE_NSEC)
 	{
 		fwprintf_s(FileHandle, L"\n   Data: ");
 
@@ -831,7 +831,7 @@ void PrintResourseData(
 			fwprintf_s(FileHandle, L"%x", Buffer[Index]);
 	}
 //CAA Record(Certification Authority Authorization)
-	else if (ntohs(Type) == DNS_TYPE_CAA)
+	else if (ntoh16(Type) == DNS_TYPE_CAA)
 	{
 		fwprintf_s(FileHandle, L"   Data: ");
 

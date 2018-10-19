@@ -23,7 +23,7 @@
 #include "Include.h"
 
 //Functions
-void PrintFlags(
+void PrintFlagsData(
 	FILE * const FileHandle, 
 	const uint16_t Flags);
 void PrintTypeClassesName(

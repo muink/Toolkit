@@ -37,11 +37,11 @@ int main(
 	}
 	else {
 	//Initialization, read commands, check all parameters and settings.
-		if (!ConfigurationInitialization() || !ReadCommand(argc, argv) || !ParameterCheckAndSetting())
+		if (!ConfigurationInitialization() || !ReadCommand(argc, argv) || !Parameter_CheckSetting())
 			return EXIT_FAILURE;
 
 	//Main send process
-		if (!MainProcess())
+		if (!RequestLoopProcess())
 			return EXIT_FAILURE;
 	}
 
@@ -110,7 +110,7 @@ bool ConfigurationInitialization(
 }
 
 //Check all parameters and settings
-bool ParameterCheckAndSetting(
+bool Parameter_CheckSetting(
 	void)
 {
 //Socket address check
@@ -125,8 +125,8 @@ bool ParameterCheckAndSetting(
 		else {
 			if (ConfigurationParameter.ServiceType == 0)
 			{
-				ConfigurationParameter.ServiceType = htons(IPPORT_DNS);
-				reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_port = htons(IPPORT_DNS);
+				ConfigurationParameter.ServiceType = hton16(IPPORT_DNS);
+				reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_port = hton16(IPPORT_DNS);
 			}
 			else {
 				reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_port = ConfigurationParameter.ServiceType;
@@ -144,8 +144,8 @@ bool ParameterCheckAndSetting(
 		else {
 			if (ConfigurationParameter.ServiceType == 0)
 			{
-				ConfigurationParameter.ServiceType = htons(IPPORT_DNS);
-				reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_port = htons(IPPORT_DNS);
+				ConfigurationParameter.ServiceType = hton16(IPPORT_DNS);
+				reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_port = hton16(IPPORT_DNS);
 			}
 			else {
 				reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_port = ConfigurationParameter.ServiceType;
@@ -195,17 +195,17 @@ bool ParameterCheckAndSetting(
 
 //Check DNS packet data.
 	if (ConfigurationParameter.Parameter_Header.Flags == 0)
-		ConfigurationParameter.Parameter_Header.Flags = htons(DNS_FLAG_REQUEST_STANDARD);
+		ConfigurationParameter.Parameter_Header.Flags = hton16(DNS_FLAG_REQUEST_STANDARD);
 	if (ConfigurationParameter.Parameter_Header.Question == 0)
-		ConfigurationParameter.Parameter_Header.Question = htons(U16_NUM_ONE);
+		ConfigurationParameter.Parameter_Header.Question = hton16(U16_NUM_ONE);
 	if (ConfigurationParameter.Parameter_Query.Classes == 0)
-		ConfigurationParameter.Parameter_Query.Classes = htons(DNS_CLASS_INTERNET);
+		ConfigurationParameter.Parameter_Query.Classes = hton16(DNS_CLASS_INTERNET);
 	if (ConfigurationParameter.Parameter_Query.Type == 0)
 	{
 		if (ConfigurationParameter.SockAddr_Normal.ss_family == AF_INET6)
-			ConfigurationParameter.Parameter_Query.Type = htons(DNS_TYPE_AAAA);
+			ConfigurationParameter.Parameter_Query.Type = hton16(DNS_TYPE_AAAA);
 		else //IPv4
-			ConfigurationParameter.Parameter_Query.Type = htons(DNS_TYPE_A);
+			ConfigurationParameter.Parameter_Query.Type = hton16(DNS_TYPE_A);
 	}
 
 //Check EDNS Label.
@@ -213,17 +213,17 @@ bool ParameterCheckAndSetting(
 		ConfigurationParameter.IsEDNS = true;
 	if (ConfigurationParameter.IsEDNS)
 	{
-		ConfigurationParameter.Parameter_Header.Additional = htons(U16_NUM_ONE);
-		ConfigurationParameter.Parameter_EDNS.Type = htons(DNS_TYPE_OPT);
+		ConfigurationParameter.Parameter_Header.Additional = hton16(U16_NUM_ONE);
+		ConfigurationParameter.Parameter_EDNS.Type = hton16(DNS_TYPE_OPT);
 		if (ConfigurationParameter.EDNSPayloadSize == 0)
-			ConfigurationParameter.Parameter_EDNS.UDP_PayloadSize = htons(EDNS_PACKET_MINSIZE);
+			ConfigurationParameter.Parameter_EDNS.UDP_PayloadSize = hton16(EDNS_PACKET_MINSIZE);
 		else 
-			ConfigurationParameter.Parameter_EDNS.UDP_PayloadSize = htons(static_cast<uint16_t>(ConfigurationParameter.EDNSPayloadSize));
+			ConfigurationParameter.Parameter_EDNS.UDP_PayloadSize = hton16(static_cast<uint16_t>(ConfigurationParameter.EDNSPayloadSize));
 		if (ConfigurationParameter.IsDNSSEC)
 		{
-			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_AD); //Set Authentic Data bit.
-			ConfigurationParameter.Parameter_Header.Flags = htons(ntohs(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_CD); //Set Checking Disabled bit.
-			ConfigurationParameter.Parameter_EDNS.Z_Field = htons(ntohs(ConfigurationParameter.Parameter_EDNS.Z_Field) | EDNS_FLAG_GET_BIT_DO); //Set Accepts DNSSEC security resource records bit.
+			ConfigurationParameter.Parameter_Header.Flags = hton16(ntoh16(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_AD); //Set Authentic Data bit.
+			ConfigurationParameter.Parameter_Header.Flags = hton16(ntoh16(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_CD); //Set Checking Disabled bit.
+			ConfigurationParameter.Parameter_EDNS.Z_Field = hton16(ntoh16(ConfigurationParameter.Parameter_EDNS.Z_Field) | EDNS_FLAG_GET_BIT_DO); //Set Accepts DNSSEC security resource records bit.
 		}
 	}
 
@@ -236,8 +236,8 @@ bool ParameterCheckAndSetting(
 	return true;
 }
 
-//Main send process
-bool MainProcess(
+//Main request process
+bool RequestLoopProcess(
 	void)
 {
 	if (ConfigurationParameter.Statistics_PlanSend == 0)

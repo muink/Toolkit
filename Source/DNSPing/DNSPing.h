@@ -28,8 +28,8 @@ extern ConfigurationTable ConfigurationParameter;
 //Functions
 bool ConfigurationInitialization(
 	void);
-bool ParameterCheckAndSetting(
+bool Parameter_CheckSetting(
 	void);
-bool MainProcess(
+bool RequestLoopProcess(
 	void);
 #endif

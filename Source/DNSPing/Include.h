@@ -125,7 +125,7 @@ void PrintHexResponse(
 	FILE * const FileHandle, 
 	const uint8_t * const Buffer, 
 	const size_t Length);
-void PrintResponse(
+void PrintFormattedResponse(
 	FILE * const FileHandle, 
 	const uint8_t * const Buffer, 
 	const size_t Length);

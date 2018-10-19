@@ -31,7 +31,7 @@ bool PrintSendResult(
 	const dns_hdr * const DNS_Header, 
 	std::unique_ptr<uint8_t[]> &RecvBuffer, 
 	ssize_t &DataLength, 
-	long double &Result, 
+	long double &ResultValue, 
 	bool &IsContinue, 
 #if defined(PLATFORM_WIN)
 	LARGE_INTEGER &CPU_Frequency, 

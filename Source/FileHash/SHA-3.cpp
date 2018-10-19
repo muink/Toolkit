@@ -89,17 +89,17 @@ bool ReadCommand_SHA3(
 		//SHA-3 SHAKE output length.
 			_set_errno(0);
 		#if defined(PLATFORM_WIN)
-			auto Result = wcstoul(Command.c_str() + Offset, nullptr, 0);
+			auto ResultValue = wcstoul(Command.c_str() + Offset, nullptr, 0);
 		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-			auto Result = strtoul(Command.c_str() + Offset, nullptr, 0);
+			auto ResultValue = strtoul(Command.c_str() + Offset, nullptr, 0);
 		#endif
-			if (Result >= FILE_BUFFER_SIZE)
+			if (ResultValue >= FILE_BUFFER_SIZE)
 			{
 				fwprintf_s(stderr, L"[Error] Commands error.\n");
 				return false;
 			}
 			else {
-				SHA3_SHAKE_Length = Result;
+				SHA3_SHAKE_Length = ResultValue;
 			}
 		}
 	//SHA-3 SHAKE 256 bits
@@ -117,17 +117,17 @@ bool ReadCommand_SHA3(
 		//SHA-3 SHAKE output length.
 			_set_errno(0);
 		#if defined(PLATFORM_WIN)
-			auto Result = wcstoul(Command.c_str() + wcslen(COMMAND_SHA3_SHAKE_256), nullptr, 0);
+			auto ResultValue = wcstoul(Command.c_str() + wcslen(COMMAND_SHA3_SHAKE_256), nullptr, 0);
 		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-			auto Result = strtoul(Command.c_str() + strlen(COMMAND_SHA3_SHAKE_256), nullptr, 0);
+			auto ResultValue = strtoul(Command.c_str() + strlen(COMMAND_SHA3_SHAKE_256), nullptr, 0);
 		#endif
-			if (Result >= FILE_BUFFER_SIZE)
+			if (ResultValue >= FILE_BUFFER_SIZE)
 			{
 				fwprintf_s(stderr, L"[Error] Commands error.\n");
 				return false;
 			}
 			else {
-				SHA3_SHAKE_Length = Result;
+				SHA3_SHAKE_Length = ResultValue;
 			}
 		}
 	//Commands error
