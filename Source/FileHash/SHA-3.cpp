@@ -26,7 +26,7 @@
 bool ReadCommand_SHA3(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command)
 #endif
 {
@@ -68,13 +68,13 @@ bool ReadCommand_SHA3(
 			if (Command.find(COMMAND_SHA3_SHAKE_SIZE) == 0)
 			#if defined(PLATFORM_WIN)
 				Offset = wcslen(COMMAND_SHA3_SHAKE_SIZE);
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				Offset = strlen(COMMAND_SHA3_SHAKE_SIZE);
 			#endif
 			else 
 			#if defined(PLATFORM_WIN)
 				Offset = wcslen(COMMAND_SHA3_SHAKE_128);
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				Offset = strlen(COMMAND_SHA3_SHAKE_128);
 			#endif
 			SHA3_HashFunctionID = HASH_ID_SHA3_SHAKE_128;
@@ -90,7 +90,7 @@ bool ReadCommand_SHA3(
 			_set_errno(0);
 		#if defined(PLATFORM_WIN)
 			auto ResultValue = wcstoul(Command.c_str() + Offset, nullptr, 0);
-		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+		#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 			auto ResultValue = strtoul(Command.c_str() + Offset, nullptr, 0);
 		#endif
 			if (ResultValue >= FILE_BUFFER_SIZE)
@@ -118,7 +118,7 @@ bool ReadCommand_SHA3(
 			_set_errno(0);
 		#if defined(PLATFORM_WIN)
 			auto ResultValue = wcstoul(Command.c_str() + wcslen(COMMAND_SHA3_SHAKE_256), nullptr, 0);
-		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+		#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 			auto ResultValue = strtoul(Command.c_str() + strlen(COMMAND_SHA3_SHAKE_256), nullptr, 0);
 		#endif
 			if (ResultValue >= FILE_BUFFER_SIZE)

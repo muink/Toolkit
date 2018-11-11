@@ -19,7 +19,7 @@
 
 #include "Terminal.h"
 
-#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 //Handle the system signal.
 void SignalHandler(
 	const int SignalType)
@@ -44,7 +44,7 @@ void SignalHandler(
 	}
 
 	_fcloseall();
-#elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
+#elif (defined(PLATFORM_FREEBSD) || (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT)))
 	fcloseall();
 #endif
 

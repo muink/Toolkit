@@ -1,4 +1,4 @@
-﻿### Linux/macOS 用法
+﻿### FreeBSD/Linux/macOS 编译方法
 * 打开终端，并进入 Toolkit/Auxiliary/Scripts 目录
 * 运行 chmod 755 CMake_Build.sh 给予编译脚本运行权限
 * 运行 ./CMake_Build.sh 生成二进制可执行文件

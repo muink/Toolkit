@@ -334,8 +334,8 @@
 
 //////////////////////////////////////////////////
 // Platform check
-//Toolkit now support Windows, Linux and macOS.
-#if !(defined(PLATFORM_WIN) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+//Toolkit now support FreeBSD, Linux, macOS, and Windows.
+#if !(defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS) || defined(PLATFORM_WIN))
 	#error "This platform is unsupported."
 #endif
 
@@ -376,7 +376,7 @@
 
 //Windows compatible definitions
 	typedef SSIZE_T                     ssize_t;
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 //Portable Operating System Interface/POSIX and Unix system header
 	#include <cerrno>                   //Error report support
 	#include <climits>                  //Limits support
@@ -389,14 +389,19 @@
 	#include <unistd.h>                 //Standard library API support
 	#include <arpa/inet.h>              //Internet operations support
 	#include <sys/time.h>               //Date and time support
-#if defined(PLATFORM_MACOS)
+#if defined(PLATFORM_FREEBSD)
+	#include <netinet/in.h>             //Internet Protocol family support
+	#include <sys/socket.h>             //Main sockets header support
+#elif defined(PLATFORM_MACOS)
 	#include <mach/kern_return.h>       //Mach kernel return codes
 	#include <mach/mach.h>              //Mach includes all the types that a normal user of Mach programs should need
 	#include <mach/mach_time.h>         //Mach time structure support
 #endif
 
 //Portable Operating System Interface/POSIX and Unix system header
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_FREEBSD)
+	#include <sys/endian.h>                                          //Endian support
+#elif defined(PLATFORM_LINUX)
 	#include <endian.h>                                              //Endian support
 #elif defined(PLATFORM_MACOS)
 	#define __LITTLE_ENDIAN             1234                         //Little Endian

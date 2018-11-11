@@ -41,7 +41,7 @@
 	#define COMMAND_BLAKE_256           L"-BLAKE_256"
 	#define COMMAND_BLAKE_384           L"-BLAKE_384"
 	#define COMMAND_BLAKE_512           L"-BLAKE_512"
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	#define COMMAND_BLAKE_224           ("-BLAKE_224")
 	#define COMMAND_BLAKE_256           ("-BLAKE_256")
 	#define COMMAND_BLAKE_384           ("-BLAKE_384")
@@ -65,7 +65,7 @@ size_t BLAKE_HashFunctionID = DEFAULT_HASH_FUNCTION_ID;
 #define U8TO64_BIG(p)                                                    \
 	(((uint64_t)U8TO32_BIG(p) << 32U) | (uint64_t)U8TO32_BIG((p) + 4))
 
-#define U64TO8_BIG(p, v)		                                         \
+#define U64TO8_BIG(p, v)                                                 \
 	U32TO8_BIG((p), (uint32_t)((v) >> 32U));                             \
 	U32TO8_BIG((p) + 4, (uint32_t)((v)));
 

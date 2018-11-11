@@ -790,7 +790,7 @@ uint16_t CRC16_Init(
 //CRC-16 calculate process
 uint16_t CRC16_Calculate(
 	uint16_t CRC, 
-	uint8_t * const ParameterA,  
+	uint8_t * const ParameterA, 
 	uint8_t * const ParameterB, 
 	const size_t TableType, 
 	uint8_t *Buffer, 
@@ -1896,7 +1896,7 @@ uint64_t CRC64_Final(
 bool ReadCommand_CRC(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command
 #endif
 )
@@ -2302,7 +2302,7 @@ bool CRC_Hash(
 
 //Binary to hex
 	memset(StringBuffer.get(), 0, FILE_BUFFER_SIZE);
-	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, reinterpret_cast<uint8_t *>(Result), DigestSize) == nullptr)
+	if (sodium_bin2hex(StringBuffer.get(), FILE_BUFFER_SIZE, reinterpret_cast<const uint8_t *>(Result), DigestSize) == nullptr)
 	{
 		fwprintf_s(stderr, L"[Error] Convert binary to hex error.\n");
 		return false;

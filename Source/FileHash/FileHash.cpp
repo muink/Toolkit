@@ -24,7 +24,7 @@
 int wmain(
 	int argc, 
 	wchar_t *argv[])
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 int main(
 	int argc, 
 	char *argv[])
@@ -33,7 +33,7 @@ int main(
 //Initialization(Part 1)
 #if defined(PLATFORM_WIN)
 	std::wstring FileName, OutputFile;
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string FileName, OutputFile;
 #endif
 
@@ -52,10 +52,10 @@ int main(
 	//List all commands.
 	#if defined(PLATFORM_WIN)
 		std::vector<std::wstring> CommandList;
-	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		std::vector<std::string> CommandList;
 	#endif
-		for (size_t Index = 1U;static_cast<int>(Index) < argc;++Index)
+		for (size_t Index = 1U;static_cast<const int>(Index) < argc;++Index)
 		{
 			CommandList.push_back(argv[Index]);
 			if (CommandList.at(Index - 1U).empty())
@@ -86,13 +86,13 @@ int main(
 	ssize_t ResultValue = 0;
 #if defined(PLATFORM_WIN)
 	ResultValue = _wfopen_s(&FileHandle, FileName.c_str(), L"rb");
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	errno = 0;
 	FileHandle = fopen(FileName.c_str(), "rb");
 #endif
 	if (FileHandle == nullptr)
 	{
-	#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	#if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		ResultValue = errno;
 	#endif
 		std::wstring Message(L"[Error] Read file error");
@@ -111,13 +111,13 @@ int main(
 	{
 	#if defined(PLATFORM_WIN)
 		ResultValue = _wfopen_s(&OutputFileHandle, OutputFile.c_str(), L"a,ccs=UTF-8");
-	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		errno = 0;
 		OutputFileHandle = fopen(OutputFile.c_str(), "a");
 	#endif
 		if (OutputFileHandle == nullptr)
 		{
-		#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+		#if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 			ResultValue = errno;
 		#endif
 			std::wstring Message(L"[Error] Read file error");
@@ -131,7 +131,7 @@ int main(
 			fclose(FileHandle);
 		#if defined(PLATFORM_WIN)
 			_fcloseall();
-		#elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
+		#elif (defined(PLATFORM_FREEBSD) || (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT)))
 			fcloseall();
 		#endif
 
@@ -152,7 +152,7 @@ bool ReadCommand(
 	std::vector<std::wstring> CommandList, 
 	std::wstring &FileName, 
 	std::wstring &OutputFile
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::vector<std::string> CommandList, 
 	std::string &FileName, 
 	std::string &OutputFile
@@ -164,7 +164,7 @@ bool ReadCommand(
 	{
 	#if defined(PLATFORM_WIN)
 		std::wstring InnerCommand(CommandList.at(Index));
-	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		std::string InnerCommand(CommandList.at(Index));
 	#endif
 		CaseConvert(InnerCommand, true);
@@ -202,7 +202,7 @@ bool ReadCommand(
 				++Index;
 
 			//Path and file name check.
-			#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (CommandList.at(Index).length() >= PATH_MAX)
 				{
 					fwprintf_s(stderr, L"[Error] Commands error.\n");
@@ -408,7 +408,7 @@ bool MainHashProcess(
 		fclose(OutputFile);
 #if defined(PLATFORM_WIN)
 	_fcloseall();
-#elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
+#elif (defined(PLATFORM_FREEBSD) || (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT)))
 	fcloseall();
 #endif
 

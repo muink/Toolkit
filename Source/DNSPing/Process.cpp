@@ -66,7 +66,7 @@ bool SendRequestProcess(
 #if defined(PLATFORM_WIN)
 	if (setsockopt(Socket_Normal, SOL_SOCKET, SO_SNDTIMEO, reinterpret_cast<const char *>(&ConfigurationParameter.SocketTimeout), sizeof(ConfigurationParameter.SocketTimeout)) == SOCKET_ERROR || 
 		setsockopt(Socket_Normal, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<const char *>(&ConfigurationParameter.SocketTimeout), sizeof(ConfigurationParameter.SocketTimeout)) == SOCKET_ERROR)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	if (setsockopt(Socket_Normal, SOL_SOCKET, SO_SNDTIMEO, &ConfigurationParameter.SocketTimeout, sizeof(ConfigurationParameter.SocketTimeout)) == SOCKET_ERROR || 
 		setsockopt(Socket_Normal, SOL_SOCKET, SO_RCVTIMEO, &ConfigurationParameter.SocketTimeout, sizeof(ConfigurationParameter.SocketTimeout)) == SOCKET_ERROR)
 #endif
@@ -84,7 +84,7 @@ bool SendRequestProcess(
 		if (ConfigurationParameter.PacketHopLimits != 0 && 
 		#if defined(PLATFORM_WIN)
 			setsockopt(Socket_Normal, IPPROTO_IPV6, IPV6_UNICAST_HOPS, reinterpret_cast<const char *>(&ConfigurationParameter.PacketHopLimits), sizeof(ConfigurationParameter.PacketHopLimits)) == SOCKET_ERROR)
-		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+		#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 			setsockopt(Socket_Normal, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &ConfigurationParameter.PacketHopLimits, sizeof(ConfigurationParameter.PacketHopLimits)) == SOCKET_ERROR)
 		#endif
 		{
@@ -99,7 +99,7 @@ bool SendRequestProcess(
 		if (ConfigurationParameter.PacketHopLimits != 0 && 
 		#if defined(PLATFORM_WIN)
 			setsockopt(Socket_Normal, IPPROTO_IP, IP_TTL, reinterpret_cast<const char *>(&ConfigurationParameter.PacketHopLimits), sizeof(ConfigurationParameter.PacketHopLimits)) == SOCKET_ERROR)
-		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+		#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 			setsockopt(Socket_Normal, IPPROTO_IP, IP_TTL, &ConfigurationParameter.PacketHopLimits, sizeof(ConfigurationParameter.PacketHopLimits)) == SOCKET_ERROR)
 		#endif
 		{
@@ -111,10 +111,13 @@ bool SendRequestProcess(
 		}
 
 //Set Do Not Fragment flag.
-	#if (defined(PLATFORM_WIN) || defined(PLATFORM_LINUX))
+	#if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_WIN))
 	#if defined(PLATFORM_WIN)
 		BOOL DoNotFragment = TRUE;
 		if (ConfigurationParameter.IsDoNotFragment && setsockopt(Socket_Normal, IPPROTO_IP, IP_DONTFRAGMENT, reinterpret_cast<const char *>(&DoNotFragment), sizeof(DoNotFragment)) == SOCKET_ERROR)
+	#elif defined(PLATFORM_FREEBSD)
+		int DoNotFragment = 1;
+		if (ConfigurationParameter.IsDoNotFragment && setsockopt(Socket_Normal, IPPROTO_IP, IP_DONTFRAG, &DoNotFragment, sizeof(DoNotFragment)) == SOCKET_ERROR)
 	#elif defined(PLATFORM_LINUX)
 		int DoNotFragment = IP_PMTUDISC_DO;
 		if (ConfigurationParameter.IsDoNotFragment && setsockopt(Socket_Normal, IPPROTO_IP, IP_MTU_DISCOVER, &DoNotFragment, sizeof(DoNotFragment)) == SOCKET_ERROR)
@@ -137,7 +140,7 @@ bool SendRequestProcess(
 #if defined(PLATFORM_WIN)
 	LARGE_INTEGER CPU_Frequency, BeforeTime, AfterTime;
 	memset(&CPU_Frequency, 0, sizeof(CPU_Frequency));
-#elif defined(PLATFORM_LINUX)
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX))
 	timespec BeforeTime, AfterTime;
 #elif defined(PLATFORM_MACOS)
 	uint64_t BeforeTime = 0, AfterTime = 0;
@@ -167,11 +170,11 @@ bool SendRequestProcess(
 		{
 			DNS_Header = reinterpret_cast<dns_hdr *>(SendBuffer.get() + DataLength);
 		#if defined(PLATFORM_WIN)
-			DNS_Header->ID = hton16(static_cast<uint16_t>(GetCurrentProcessId()));
+			DNS_Header->ID = hton16(static_cast<const uint16_t>(GetCurrentProcessId()));
 		#elif defined(PLATFORM_LINUX)
-			DNS_Header->ID = hton16(static_cast<uint16_t>(pthread_self()));
-		#elif defined(PLATFORM_MACOS)
-			DNS_Header->ID = hton16(*reinterpret_cast<uint16_t *>(pthread_self()));
+			DNS_Header->ID = hton16(static_cast<const uint16_t>(pthread_self()));
+		#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_MACOS))
+			DNS_Header->ID = hton16(*reinterpret_cast<const uint16_t *>(pthread_self()));
 		#endif
 		}
 		DataLength += sizeof(dns_hdr);
@@ -198,7 +201,7 @@ bool SendRequestProcess(
 //Mark start time.
 #if defined(PLATFORM_WIN)
 	if (!MarkProcessTime(false, CPU_Frequency, BeforeTime, AfterTime))
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	if (!MarkProcessTime(false, BeforeTime, AfterTime))
 #endif
 	{
@@ -212,7 +215,7 @@ bool SendRequestProcess(
 	DataLength = 0;
 	for (;;)
 	{
-		ssize_t SendLength = send(Socket_Normal, reinterpret_cast<const char *>(SendBuffer.get() + DataLength), static_cast<int>(TotalSendSize - DataLength), 0);
+		ssize_t SendLength = send(Socket_Normal, reinterpret_cast<const char *>(SendBuffer.get() + DataLength), static_cast<const int>(TotalSendSize - DataLength), 0);
 		if (SendLength == SOCKET_ERROR || SendLength == 0) //SOCKET_ERROR or connection closed
 		{
 			PrintErrorToScreen(L"[Error] Send packet error", WSAGetLastError());
@@ -240,9 +243,9 @@ bool SendRequestProcess(
 
 //Receive response and mark end time.
 #if defined(PLATFORM_WIN)
-	DataLength = recv(Socket_Normal, reinterpret_cast<char *>(RecvBuffer.get()), static_cast<int>(ConfigurationParameter.BufferSize), 0);
+	DataLength = recv(Socket_Normal, reinterpret_cast<char *>(RecvBuffer.get()), static_cast<const int>(ConfigurationParameter.BufferSize), 0);
 	if (!MarkProcessTime(true, CPU_Frequency, BeforeTime, AfterTime))
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	DataLength = recv(Socket_Normal, RecvBuffer.get(), ConfigurationParameter.BufferSize, 0);
 	if (!MarkProcessTime(true, BeforeTime, AfterTime))
 #endif
@@ -255,7 +258,7 @@ bool SendRequestProcess(
 //Get waiting time.
 #if defined(PLATFORM_WIN)
 	auto ResultValue = ResultTimeCalculator(CPU_Frequency, BeforeTime, AfterTime);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	auto ResultValue = ResultTimeCalculator(BeforeTime, AfterTime);
 #endif
 	if (ResultValue == 0)
@@ -269,12 +272,12 @@ bool SendRequestProcess(
 
 //Print result to screen.
 	auto IsContinue = true;
-	if (DataLength >= static_cast<ssize_t>(DNS_PACKET_MINSIZE))
+	if (DataLength >= static_cast<const ssize_t>(DNS_PACKET_MINSIZE))
 	{
 	//Print send result.
 	#if defined(PLATFORM_WIN)
 		if (!PrintSendResult(Socket_Normal, DNS_Header, RecvBuffer, DataLength, ResultValue, IsContinue, CPU_Frequency, BeforeTime, AfterTime))
-	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		if (!PrintSendResult(Socket_Normal, DNS_Header, RecvBuffer, DataLength, ResultValue, IsContinue, BeforeTime, AfterTime))
 	#endif
 			return false;
@@ -287,12 +290,12 @@ bool SendRequestProcess(
 		std::wstring Message(L"Receive error: %d(%d), waiting ");
 	#if defined(PLATFORM_WIN)
 		Message.append(L"%lf ms.\n");
-	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		Message.append(L"%Lf ms.\n");
 	#endif
-		fwprintf_s(stderr, Message.c_str(), static_cast<int>(DataLength), WSAGetLastError(), ResultValue);
+		fwprintf_s(stderr, Message.c_str(), static_cast<const int>(DataLength), WSAGetLastError(), ResultValue);
 		if (ConfigurationParameter.OutputFile != nullptr)
-			fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), static_cast<int>(DataLength), WSAGetLastError(), ResultValue);
+			fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), static_cast<const int>(DataLength), WSAGetLastError(), ResultValue);
 	}
 
 //Transmission interval
@@ -300,14 +303,14 @@ bool SendRequestProcess(
 	{
 		if (ConfigurationParameter.TransmissionInterval != 0 && ConfigurationParameter.TransmissionInterval > ResultValue)
 		#if defined(PLATFORM_WIN)
-			Sleep(static_cast<DWORD>(ConfigurationParameter.TransmissionInterval - ResultValue));
-		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			Sleep(static_cast<const DWORD>(ConfigurationParameter.TransmissionInterval - ResultValue));
+		#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 			usleep(ConfigurationParameter.TransmissionInterval - ResultValue);
 		#endif
 		else if (ResultValue <= STANDARD_TIMEOUT)
 		#if defined(PLATFORM_WIN)
 			Sleep(STANDARD_TIMEOUT);
-		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+		#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 			usleep(STANDARD_TIMEOUT);
 		#endif
 	}
@@ -329,7 +332,7 @@ bool PrintSendResult(
 	LARGE_INTEGER &CPU_Frequency, 
 	LARGE_INTEGER &BeforeTime, 
 	LARGE_INTEGER &AfterTime
-#elif defined(PLATFORM_LINUX)
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX))
 	timespec &BeforeTime, 
 	timespec &AfterTime
 #elif defined(PLATFORM_MACOS)
@@ -346,12 +349,12 @@ bool PrintSendResult(
 		std::wstring Message(L"Receive from %ls:%u -> %d bytes but validate error, waiting ");
 	#if defined(PLATFORM_WIN)
 		Message.append(L"%lf ms.\n");
-	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		Message.append(L"%Lf ms.\n");
 	#endif
-		fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), ResultValue);
+		fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<const int>(DataLength), ResultValue);
 		if (ConfigurationParameter.OutputFile != nullptr)
-			fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), ResultValue);
+			fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<const int>(DataLength), ResultValue);
 
 	//Try to waiting correct packet.
 		for (;;)
@@ -360,7 +363,7 @@ bool PrintSendResult(
 		#if defined(PLATFORM_WIN)
 			if (ResultValue >= ConfigurationParameter.SocketTimeout)
 				break;
-		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+		#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 			if (ResultValue >= ConfigurationParameter.SocketTimeout.tv_usec / MICROSECOND_TO_MILLISECOND + ConfigurationParameter.SocketTimeout.tv_sec * SECOND_TO_MILLISECOND)
 				break;
 		#endif
@@ -368,9 +371,9 @@ bool PrintSendResult(
 		//Receive response and mark end time.
 			memset(RecvBuffer.get(), 0, ConfigurationParameter.BufferSize);
 		#if defined(PLATFORM_WIN)
-			DataLength = recv(Socket_Normal, reinterpret_cast<char *>(RecvBuffer.get()), static_cast<int>(ConfigurationParameter.BufferSize), 0);
+			DataLength = recv(Socket_Normal, reinterpret_cast<char *>(RecvBuffer.get()), static_cast<const int>(ConfigurationParameter.BufferSize), 0);
 			if (!MarkProcessTime(true, CPU_Frequency, BeforeTime, AfterTime))
-		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+		#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 			DataLength = recv(Socket_Normal, RecvBuffer.get(), ConfigurationParameter.BufferSize, 0);
 			if (!MarkProcessTime(true, BeforeTime, AfterTime))
 		#endif
@@ -383,7 +386,7 @@ bool PrintSendResult(
 		//Get waiting time.
 		#if defined(PLATFORM_WIN)
 			ResultValue = ResultTimeCalculator(CPU_Frequency, BeforeTime, AfterTime);
-		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+		#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 			ResultValue = ResultTimeCalculator(BeforeTime, AfterTime);
 		#endif
 			if (ResultValue == 0)
@@ -405,12 +408,12 @@ bool PrintSendResult(
 				Message = (L"Receive from %ls:%u -> %d bytes but validate error, waiting ");
 			#if defined(PLATFORM_WIN)
 				Message.append(L"%lf ms.\n");
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				Message.append(L"%Lf ms.\n");
 			#endif
-				fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), ResultValue);
+				fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<const int>(DataLength), ResultValue);
 				if (ConfigurationParameter.OutputFile != nullptr)
-					fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), ResultValue);
+					fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<const int>(DataLength), ResultValue);
 			}
 			else {
 				break;
@@ -423,12 +426,12 @@ bool PrintSendResult(
 			Message = (L"Receive error: %d(%d), waiting correct answers timeout(");
 		#if defined(PLATFORM_WIN)
 			Message.append(L"%lf ms).\n");
-		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+		#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 			Message.append(L"%Lf ms).\n");
 		#endif
-			fwprintf_s(stderr, Message.c_str(), static_cast<int>(DataLength), WSAGetLastError(), ResultValue);
+			fwprintf_s(stderr, Message.c_str(), static_cast<const int>(DataLength), WSAGetLastError(), ResultValue);
 			if (ConfigurationParameter.OutputFile != nullptr)
-				fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), static_cast<int>(DataLength), WSAGetLastError(), ResultValue);
+				fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), static_cast<const int>(DataLength), WSAGetLastError(), ResultValue);
 
 			shutdown(Socket_Normal, SD_BOTH);
 			closesocket(Socket_Normal);
@@ -438,24 +441,24 @@ bool PrintSendResult(
 			Message = (L"Receive from %ls:%u -> %d bytes, waiting ");
 		#if defined(PLATFORM_WIN)
 			Message.append(L"%lf ms.\n");
-		#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+		#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 			Message.append(L"%Lf ms.\n");
 		#endif
-			fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), ResultValue);
+			fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<const int>(DataLength), ResultValue);
 			if (ConfigurationParameter.OutputFile != nullptr)
-				fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), ResultValue);
+				fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<const int>(DataLength), ResultValue);
 		}
 	}
 	else {
 		std::wstring Message(L"Receive from %ls:%u -> %d bytes, waiting ");
 	#if defined(PLATFORM_WIN)
 		Message.append(L"%lf ms.\n");
-	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		Message.append(L"%Lf ms.\n");
 	#endif
-		fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), ResultValue);
+		fwprintf_s(stderr, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<const int>(DataLength), ResultValue);
 		if (ConfigurationParameter.OutputFile != nullptr)
-			fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<int>(DataLength), ResultValue);
+			fwprintf_s(ConfigurationParameter.OutputFile, Message.c_str(), ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), static_cast<const int>(DataLength), ResultValue);
 	}
 
 //Print response result or data.
@@ -502,7 +505,7 @@ bool MarkProcessTime(
 	LARGE_INTEGER &CPU_Frequency, 
 	LARGE_INTEGER &BeforeTime, 
 	LARGE_INTEGER &AfterTime
-#elif defined(PLATFORM_LINUX)
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX))
 	timespec &BeforeTime, 
 	timespec &AfterTime
 #elif defined(PLATFORM_MACOS)
@@ -523,7 +526,7 @@ bool MarkProcessTime(
 			PrintErrorToScreen(L"[Error] Get current time from High Precision Event Timer/HPET error", GetLastError());
 			return false;
 		}
-	#elif defined(PLATFORM_LINUX)
+	#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX))
 		if (clock_gettime(CLOCK_MONOTONIC, &BeforeTime) != 0)
 		{
 			PrintErrorToScreen(L"[Error] Get current time error", errno);
@@ -560,7 +563,7 @@ bool MarkProcessTime(
 			PrintErrorToScreen(L"[Error] Get current time from High Precision Event Timer/HPET error", GetLastError());
 			return false;
 		}
-	#elif defined(PLATFORM_LINUX)
+	#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX))
 		if (clock_gettime(CLOCK_MONOTONIC, &AfterTime) != 0)
 		{
 			PrintErrorToScreen(L"[Error] Get current time error", errno);
@@ -598,7 +601,7 @@ long double ResultTimeCalculator(
 	const LARGE_INTEGER CPU_Frequency, 
 	const LARGE_INTEGER BeforeTime, 
 	const LARGE_INTEGER AfterTime)
-#elif defined(PLATFORM_LINUX)
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX))
 	const timespec BeforeTime, 
 	const timespec AfterTime)
 #elif defined(PLATFORM_MACOS)
@@ -608,13 +611,13 @@ long double ResultTimeCalculator(
 {
 #if defined(PLATFORM_WIN)
 	if (AfterTime.QuadPart >= BeforeTime.QuadPart)
-		return static_cast<long double>((AfterTime.QuadPart - BeforeTime.QuadPart) * static_cast<LONGLONG>(MICROSECOND_TO_MILLISECOND)) / static_cast<long double>(CPU_Frequency.QuadPart);
-#elif defined(PLATFORM_LINUX)
+		return static_cast<const long double>((AfterTime.QuadPart - BeforeTime.QuadPart) * static_cast<const LONGLONG>(MICROSECOND_TO_MILLISECOND)) / static_cast<const long double>(CPU_Frequency.QuadPart);
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX))
 	if (AfterTime.tv_sec >= BeforeTime.tv_sec)
-		return static_cast<long double>((AfterTime.tv_sec - BeforeTime.tv_sec) * static_cast<time_t>(SECOND_TO_MILLISECOND)) + static_cast<long double>(AfterTime.tv_nsec - BeforeTime.tv_nsec) / static_cast<long double>(NANOSECOND_TO_MICROSECOND * MICROSECOND_TO_MILLISECOND);
+		return static_cast<const long double>((AfterTime.tv_sec - BeforeTime.tv_sec) * static_cast<const time_t>(SECOND_TO_MILLISECOND)) + static_cast<const long double>(AfterTime.tv_nsec - BeforeTime.tv_nsec) / static_cast<const long double>(NANOSECOND_TO_MICROSECOND * MICROSECOND_TO_MILLISECOND);
 #elif defined(PLATFORM_MACOS)
 	if (AfterTime >= BeforeTime)
-		return static_cast<long double>(AfterTime - BeforeTime) / static_cast<long double>(NANOSECOND_TO_MICROSECOND * MICROSECOND_TO_MILLISECOND);
+		return static_cast<const long double>(AfterTime - BeforeTime) / static_cast<const long double>(NANOSECOND_TO_MICROSECOND * MICROSECOND_TO_MILLISECOND);
 #endif
 
 	return 0;
@@ -629,31 +632,31 @@ void PrintProcess(
 	if (IsPacketStatistics)
 	{
 		fwprintf_s(stderr, L"\nPacket statistics for pinging %ls:\n", ConfigurationParameter.WideTargetString.c_str());
-		fwprintf_s(stderr, L"   Send: %u\n", static_cast<unsigned int>(ConfigurationParameter.Statistics_RealSend));
-		fwprintf_s(stderr, L"   Receive: %u\n", static_cast<unsigned int>(ConfigurationParameter.Statistics_RecvNum));
+		fwprintf_s(stderr, L"   Send: %u\n", static_cast<const unsigned int>(ConfigurationParameter.Statistics_RealSend));
+		fwprintf_s(stderr, L"   Receive: %u\n", static_cast<const unsigned int>(ConfigurationParameter.Statistics_RecvNum));
 
 	//Output to file.
 		if (ConfigurationParameter.OutputFile != nullptr)
 		{
 			fwprintf_s(ConfigurationParameter.OutputFile, L"\nPacket statistics for pinging %ls:\n", ConfigurationParameter.WideTargetString.c_str());
-			fwprintf_s(ConfigurationParameter.OutputFile, L"   Send: %u\n", static_cast<unsigned int>(ConfigurationParameter.Statistics_RealSend));
-			fwprintf_s(ConfigurationParameter.OutputFile, L"   Receive: %u\n", static_cast<unsigned int>(ConfigurationParameter.Statistics_RecvNum));
+			fwprintf_s(ConfigurationParameter.OutputFile, L"   Send: %u\n", static_cast<const unsigned int>(ConfigurationParameter.Statistics_RealSend));
+			fwprintf_s(ConfigurationParameter.OutputFile, L"   Receive: %u\n", static_cast<const unsigned int>(ConfigurationParameter.Statistics_RecvNum));
 		}
 
 		if (ConfigurationParameter.Statistics_RealSend >= ConfigurationParameter.Statistics_RecvNum)
 		{
-			fwprintf_s(stderr, L"   Lost: %u", static_cast<unsigned int>(ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum));
+			fwprintf_s(stderr, L"   Lost: %u", static_cast<const unsigned int>(ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum));
 			if (ConfigurationParameter.Statistics_RealSend > 0)
-				fwprintf_s(stderr, L" (%u%%)\n", static_cast<unsigned int>((ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum) * 100 / ConfigurationParameter.Statistics_RealSend));
+				fwprintf_s(stderr, L" (%u%%)\n", static_cast<const unsigned int>((ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum) * 100 / ConfigurationParameter.Statistics_RealSend));
 			else  //Not any packets.
 				fwprintf_s(stderr, L"\n");
 
 		//Output to file.
 			if (ConfigurationParameter.OutputFile != nullptr)
 			{
-				fwprintf_s(ConfigurationParameter.OutputFile, L"   Lost: %u", static_cast<unsigned int>(ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum));
+				fwprintf_s(ConfigurationParameter.OutputFile, L"   Lost: %u", static_cast<const unsigned int>(ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum));
 				if (ConfigurationParameter.Statistics_RealSend > 0)
-					fwprintf_s(ConfigurationParameter.OutputFile, L" (%u%%)\n", static_cast<unsigned int>((ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum) * 100 / ConfigurationParameter.Statistics_RealSend));
+					fwprintf_s(ConfigurationParameter.OutputFile, L" (%u%%)\n", static_cast<const unsigned int>((ConfigurationParameter.Statistics_RealSend - ConfigurationParameter.Statistics_RecvNum) * 100 / ConfigurationParameter.Statistics_RealSend));
 				else  //Not any packets.
 					fwprintf_s(ConfigurationParameter.OutputFile, L"\n");
 			}
@@ -675,19 +678,19 @@ void PrintProcess(
 		Message.append(L"   Minimum time: ");
 	#if defined(PLATFORM_WIN)
 		Message.append(L"%lf ms.\n");
-	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		Message.append(L"%Lf ms.\n");
 	#endif
 		Message.append(L"   Maximum time: ");
 	#if defined(PLATFORM_WIN)
 		Message.append(L"%lf ms.\n");
-	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		Message.append(L"%Lf ms.\n");
 	#endif
 		Message.append(L"   Average time: ");
 	#if defined(PLATFORM_WIN)
 		Message.append(L"%lf ms.\n");
-	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		Message.append(L"%Lf ms.\n");
 	#endif
 		fwprintf_s(
@@ -696,7 +699,7 @@ void PrintProcess(
 			ConfigurationParameter.WideTargetString.c_str(), 
 			ConfigurationParameter.Statistics_MinTime, 
 			ConfigurationParameter.Statistics_MaxTime, 
-			ConfigurationParameter.Statistics_TotalTime / static_cast<long double>(ConfigurationParameter.Statistics_RecvNum));
+			ConfigurationParameter.Statistics_TotalTime / static_cast<const long double>(ConfigurationParameter.Statistics_RecvNum));
 		if (ConfigurationParameter.OutputFile != nullptr)
 			fwprintf_s(
 				ConfigurationParameter.OutputFile, 
@@ -704,10 +707,10 @@ void PrintProcess(
 				ConfigurationParameter.WideTargetString.c_str(), 
 				ConfigurationParameter.Statistics_MinTime, 
 				ConfigurationParameter.Statistics_MaxTime, 
-				ConfigurationParameter.Statistics_TotalTime / static_cast<long double>(ConfigurationParameter.Statistics_RecvNum));
+				ConfigurationParameter.Statistics_TotalTime / static_cast<const long double>(ConfigurationParameter.Statistics_RecvNum));
 	}
 
-#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	fwprintf_s(stderr, L"\n");
 	if (ConfigurationParameter.OutputFile != nullptr)
 		fwprintf_s(ConfigurationParameter.OutputFile, L"\n");
@@ -724,7 +727,7 @@ bool OutputResultToFile(
 
 #if defined(PLATFORM_WIN)
 	SignedResult = _wfopen_s(&ConfigurationParameter.OutputFile, ConfigurationParameter.WideOutputFileName.c_str(), L"a,ccs=UTF-8");
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	errno = 0;
 	ConfigurationParameter.OutputFile = fopen(ConfigurationParameter.OutputFileName.c_str(), "a");
 #endif
@@ -776,7 +779,7 @@ void PrintHeaderToScreen(
 		{
 			auto FQDN_String = std::make_unique<uint8_t[]>(NI_MAXHOST + MEMORY_RESERVED_BYTES);
 			memset(FQDN_String.get(), 0, NI_MAXHOST + MEMORY_RESERVED_BYTES);
-			if (getnameinfo(reinterpret_cast<sockaddr *>(&ConfigurationParameter.SockAddr_Normal), sizeof(sockaddr_in), reinterpret_cast<char *>(FQDN_String.get()), NI_MAXHOST, nullptr, 0, NI_NUMERICSERV) != 0)
+			if (getnameinfo(reinterpret_cast<const sockaddr *>(&ConfigurationParameter.SockAddr_Normal), sizeof(sockaddr_in), reinterpret_cast<char *>(FQDN_String.get()), NI_MAXHOST, nullptr, 0, NI_NUMERICSERV) != 0)
 			{
 				PrintErrorToScreen(L"[Error] Resolve addresses to host names error", WSAGetLastError());
 				fwprintf_s(stderr, L"DNSPing %ls:%u with %ls:\n", ConfigurationParameter.WideTargetString.c_str(), ntoh16(ConfigurationParameter.ServiceType), WideTestDomainString.c_str());
@@ -847,7 +850,7 @@ void ErrorCodeToMessage(
 	if (FormatMessageW(
 			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_MAX_WIDTH_MASK, 
 			nullptr, 
-			static_cast<DWORD>(ErrorCode), 
+			static_cast<const DWORD>(ErrorCode), 
 			MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), 
 			reinterpret_cast<const LPWSTR>(&InnerMessage), 
 			0, 
@@ -875,9 +878,9 @@ void ErrorCodeToMessage(
 		LocalFree(InnerMessage);
 		InnerMessage = nullptr;
 	}
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::wstring InnerMessage;
-	const auto ErrorMessage = strerror(static_cast<int>(ErrorCode));
+	const auto ErrorMessage = strerror(static_cast<const int>(ErrorCode));
 	if (ErrorMessage == nullptr || !MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(ErrorMessage), strnlen(ErrorMessage, FILE_BUFFER_SIZE), InnerMessage))
 	{
 		Message.append(L", error code is %d");
@@ -903,7 +906,7 @@ void PrintErrorToScreen(
 	if (ErrorCode == 0)
 		fwprintf_s(stderr, InnerMessage.c_str());
 	else 
-		fwprintf_s(stderr, InnerMessage.c_str(), static_cast<int>(ErrorCode));
+		fwprintf_s(stderr, InnerMessage.c_str(), static_cast<const int>(ErrorCode));
 
 	return;
 }
@@ -916,14 +919,16 @@ void PrintDescription(
 	fwprintf_s(stderr, L"\n--------------------------------------------------\n");
 	fwprintf_s(stderr, L"DNSPing ");
 	fwprintf_s(stderr, FULL_VERSION);
-#if defined(PLATFORM_WIN)
-	fwprintf_s(stderr, L"(Windows)\n");
+#if defined(PLATFORM_FREEBSD)
+	fwprintf(stderr, L"(FreeBSD)\n");
 #elif defined(PLATFORM_OPENWRT)
 	fwprintf(stderr, L"(OpenWrt)\n");
 #elif defined(PLATFORM_LINUX)
 	fwprintf(stderr, L"(Linux)\n");
 #elif defined(PLATFORM_MACOS)
 	fwprintf(stderr, L"(macOS)\n");
+#elif defined(PLATFORM_WIN)
+	fwprintf_s(stderr, L"(Windows)\n");
 #endif
 	fwprintf_s(stderr, L"DNSPing, a useful and powerful toolkit\n");
 	fwprintf_s(stderr, COPYRIGHT_MESSAGE);
@@ -942,7 +947,7 @@ void PrintDescription(
 	fwprintf_s(stderr, L"   -a                Resolve addresses to host names.\n");
 	fwprintf_s(stderr, L"   -n count          Set number of echo requests to send.\n");
 	fwprintf_s(stderr, L"                     Count must between 1 - 0xFFFF/65535.\n");
-#if (defined(PLATFORM_WIN) || defined(PLATFORM_LINUX))
+#if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_WIN))
 	fwprintf_s(stderr, L"   -f                Set the \"Do Not Fragment\" flag in outgoing packets(IPv4).\n");
 	fwprintf_s(stderr, L"                     No available in macOS.\n");
 #endif
@@ -1040,7 +1045,7 @@ void PrintDescription(
 	fwprintf_s(stderr, L"   domain            A domain name which will make request to send to DNS server.\n");
 	fwprintf_s(stderr, L"   target            Target, support IPv4/IPv6 address and domain.\n");
 
-#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	fwprintf_s(stderr, L"\n");
 #endif
 	return;

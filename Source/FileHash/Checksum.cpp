@@ -46,7 +46,7 @@ uint16_t Checksum_Final(
 	Checksum = (Checksum >> (sizeof(uint16_t) * BYTES_TO_BITS)) + (Checksum & UINT16_MAX);
 	Checksum += (Checksum >> (sizeof(uint16_t) * BYTES_TO_BITS));
 
-	return static_cast<uint16_t>(~Checksum);
+	return static_cast<const uint16_t>(~Checksum);
 }
 
 //////////////////////////////////////////////////

@@ -1,4 +1,4 @@
-﻿### Build in Linux/macOS
+﻿### Build in FreeBSD/Linux/macOS
 * Run terminal and enter to Toolkit/Auxiliary/Scripts directory.
 * Run "chmod 755 CMake_Build.sh" to give running privilege to script.
 * Run "./CMake_Build.sh" to build binary.

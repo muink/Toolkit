@@ -43,13 +43,13 @@ ConfigurationTable::ConfigurationTable(
 	IsValidated = true;
 	IsShowResponse = false;
 	IsShowHexResponse = false;
-#if (defined(PLATFORM_WIN) || defined(PLATFORM_LINUX))
+#if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_WIN) || defined(PLATFORM_LINUX))
 	IsDoNotFragment = false;
 #endif
 #if defined(PLATFORM_WIN)
 	PacketHopLimits = 0;
 	SocketTimeout = DEFAULT_TIMEOUT;
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	PacketHopLimits = 0;
 	SocketTimeout.tv_sec = DEFAULT_TIMEOUT;
 #endif
@@ -90,7 +90,7 @@ ConfigurationTable::~ConfigurationTable(
 
 //Close all file handles.
 	_fcloseall();
-#elif (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT))
+#elif (defined(PLATFORM_FREEBSD) || (defined(PLATFORM_LINUX) && !defined(PLATFORM_OPENWRT)))
 	fcloseall();
 #endif
 

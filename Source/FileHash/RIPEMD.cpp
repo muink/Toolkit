@@ -903,7 +903,7 @@ void MD_Finish(
 bool ReadCommand_RIPEMD(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command
 #endif
 )
@@ -1041,10 +1041,10 @@ bool RIPEMD_Hash(
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	for (Index_A = 0;Index_A < DigestSize / (sizeof(uint8_t) * BYTES_TO_BITS);Index_A += 4U)
 	{
-		Buffer.get()[Index_A] = static_cast<uint8_t>(MDbuf.get()[Index_A >> 2U]);
-		Buffer.get()[Index_A + 1U] = static_cast<uint8_t>(MDbuf.get()[Index_A >> 2U] >> 8U);
-		Buffer.get()[Index_A + 2U] = static_cast<uint8_t>(MDbuf.get()[Index_A >> 2U] >> 16U);
-		Buffer.get()[Index_A + 3U] = static_cast<uint8_t>(MDbuf.get()[Index_A >> 2U] >> 24U);
+		Buffer.get()[Index_A] = static_cast<const uint8_t>(MDbuf.get()[Index_A >> 2U]);
+		Buffer.get()[Index_A + 1U] = static_cast<const uint8_t>(MDbuf.get()[Index_A >> 2U] >> 8U);
+		Buffer.get()[Index_A + 2U] = static_cast<const uint8_t>(MDbuf.get()[Index_A >> 2U] >> 16U);
+		Buffer.get()[Index_A + 3U] = static_cast<const uint8_t>(MDbuf.get()[Index_A >> 2U] >> 24U);
 	}
 
 //Binary to hex

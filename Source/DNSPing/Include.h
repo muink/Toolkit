@@ -29,7 +29,7 @@
 #if defined(PLATFORM_WIN)
 BOOL WINAPI SignalHandler(
 	const DWORD SignalType);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 //Terminal.h
 void SignalHandler(
 	const int SignalType);
@@ -114,7 +114,7 @@ void PrintDateTime(
 bool ReadCommand(
 	int argc, 
 	wchar_t *argv[]);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 bool ReadCommand(
 	int argc, 
 	char *argv[]);

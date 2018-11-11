@@ -24,7 +24,7 @@
 int wmain(
 	int argc, 
 	wchar_t *argv[])
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 int main(
 	int argc, 
 	char *argv[])
@@ -85,7 +85,7 @@ bool ConfigurationInitialization(
 	else {
 		ConfigurationParameter.IsInitialized_WinSock = true;
 	}
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 //Handle the system signal.
 	errno = 0;
 	if (signal(SIGHUP, SignalHandler) == SIG_ERR || 
@@ -116,7 +116,7 @@ bool Parameter_CheckSetting(
 //Socket address check
 	if (ConfigurationParameter.SockAddr_Normal.ss_family == AF_INET6) //IPv6
 	{
-		if (CheckEmptyBuffer(&reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr, sizeof(reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr)))
+		if (CheckEmptyBuffer(&reinterpret_cast<const sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr, sizeof(reinterpret_cast<const sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr)))
 		{
 			PrintErrorToScreen(L"\n[Error] Target is empty", 0);
 			return false;
@@ -135,7 +135,7 @@ bool Parameter_CheckSetting(
 	}
 	else if (ConfigurationParameter.SockAddr_Normal.ss_family == AF_INET) //IPv4
 	{
-		if (reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_addr.s_addr == 0)
+		if (reinterpret_cast<const sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_addr.s_addr == 0)
 		{
 			PrintErrorToScreen(L"\n[Error] Target is empty", 0);
 			return false;
@@ -170,7 +170,7 @@ bool Parameter_CheckSetting(
 	}
 
 	ConfigurationParameter.Statistics_MinTime = ConfigurationParameter.SocketTimeout;
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	ConfigurationParameter.Statistics_MinTime = ConfigurationParameter.SocketTimeout.tv_sec * SECOND_TO_MILLISECOND + ConfigurationParameter.SocketTimeout.tv_usec / MICROSECOND_TO_MILLISECOND;
 #endif
 
@@ -218,7 +218,7 @@ bool Parameter_CheckSetting(
 		if (ConfigurationParameter.EDNSPayloadSize == 0)
 			ConfigurationParameter.Parameter_EDNS.UDP_PayloadSize = hton16(EDNS_PACKET_MINSIZE);
 		else 
-			ConfigurationParameter.Parameter_EDNS.UDP_PayloadSize = hton16(static_cast<uint16_t>(ConfigurationParameter.EDNSPayloadSize));
+			ConfigurationParameter.Parameter_EDNS.UDP_PayloadSize = hton16(static_cast<const uint16_t>(ConfigurationParameter.EDNSPayloadSize));
 		if (ConfigurationParameter.IsDNSSEC)
 		{
 			ConfigurationParameter.Parameter_Header.Flags = hton16(ntoh16(ConfigurationParameter.Parameter_Header.Flags) | DNS_FLAG_GET_BIT_AD); //Set Authentic Data bit.

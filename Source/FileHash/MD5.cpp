@@ -248,7 +248,7 @@ bool MD5_Hash(
 			return false;
 		}
 		else {
-			MD5_Update(&HashInstance, Buffer.get(), static_cast<unsigned int>(ReadLength));
+			MD5_Update(&HashInstance, Buffer.get(), static_cast<const unsigned int>(ReadLength));
 		}
 	}
 

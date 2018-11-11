@@ -712,7 +712,7 @@ static void SHA2_512_Final(
 bool ReadCommand_SHA2(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command
 #endif
 )
@@ -829,10 +829,10 @@ bool SHA2_Hash(
 		}
 		else {
 			if (SHA2_HashFunctionID == HASH_ID_SHA2_224 || SHA2_HashFunctionID == HASH_ID_SHA2_256)
-				SHA2_256_Update(&HashInstance256, Buffer.get(), static_cast<int>(ReadLength));
+				SHA2_256_Update(&HashInstance256, Buffer.get(), static_cast<const int>(ReadLength));
 			else if (SHA2_HashFunctionID == HASH_ID_SHA2_384 || SHA2_HashFunctionID == HASH_ID_SHA2_512 || 
 				SHA2_HashFunctionID == HASH_ID_SHA2_512_224 || SHA2_HashFunctionID == HASH_ID_SHA2_512_256)
-					SHA2_512_Update(&HashInstance512, Buffer.get(), static_cast<int>(ReadLength));
+					SHA2_512_Update(&HashInstance512, Buffer.get(), static_cast<const int>(ReadLength));
 			else 
 				return false;
 		}

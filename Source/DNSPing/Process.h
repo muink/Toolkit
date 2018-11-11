@@ -37,7 +37,7 @@ bool PrintSendResult(
 	LARGE_INTEGER &CPU_Frequency, 
 	LARGE_INTEGER &BeforeTime, 
 	LARGE_INTEGER &AfterTime);
-#elif defined(PLATFORM_LINUX)
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX))
 	timespec &BeforeTime, 
 	timespec &AfterTime);
 #elif defined(PLATFORM_MACOS)
@@ -50,7 +50,7 @@ bool MarkProcessTime(
 	LARGE_INTEGER &CPU_Frequency, 
 	LARGE_INTEGER &BeforeTime, 
 	LARGE_INTEGER &AfterTime);
-#elif defined(PLATFORM_LINUX)
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX))
 	timespec &BeforeTime, 
 	timespec &AfterTime);
 #elif defined(PLATFORM_MACOS)
@@ -62,7 +62,7 @@ long double ResultTimeCalculator(
 	const LARGE_INTEGER CPU_Frequency, 
 	const LARGE_INTEGER BeforeTime, 
 	const LARGE_INTEGER AfterTime);
-#elif defined(PLATFORM_LINUX)
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX))
 	const timespec BeforeTime, 
 	const timespec AfterTime);
 #elif defined(PLATFORM_MACOS)

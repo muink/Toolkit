@@ -23,7 +23,7 @@
 #include "Include.h"
 #if defined(PLATFORM_WIN)
 	#include "SHA3\\KeccakHash.h"
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	#include "SHA3/KeccakHash.h"
 #endif
 
@@ -52,7 +52,7 @@
 	#define COMMAND_SHA3_SHAKE_SIZE    L"-SHA3_SHAKE="
 	#define COMMAND_SHA3_SHAKE_128     L"-SHA3_SHAKE_128="
 	#define COMMAND_SHA3_SHAKE_256     L"-SHA3_SHAKE_256="
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	#define COMMAND_SHA3_224           ("-SHA3_224")
 	#define COMMAND_SHA3_256           ("-SHA3_256")
 	#define COMMAND_SHA3_384           ("-SHA3_384")

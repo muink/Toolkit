@@ -32,7 +32,7 @@ bool ReadCommand(
 	std::vector<std::wstring> CommandList, 
 	std::wstring &FileName, 
 	std::wstring &OutputFile);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::vector<std::string> CommandList, 
 	std::string &FileName, 
 	std::string &OutputFile);

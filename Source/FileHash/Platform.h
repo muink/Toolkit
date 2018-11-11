@@ -334,8 +334,8 @@
 
 //////////////////////////////////////////////////
 // Platform check
-//Toolkit now support Windows, Linux and macOS.
-#if !(defined(PLATFORM_WIN) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+//Toolkit now support FreeBSD, Linux, macOS, and Windows.
+#if !(defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS) || defined(PLATFORM_WIN))
 	#error "This platform is unsupported."
 #endif
 
@@ -346,6 +346,7 @@
 //C Standard Library and C++ Standard Template Library/STL headers
 #include <cerrno>                  //Error report support
 #include <climits>                 //Limits support
+#include <cstdint>                 //Integral type support
 #include <cstdio>                  //File Input and Output support
 #include <cstdlib>                 //Several general purpose functions support
 #include <cstring>                 //C-Style String support
@@ -353,11 +354,13 @@
 #include <memory>                  //Manage dynamic memory support
 #include <string>                  //STL String support
 #include <vector>                  //Vector support
-#include <cstdint>
 
 #if defined(PLATFORM_WIN)
 //Windows API headers
+	#include <winsock2.h>                //WinSock 2.0+ support
 	#include <windows.h>                 //Windows master header file
+
+//Library linking
 	#pragma comment(lib, "ws2_32.lib")   //Windows WinSock 2.0+ support
 
 //Endian definitions
@@ -370,6 +373,9 @@
 
 //Windows compatible definitions
 	typedef SSIZE_T                    ssize_t;
+#elif defined(PLATFORM_FREEBSD)
+	#include <arpa/inet.h>                                           //Internet operations
+	#include <sys/endian.h>                                          //Endian
 #elif defined(PLATFORM_LINUX)
 	#include <arpa/inet.h>                                           //Internet operations
 	#include <endian.h>                                              //Endian
@@ -380,7 +386,7 @@
 	#define __BYTE_ORDER               __LITTLE_ENDIAN           //x86 and x86-64/x64 is Little Endian.
 #endif
 
-#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 //Linux and macOS compatible
 	#define RETURN_ERROR                                      (-1)
 	#define fwprintf_s                                        fwprintf

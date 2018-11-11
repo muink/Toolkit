@@ -57,7 +57,7 @@ void PrintDescription(
 bool ReadCommand_BLAKE(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command);
 #endif
 bool BLAKE_Hash(
@@ -68,7 +68,7 @@ bool BLAKE_Hash(
 bool ReadCommand_BLAKE2(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command);
 #endif
 bool BLAKE2_Hash(
@@ -84,7 +84,7 @@ bool Checksum_Hash(
 bool ReadCommand_CRC(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command);
 #endif
 bool CRC_Hash(
@@ -110,7 +110,7 @@ bool MD5_Hash(
 bool ReadCommand_RIPEMD(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command);
 #endif
 bool RIPEMD_Hash(
@@ -129,7 +129,7 @@ bool SHA2_Hash(
 bool ReadCommand_SHA2(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command);
 #endif
 
@@ -140,7 +140,7 @@ bool SHA3_Hash(
 bool ReadCommand_SHA3(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command);
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command);
 #endif
 #endif

@@ -65,9 +65,9 @@ bool MBS_To_WCS_String(
 			reinterpret_cast<LPCCH>(Buffer), 
 			MBSTOWCS_NULL_TERMINATE, 
 			TargetBuffer.get(), 
-			static_cast<int>(Length + NULL_TERMINATE_LENGTH)) == 0)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-	if (mbstowcs(TargetBuffer.get(), reinterpret_cast<const char *>(Buffer), Length + NULL_TERMINATE_LENGTH) == static_cast<size_t>(RETURN_ERROR))
+			static_cast<const int>(Length + NULL_TERMINATE_LENGTH)) == 0)
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	if (mbstowcs(TargetBuffer.get(), reinterpret_cast<const char *>(Buffer), Length + NULL_TERMINATE_LENGTH) == static_cast<const size_t>(RETURN_ERROR))
 #endif
 	{
 		return false;
@@ -91,10 +91,10 @@ void CaseConvert(
 	{
 	//Lowercase to uppercase
 		if (IsLowerToUpper)
-			StringIter = static_cast<char>(toupper(StringIter));
+			StringIter = static_cast<const char>(toupper(StringIter));
 	//Uppercase to lowercase
 		else 
-			StringIter = static_cast<char>(tolower(StringIter));
+			StringIter = static_cast<const char>(tolower(StringIter));
 	}
 
 	return;
@@ -109,10 +109,10 @@ void CaseConvert(
 	{
 	//Lowercase to uppercase
 		if (IsLowerToUpper)
-			StringIter = static_cast<wchar_t>(toupper(StringIter));
+			StringIter = static_cast<const wchar_t>(toupper(StringIter));
 	//Uppercase to lowercase
 		else 
-			StringIter = static_cast<wchar_t>(tolower(StringIter));
+			StringIter = static_cast<const wchar_t>(tolower(StringIter));
 	}
 
 	return;
@@ -125,7 +125,7 @@ uint8_t * sodium_bin2hex(
 	const uint8_t * const bin, 
 	const size_t bin_len)
 {
-	size_t       i = static_cast<size_t>(0U);
+	size_t       i = static_cast<const size_t>(0U);
 	unsigned int x = 0;
 	int          b = 0;
 	int          c = 0;
@@ -136,7 +136,7 @@ uint8_t * sodium_bin2hex(
 	{
 		c = bin[i] & 0xf;
 		b = bin[i] >> 4;
-		x = static_cast<uint8_t>(87U + c + (((c - 10U) >> 8) & ~38U)) << 8 | static_cast<uint8_t>(87U + b + (((b - 10U) >> 8) & ~38U));
+		x = static_cast<const uint8_t>(87U + c + (((c - 10U) >> 8) & ~38U)) << 8 | static_cast<const uint8_t>(87U + b + (((b - 10U) >> 8) & ~38U));
 		hex[i * 2U] = static_cast<char>(x);
 		x >>= 8;
 		hex[i * 2U + 1U] = static_cast<char>(x);
@@ -165,7 +165,7 @@ void ErrorCodeToMessage(
 	if (FormatMessageW(
 			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_MAX_WIDTH_MASK, 
 			nullptr, 
-			static_cast<DWORD>(ErrorCode), 
+			static_cast<const DWORD>(ErrorCode), 
 			MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), 
 			reinterpret_cast<const LPWSTR>(&InnerMessage), 
 			0, 
@@ -193,9 +193,9 @@ void ErrorCodeToMessage(
 		LocalFree(InnerMessage);
 		InnerMessage = nullptr;
 	}
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::wstring InnerMessage;
-	const auto ErrorMessage = strerror(static_cast<int>(ErrorCode));
+	const auto ErrorMessage = strerror(static_cast<const int>(ErrorCode));
 	if (ErrorMessage == nullptr || !MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(ErrorMessage), strnlen(ErrorMessage, FILE_BUFFER_SIZE), InnerMessage))
 	{
 		Message.append(L", error code is %d");
@@ -236,14 +236,16 @@ void PrintDescription(
 	fwprintf_s(stderr, L"\n--------------------------------------------------\n");
 	fwprintf_s(stderr, L"FileHash ");
 	fwprintf_s(stderr, FULL_VERSION);
-#if defined(PLATFORM_WIN)
-	fwprintf_s(stderr, L"(Windows)\n");
+#if defined(PLATFORM_FREEBSD)
+	fwprintf(stderr, L"(FreeBSD)\n");
 #elif defined(PLATFORM_OPENWRT)
 	fwprintf(stderr, L"(OpenWrt)\n");
 #elif defined(PLATFORM_LINUX)
 	fwprintf(stderr, L"(Linux)\n");
 #elif defined(PLATFORM_MACOS)
 	fwprintf(stderr, L"(macOS)\n");
+#elif defined(PLATFORM_WIN)
+	fwprintf_s(stderr, L"(Windows)\n");
 #endif
 	fwprintf_s(stderr, L"FileHash, a useful and powerful toolkit\n");
 	fwprintf_s(stderr, COPYRIGHT_MESSAGE);
@@ -360,7 +362,7 @@ void PrintDescription(
 	fwprintf_s(stderr, L"                     -SHA3_SHAKE_256=Size        SHA-3 SHAKE 256 bits\n");
 	fwprintf_s(stderr, L"                                                 Size = Digest output length\n");
 
-#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	fwprintf_s(stderr, L"\n");
 #endif
 	return;

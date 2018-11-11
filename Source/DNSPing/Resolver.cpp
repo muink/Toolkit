@@ -50,7 +50,7 @@ void PrintHexResponse(
 			}
 			if (Index + 1U < Length)
 			{
-				fwprintf_s(FileHandle, L"\n%04x  ", static_cast<unsigned int>(Index + 1U));
+				fwprintf_s(FileHandle, L"\n%04x  ", static_cast<const unsigned int>(Index + 1U));
 			}
 		}
 		else {
@@ -136,7 +136,7 @@ void PrintFormattedResponse(
 		for (Index = 0;Index < ntoh16(DNS_Header->Answer);++Index)
 		{
 		//Print Name.
-			fwprintf_s(FileHandle, L" RR(%u)\n   Name: ", static_cast<unsigned int>(Index + 1U));
+			fwprintf_s(FileHandle, L" RR(%u)\n   Name: ", static_cast<const unsigned int>(Index + 1U));
 			CurrentLength += PrintDomainName(FileHandle, Buffer, CurrentLength);
 			fwprintf_s(FileHandle, L"\n");
 
@@ -163,7 +163,7 @@ void PrintFormattedResponse(
 		for (Index = 0;Index < ntoh16(DNS_Header->Authority);++Index)
 		{
 		//Print Name.
-			fwprintf_s(FileHandle, L" RR(%u)\n   Name: ", static_cast<unsigned int>(Index + 1U));
+			fwprintf_s(FileHandle, L" RR(%u)\n   Name: ", static_cast<const unsigned int>(Index + 1U));
 			CurrentLength += PrintDomainName(FileHandle, Buffer, CurrentLength);
 			fwprintf_s(FileHandle, L"\n");
 
@@ -190,7 +190,7 @@ void PrintFormattedResponse(
 		for (Index = 0;Index < ntoh16(DNS_Header->Additional);++Index)
 		{
 		//Print Name.
-			fwprintf_s(FileHandle, L" RR(%u)\n   Name: ", static_cast<unsigned int>(Index + 1U));
+			fwprintf_s(FileHandle, L" RR(%u)\n   Name: ", static_cast<const unsigned int>(Index + 1U));
 			CurrentLength += PrintDomainName(FileHandle, Buffer, CurrentLength);
 			fwprintf_s(FileHandle, L"\n");
 

@@ -167,7 +167,7 @@ bool MD2_Hash(
 			return false;
 		}
 		else {
-			MD2_Update(&HashInstance, Buffer.get(), static_cast<uint32_t>(ReadLength));
+			MD2_Update(&HashInstance, Buffer.get(), static_cast<const uint32_t>(ReadLength));
 		}
 	}
 

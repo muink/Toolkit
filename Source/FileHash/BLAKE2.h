@@ -59,7 +59,7 @@
 	#define COMMAND_BLAKE2S_160          L"-BLAKE2S_160"
 	#define COMMAND_BLAKE2S_224          L"-BLAKE2S_224"
 	#define COMMAND_BLAKE2S_256          L"-BLAKE2S_256"
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	#define COMMAND_BLAKE2B              ("-BLAKE2B")
 	#define COMMAND_BLAKE2_128           ("-BLAKE2_128")
 	#define COMMAND_BLAKE2_224           ("-BLAKE2_224")

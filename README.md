@@ -6,8 +6,8 @@ DNSPing and FileHash, a useful and powerful toolkit
 [![GitHub release](https://img.shields.io/github/release/chengr28/Toolkit.svg)](https://github.com/chengr28/Toolkit/releases/latest)
 
 ### Usage
-* Windows/Linux/macOS: [ReadMe documents](https://github.com/chengr28/Toolkit/tree/master/Documents)
-* OpenWrt: [openwrt-Toolkit project](https://github.com/wongsyrone/openwrt-Toolkit)
+* [FreeBSD/Linux/macOS/Windows: ReadMe documents](https://github.com/chengr28/Toolkit/tree/master/Documents)
+* [OpenWrt: openwrt-Toolkit project](https://github.com/wongsyrone/openwrt-Toolkit)
 
 ### License
 GNU General Public License/GNU GPL v2

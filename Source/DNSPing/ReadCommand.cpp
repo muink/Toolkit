@@ -24,7 +24,7 @@
 bool ReadCommand(
 	int argc, 
 	wchar_t *argv[])
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 bool ReadCommand(
 	int argc, 
 	char *argv[])
@@ -36,11 +36,11 @@ bool ReadCommand(
 	size_t UnsignedResult = 0;
 
 //Read parameter
-	for (size_t Index = 1U;Index < static_cast<size_t>(argc);++Index)
+	for (size_t Index = 1U;Index < static_cast<const size_t>(argc);++Index)
 	{
 	#if defined(PLATFORM_WIN)
 		Command = argv[Index];
-	#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 		{
 			PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -68,12 +68,12 @@ bool ReadCommand(
 	//Set number of echo requests to send.
 		else if (Command == L"-n" || Command == L"--number")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -99,7 +99,7 @@ bool ReadCommand(
 			}
 		}
 	//Set the "Do Not Fragment" flag in outgoing packets.
-	#if (defined(PLATFORM_WIN) || defined(PLATFORM_LINUX))
+	#if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_WIN))
 		else if (Command == L"-f" || Command == L"--do-not-fragment")
 		{
 			ConfigurationParameter.IsDoNotFragment = true;
@@ -108,12 +108,12 @@ bool ReadCommand(
 	//Specifie a Time To Live for outgoing packets.
 		else if (Command == L"-i" || Command == L"--hop-limits")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -127,9 +127,9 @@ bool ReadCommand(
 				if (UnsignedResult > 0 && UnsignedResult <= UINT8_MAX)
 				{
 				#if defined(PLATFORM_WIN)
-					ConfigurationParameter.PacketHopLimits = static_cast<DWORD>(UnsignedResult);
-				#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-					ConfigurationParameter.PacketHopLimits = static_cast<int>(UnsignedResult);
+					ConfigurationParameter.PacketHopLimits = static_cast<const DWORD>(UnsignedResult);
+				#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+					ConfigurationParameter.PacketHopLimits = static_cast<const int>(UnsignedResult);
 				#endif
 				}
 				else {
@@ -145,12 +145,12 @@ bool ReadCommand(
 	//Set a long wait periods (in milliseconds) for a response.
 		else if (Command == L"-w" || Command == L"--waiting-time")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -164,10 +164,10 @@ bool ReadCommand(
 				if (UnsignedResult >= SOCKET_MIN_TIMEOUT && UnsignedResult < UINT16_MAX)
 				{
 				#if defined(PLATFORM_WIN)
-					ConfigurationParameter.SocketTimeout = static_cast<DWORD>(UnsignedResult);
-				#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-					ConfigurationParameter.SocketTimeout.tv_sec = static_cast<time_t>(UnsignedResult / SECOND_TO_MILLISECOND);
-					ConfigurationParameter.SocketTimeout.tv_usec = static_cast<suseconds_t>(UnsignedResult % MICROSECOND_TO_MILLISECOND * MICROSECOND_TO_MILLISECOND);
+					ConfigurationParameter.SocketTimeout = static_cast<const DWORD>(UnsignedResult);
+				#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+					ConfigurationParameter.SocketTimeout.tv_sec = static_cast<const time_t>(UnsignedResult / SECOND_TO_MILLISECOND);
+					ConfigurationParameter.SocketTimeout.tv_usec = static_cast<const suseconds_t>(UnsignedResult % MICROSECOND_TO_MILLISECOND * MICROSECOND_TO_MILLISECOND);
 				#endif
 				}
 				else {
@@ -183,12 +183,12 @@ bool ReadCommand(
 	//Specifie DNS header ID.
 		else if (Command == L"-id" || Command == L"--dns-id")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -201,7 +201,7 @@ bool ReadCommand(
 				UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 				if (UnsignedResult > 0 && UnsignedResult <= UINT16_MAX)
 				{
-					ConfigurationParameter.Parameter_Header.ID = hton16(static_cast<uint16_t>(UnsignedResult));
+					ConfigurationParameter.Parameter_Header.ID = hton16(static_cast<const uint16_t>(UnsignedResult));
 				}
 				else {
 					PrintErrorToScreen(L"\n[Error] Command (-id dns_id) error", 0);
@@ -221,12 +221,12 @@ bool ReadCommand(
 	//Specifie DNS header OPCode.
 		else if (Command == L"-opcode" || Command == L"--flags-opcode")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -239,7 +239,7 @@ bool ReadCommand(
 				UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 				if (UnsignedResult > 0 && UnsignedResult <= UINT4_MAX)
 				{
-					auto FlagsTemp = static_cast<uint16_t>(static_cast<uint16_t>(UnsignedResult) << 11U);
+					auto FlagsTemp = static_cast<const uint16_t>(static_cast<const uint16_t>(UnsignedResult) << 11U);
 					ConfigurationParameter.Parameter_Header.Flags = hton16(ntoh16(ConfigurationParameter.Parameter_Header.Flags) | FlagsTemp);
 				}
 				else {
@@ -285,12 +285,12 @@ bool ReadCommand(
 	//Specifie DNS header RCode.
 		else if (Command == L"-rcode" || Command == L"--flags-rcode")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -303,7 +303,7 @@ bool ReadCommand(
 				UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 				if (UnsignedResult > 0 && UnsignedResult <= UINT4_MAX)
 				{
-					auto FlagsTemp = static_cast<uint16_t>(UnsignedResult);
+					auto FlagsTemp = static_cast<const uint16_t>(UnsignedResult);
 					ConfigurationParameter.Parameter_Header.Flags = hton16(ntoh16(ConfigurationParameter.Parameter_Header.Flags) | FlagsTemp);
 				}
 				else {
@@ -319,12 +319,12 @@ bool ReadCommand(
 	//Specifie DNS header question count.
 		else if (Command == L"-qn" || Command == L"--dns-qn")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -337,7 +337,7 @@ bool ReadCommand(
 				UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 				if (UnsignedResult > 0 && UnsignedResult <= UINT16_MAX)
 				{
-					ConfigurationParameter.Parameter_Header.Question = hton16(static_cast<uint16_t>(UnsignedResult));
+					ConfigurationParameter.Parameter_Header.Question = hton16(static_cast<const uint16_t>(UnsignedResult));
 				}
 				else {
 					PrintErrorToScreen(L"\n[Error] Command (-qn count) error", 0);
@@ -352,12 +352,12 @@ bool ReadCommand(
 	//Specifie DNS header Answer count.
 		else if (Command == L"-ann" || Command == L"--dns-ann")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -370,7 +370,7 @@ bool ReadCommand(
 				UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 				if (UnsignedResult > 0 && UnsignedResult <= UINT16_MAX)
 				{
-					ConfigurationParameter.Parameter_Header.Answer = hton16(static_cast<uint16_t>(UnsignedResult));
+					ConfigurationParameter.Parameter_Header.Answer = hton16(static_cast<const uint16_t>(UnsignedResult));
 				}
 				else {
 					PrintErrorToScreen(L"\n[Error] Command (-ann count) error", 0);
@@ -385,12 +385,12 @@ bool ReadCommand(
 	//Specifie DNS header Authority count.
 		else if (Command == L"-aun" || Command == L"--dns-aun")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -403,7 +403,7 @@ bool ReadCommand(
 				UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 				if (UnsignedResult > 0 && UnsignedResult <= UINT16_MAX)
 				{
-					ConfigurationParameter.Parameter_Header.Authority = hton16(static_cast<uint16_t>(UnsignedResult));
+					ConfigurationParameter.Parameter_Header.Authority = hton16(static_cast<const uint16_t>(UnsignedResult));
 				}
 				else {
 					PrintErrorToScreen(L"\n[Error] Command (-aun count) error", 0);
@@ -418,12 +418,12 @@ bool ReadCommand(
 	//Specifie DNS header Additional count.
 		else if (Command == L"-adn" || Command == L"--dns-adn")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -436,7 +436,7 @@ bool ReadCommand(
 				UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 				if (UnsignedResult > 0 && UnsignedResult <= UINT16_MAX)
 				{
-					ConfigurationParameter.Parameter_Header.Additional = hton16(static_cast<uint16_t>(UnsignedResult));
+					ConfigurationParameter.Parameter_Header.Additional = hton16(static_cast<const uint16_t>(UnsignedResult));
 				}
 				else {
 					PrintErrorToScreen(L"\n[Error] Command (-adn count) error", 0);
@@ -451,12 +451,12 @@ bool ReadCommand(
 	//Specifie transmission interval time(in milliseconds).
 		else if (Command == L"-ti" || Command == L"--transmission-interval")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -471,7 +471,7 @@ bool ReadCommand(
 				{
 				#if defined(PLATFORM_WIN)
 					ConfigurationParameter.TransmissionInterval = UnsignedResult;
-				#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+				#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 					ConfigurationParameter.TransmissionInterval = UnsignedResult * MICROSECOND_TO_MILLISECOND;
 				#endif
 				}
@@ -493,12 +493,12 @@ bool ReadCommand(
 	//Specifie EDNS Label UDP Payload length.
 		else if (Command == L"-payload")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -534,12 +534,12 @@ bool ReadCommand(
 	//Specifie Query Type.
 		else if (Command == L"-qt" || Command == L"--query-type")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -556,7 +556,7 @@ bool ReadCommand(
 					UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 					if (UnsignedResult > 0 && UnsignedResult <= UINT16_MAX)
 					{
-						ConfigurationParameter.Parameter_Query.Type = hton16(static_cast<uint16_t>(UnsignedResult));
+						ConfigurationParameter.Parameter_Query.Type = hton16(static_cast<const uint16_t>(UnsignedResult));
 					}
 					else {
 						PrintErrorToScreen(L"\n[Error] Command (-qt type) error", 0);
@@ -564,7 +564,7 @@ bool ReadCommand(
 					}
 				}
 				else {
-					ConfigurationParameter.Parameter_Query.Type = static_cast<uint16_t>(UnsignedResult);
+					ConfigurationParameter.Parameter_Query.Type = static_cast<const uint16_t>(UnsignedResult);
 				}
 			}
 			else {
@@ -575,12 +575,12 @@ bool ReadCommand(
 	//Specifie Query Classes.
 		else if (Command == L"-qc" || Command == L"--query-classes")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -597,7 +597,7 @@ bool ReadCommand(
 					UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 					if (UnsignedResult > 0 && UnsignedResult <= UINT16_MAX)
 					{
-						ConfigurationParameter.Parameter_Query.Classes = hton16(static_cast<uint16_t>(UnsignedResult));
+						ConfigurationParameter.Parameter_Query.Classes = hton16(static_cast<const uint16_t>(UnsignedResult));
 					}
 					else {
 						PrintErrorToScreen(L"\n[Error] Command (-qc classes) error", 0);
@@ -605,7 +605,7 @@ bool ReadCommand(
 					}
 				}
 				else {
-					ConfigurationParameter.Parameter_Query.Classes = static_cast<uint16_t>(UnsignedResult);
+					ConfigurationParameter.Parameter_Query.Classes = static_cast<const uint16_t>(UnsignedResult);
 				}
 			}
 			else {
@@ -616,12 +616,12 @@ bool ReadCommand(
 	//Specifie request server name or port.
 		else if (Command == L"-p" || Command == L"--port")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -638,7 +638,7 @@ bool ReadCommand(
 					UnsignedResult = wcstoul(Command.c_str(), nullptr, 0);
 					if (UnsignedResult > 0 && UnsignedResult <= UINT16_MAX)
 					{
-						ConfigurationParameter.ServiceType = hton16(static_cast<uint16_t>(UnsignedResult));
+						ConfigurationParameter.ServiceType = hton16(static_cast<const uint16_t>(UnsignedResult));
 					}
 					else {
 						PrintErrorToScreen(L"\n[Error] Command (-p service_type/protocol) error", 0);
@@ -646,7 +646,7 @@ bool ReadCommand(
 					}
 				}
 				else {
-					ConfigurationParameter.ServiceType = static_cast<uint16_t>(UnsignedResult);
+					ConfigurationParameter.ServiceType = static_cast<const uint16_t>(UnsignedResult);
 				}
 			}
 			else {
@@ -657,12 +657,12 @@ bool ReadCommand(
 	//Specifie Raw data to send.
 		else if (Command == L"-rawdata")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -709,7 +709,7 @@ bool ReadCommand(
 					UnsignedResult = strtoul(reinterpret_cast<const char *>(BufferStringTemp.data()), nullptr, 0);
 					if (UnsignedResult > 0 && UnsignedResult <= UINT8_MAX)
 					{
-						ConfigurationParameter.RawDataBuffer.get()[ConfigurationParameter.RawDataLen] = static_cast<uint8_t>(UnsignedResult);
+						ConfigurationParameter.RawDataBuffer.get()[ConfigurationParameter.RawDataLen] = static_cast<const uint8_t>(UnsignedResult);
 						++ConfigurationParameter.RawDataLen;
 					}
 					else {
@@ -726,13 +726,13 @@ bool ReadCommand(
 	//Send RAW data with Raw Socket.
 		else if (Command == L"-raw")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				ConfigurationParameter.IsRawSocket = true;
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -753,7 +753,7 @@ bool ReadCommand(
 					}
 					else if (UnsignedResult > 0 && UnsignedResult <= UINT4_MAX)
 					{
-						ConfigurationParameter.ServiceType = static_cast<uint8_t>(UnsignedResult);
+						ConfigurationParameter.ServiceType = static_cast<const uint8_t>(UnsignedResult);
 					}
 					else {
 						PrintErrorToScreen(L"\n[Error] Command (-raw service_type) error", 0);
@@ -765,7 +765,7 @@ bool ReadCommand(
 					ConfigurationParameter.IsRawSocket = false;
 				}
 				else {
-					ConfigurationParameter.ServiceType = static_cast<uint8_t>(UnsignedResult);
+					ConfigurationParameter.ServiceType = static_cast<const uint8_t>(UnsignedResult);
 				}
 			}
 			else {
@@ -776,12 +776,12 @@ bool ReadCommand(
 	//Specifie buffer size.
 		else if (Command == L"-buf" || Command == L"--buffer-size")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -814,12 +814,12 @@ bool ReadCommand(
 	//Show response.
 		else if (Command == L"-show" || Command == L"--show-response")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -850,12 +850,12 @@ bool ReadCommand(
 	//Output result to file.
 		else if (Command == L"-of" || Command == L"--output-file")
 		{
-			if (Index + 1U < static_cast<size_t>(argc))
+			if (Index + 1U < static_cast<const size_t>(argc))
 			{
 				++Index;
 			#if defined(PLATFORM_WIN)
 				Command = argv[Index];
-			#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (!MBS_To_WCS_String(reinterpret_cast<const uint8_t *>(argv[Index]), strnlen(argv[Index], FILE_BUFFER_SIZE), Command))
 				{
 					PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
@@ -865,12 +865,12 @@ bool ReadCommand(
 
 			//Mark file name.
 				ConfigurationParameter.WideOutputFileName = Command;
-			#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+			#if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 				if (Command.length() < PATH_MAX)
 				{
 					auto OutputFileNameBuffer = std::make_unique<uint8_t[]>(Command.length() + MEMORY_RESERVED_BYTES);
 					memset(OutputFileNameBuffer.get(), 0, Command.length() + MEMORY_RESERVED_BYTES);
-					if (wcstombs(reinterpret_cast<char *>(OutputFileNameBuffer.get()), Command.c_str(), Command.length()) == static_cast<size_t>(RETURN_ERROR))
+					if (wcstombs(reinterpret_cast<char *>(OutputFileNameBuffer.get()), Command.c_str(), Command.length()) == static_cast<const size_t>(RETURN_ERROR))
 					{
 						PrintErrorToScreen(L"\n[Error] Convert multiple byte or wide char string error", 0);
 						return false;
@@ -901,7 +901,7 @@ bool ReadCommand(
 			ConfigurationParameter.Protocol = AF_INET;
 		}
 	//Specifie Query Domain.
-		else if (!ConfigurationParameter.RawDataBuffer && ConfigurationParameter.TestDomainString.empty() && Index == static_cast<size_t>(argc) - 2U)
+		else if (!ConfigurationParameter.RawDataBuffer && ConfigurationParameter.TestDomainString.empty() && Index == static_cast<const size_t>(argc) - 2U)
 		{
 		//Check parameter.
 			if (Command.length() <= DOMAIN_MINSIZE || Command.length() > DOMAIN_MAXSIZE)
@@ -918,7 +918,7 @@ bool ReadCommand(
 			}
 		}
 	//Specifie target.
-		else if (Index == static_cast<size_t>(argc) - 1U)
+		else if (Index == static_cast<const size_t>(argc) - 1U)
 		{
 		//Check parameter.
 			if (Command.length() < DOMAIN_MINSIZE || Command.length() > DOMAIN_MAXSIZE)
@@ -992,16 +992,16 @@ bool ReadCommand(
 							for (auto AddrInfoItem = AddrInfo;AddrInfoItem != nullptr;AddrInfoItem = AddrInfoItem->ai_next)
 							{
 							//IPv6
-								if (AddrInfoItem->ai_family == AF_INET6 && !IN6_IS_ADDR_LINKLOCAL(reinterpret_cast<in6_addr *>(AddrInfoItem->ai_addr)) && !(reinterpret_cast<sockaddr_in6 *>(AddrInfoItem->ai_addr)->sin6_scope_id == 0)) //Get port from first(Main) IPv6 device
+								if (AddrInfoItem->ai_family == AF_INET6 && !IN6_IS_ADDR_LINKLOCAL(reinterpret_cast<const in6_addr *>(AddrInfoItem->ai_addr)) && !(reinterpret_cast<const sockaddr_in6 *>(AddrInfoItem->ai_addr)->sin6_scope_id == 0)) //Get port from first(Main) IPv6 device
 								{
 									ConfigurationParameter.Protocol = AF_INET6;
 									ConfigurationParameter.SockAddr_Normal.ss_family = AF_INET6;
-									reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr = reinterpret_cast<sockaddr_in6 *>(AddrInfoItem->ai_addr)->sin6_addr;
+									reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr = reinterpret_cast<const sockaddr_in6 *>(AddrInfoItem->ai_addr)->sin6_addr;
 
 								//Convert binary to address string.
 									ConfigurationParameter.TargetAddressString = CommandString;
 									std::array<uint8_t, ADDRESS_STRING_MAXSIZE> AddrBuffer{};
-									if (!BinaryToAddressString(AF_INET6, &reinterpret_cast<sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr, AddrBuffer.data(), AddrBuffer.max_size(), &SignedResult))
+									if (!BinaryToAddressString(AF_INET6, &reinterpret_cast<const sockaddr_in6 *>(&ConfigurationParameter.SockAddr_Normal)->sin6_addr, AddrBuffer.data(), AddrBuffer.max_size(), &SignedResult))
 									{
 										PrintErrorToScreen(L"\n[Error] IPv6 address format error error", SignedResult);
 										return false;
@@ -1014,16 +1014,16 @@ bool ReadCommand(
 									break;
 								}
 							//IPv4
-								else if (AddrInfoItem->ai_family == AF_INET && reinterpret_cast<sockaddr_in *>(AddrInfoItem->ai_addr)->sin_addr.s_addr != INADDR_LOOPBACK && reinterpret_cast<sockaddr_in *>(AddrInfoItem->ai_addr)->sin_addr.s_addr != INADDR_BROADCAST)
+								else if (AddrInfoItem->ai_family == AF_INET && reinterpret_cast<const sockaddr_in *>(AddrInfoItem->ai_addr)->sin_addr.s_addr != INADDR_LOOPBACK && reinterpret_cast<const sockaddr_in *>(AddrInfoItem->ai_addr)->sin_addr.s_addr != INADDR_BROADCAST)
 								{
 									ConfigurationParameter.Protocol = AF_INET;
 									ConfigurationParameter.SockAddr_Normal.ss_family = AF_INET;
-									reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_addr = reinterpret_cast<sockaddr_in *>(AddrInfoItem->ai_addr)->sin_addr;
+									reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_addr = reinterpret_cast<const sockaddr_in *>(AddrInfoItem->ai_addr)->sin_addr;
 
 								//Convert binary to address string.
 									ConfigurationParameter.TargetAddressString = CommandString;
 									std::array<uint8_t, ADDRESS_STRING_MAXSIZE> AddrBuffer{};
-									if (!BinaryToAddressString(AF_INET, &reinterpret_cast<sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_addr, AddrBuffer.data(), AddrBuffer.max_size(), &SignedResult))
+									if (!BinaryToAddressString(AF_INET, &reinterpret_cast<const sockaddr_in *>(&ConfigurationParameter.SockAddr_Normal)->sin_addr, AddrBuffer.data(), AddrBuffer.max_size(), &SignedResult))
 									{
 										PrintErrorToScreen(L"\n[Error] IPv4 address format error error", SignedResult);
 										return false;

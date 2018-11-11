@@ -84,9 +84,9 @@ bool MBS_To_WCS_String(
 			reinterpret_cast<LPCCH>(Buffer), 
 			MBSTOWCS_NULL_TERMINATE, 
 			TargetBuffer.get(), 
-			static_cast<int>(Length + NULL_TERMINATE_LENGTH)) == 0)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-	if (mbstowcs(TargetBuffer.get(), reinterpret_cast<const char *>(Buffer), Length + NULL_TERMINATE_LENGTH) == static_cast<size_t>(RETURN_ERROR))
+			static_cast<const int>(Length + NULL_TERMINATE_LENGTH)) == 0)
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	if (mbstowcs(TargetBuffer.get(), reinterpret_cast<const char *>(Buffer), Length + NULL_TERMINATE_LENGTH) == static_cast<const size_t>(RETURN_ERROR))
 #endif
 	{
 		return false;
@@ -125,11 +125,11 @@ bool WCS_To_MBS_String(
 			Buffer, 
 			WCSTOMBS_NULL_TERMINATE, 
 			reinterpret_cast<LPSTR>(TargetBuffer.get()), 
-			static_cast<int>(Length + NULL_TERMINATE_LENGTH), 
+			static_cast<const int>(Length + NULL_TERMINATE_LENGTH), 
 			nullptr, 
 			nullptr) == 0)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-	if (wcstombs(reinterpret_cast<char *>(TargetBuffer.get()), Buffer, Length + NULL_TERMINATE_LENGTH) == static_cast<size_t>(RETURN_ERROR))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	if (wcstombs(reinterpret_cast<char *>(TargetBuffer.get()), Buffer, Length + NULL_TERMINATE_LENGTH) == static_cast<const size_t>(RETURN_ERROR))
 #endif
 	{
 		return false;
@@ -154,10 +154,10 @@ void CaseConvert(
 	{
 	//Lowercase to uppercase
 		if (IsLowerUpper)
-			Buffer[Index] = static_cast<uint8_t>(toupper(Buffer[Index]));
+			Buffer[Index] = static_cast<const uint8_t>(toupper(Buffer[Index]));
 	//Uppercase to lowercase
 		else 
-			Buffer[Index] = static_cast<uint8_t>(tolower(Buffer[Index]));
+			Buffer[Index] = static_cast<const uint8_t>(tolower(Buffer[Index]));
 	}
 
 	return;
@@ -172,10 +172,10 @@ void CaseConvert(
 	{
 	//Lowercase to uppercase
 		if (IsLowerToUpper)
-			StringIter = static_cast<wchar_t>(toupper(StringIter));
+			StringIter = static_cast<const wchar_t>(toupper(StringIter));
 	//Uppercase to lowercase
 		else 
-			StringIter = static_cast<wchar_t>(tolower(StringIter));
+			StringIter = static_cast<const wchar_t>(tolower(StringIter));
 	}
 
 	return;
@@ -251,7 +251,7 @@ bool AddressStringToBinary(
 			return false;
 		}
 
-		memcpy_s(OriginalAddr, sizeof(reinterpret_cast<sockaddr_in6 *>(&SockAddr)->sin6_addr), &reinterpret_cast<sockaddr_in6 *>(&SockAddr)->sin6_addr, sizeof(reinterpret_cast<sockaddr_in6 *>(&SockAddr)->sin6_addr));
+		memcpy_s(OriginalAddr, sizeof(reinterpret_cast<const sockaddr_in6 *>(&SockAddr)->sin6_addr), &reinterpret_cast<const sockaddr_in6 *>(&SockAddr)->sin6_addr, sizeof(reinterpret_cast<const sockaddr_in6 *>(&SockAddr)->sin6_addr));
 	#else
 		ResultValue = inet_pton(AF_INET6, AddrString.c_str(), OriginalAddr);
 		if (ResultValue == SOCKET_ERROR || ResultValue == 0)
@@ -325,7 +325,7 @@ bool AddressStringToBinary(
 			return false;
 		}
 
-		memcpy_s(OriginalAddr, sizeof(reinterpret_cast<sockaddr_in *>(&SockAddr)->sin_addr), &reinterpret_cast<sockaddr_in *>(&SockAddr)->sin_addr, sizeof(reinterpret_cast<sockaddr_in *>(&SockAddr)->sin_addr));
+		memcpy_s(OriginalAddr, sizeof(reinterpret_cast<const sockaddr_in *>(&SockAddr)->sin_addr), &reinterpret_cast<const sockaddr_in *>(&SockAddr)->sin_addr, sizeof(reinterpret_cast<const sockaddr_in *>(&SockAddr)->sin_addr));
 	#else
 		ResultValue = inet_pton(AF_INET, AddrString.c_str(), OriginalAddr);
 		if (ResultValue == SOCKET_ERROR || ResultValue == 0)
@@ -382,7 +382,7 @@ bool BinaryToAddressString(
 		static_cast<LPSTR>(AddressString), 
 		&BufferLength) == SOCKET_ERROR)
 #else
-	if (inet_ntop(Protocol, const_cast<void *>(OriginalAddr), static_cast<char *>(AddressString), static_cast<const socklen_t>(StringSize)) == nullptr)
+	if (inet_ntop(Protocol, OriginalAddr, static_cast<char *>(AddressString), static_cast<const socklen_t>(StringSize)) == nullptr)
 #endif
 	{
 		if (ErrorCode != nullptr)
@@ -1105,7 +1105,7 @@ size_t StringToPacketQuery(
 {
 //Initialization
 	std::array<int, 3U> Index{};
-	Index.at(0) = static_cast<int>(strnlen_s(reinterpret_cast<const char *>(FName), DOMAIN_MAXSIZE));
+	Index.at(0) = static_cast<const int>(strnlen_s(reinterpret_cast<const char *>(FName), DOMAIN_MAXSIZE));
 	if (Index.at(0) <= 0)
 	{
 		return 0;
@@ -1121,7 +1121,7 @@ size_t StringToPacketQuery(
 	{
 		if (FName[Index.at(0)] == ASCII_PERIOD)
 		{
-			*(TName + Index.at(2U)) = static_cast<uint8_t>(Index.at(1U));
+			*(TName + Index.at(2U)) = static_cast<const uint8_t>(Index.at(1U));
 			Index.at(1U) = 0;
 		}
 		else {
@@ -1130,7 +1130,7 @@ size_t StringToPacketQuery(
 		}
 	}
 
-	*(TName + Index.at(2U)) = static_cast<uint8_t>(Index.at(1U));
+	*(TName + Index.at(2U)) = static_cast<const uint8_t>(Index.at(1U));
 	return strnlen_s(reinterpret_cast<const char *>(TName), DOMAIN_MAXSIZE - 1U) + NULL_TERMINATE_LENGTH;
 }
 
@@ -1150,21 +1150,21 @@ size_t PacketQueryToString(
 	//Pointer
 		if (TName[LocateIndex] >= DNS_POINTER_8_BITS)
 		{
-			TruncateLocation = static_cast<uint8_t>(TName[LocateIndex] & 0x3F);
+			TruncateLocation = static_cast<const uint8_t>(TName[LocateIndex] & 0x3F);
 			TruncateLocation = TruncateLocation << sizeof(uint8_t) * BYTES_TO_BITS;
-			TruncateLocation += static_cast<uint8_t>(TName[LocateIndex + 1U]);
+			TruncateLocation += static_cast<const uint8_t>(TName[LocateIndex + 1U]);
 			return LocateIndex + sizeof(uint16_t);
 		}
 		else if (LocateIndex == 0)
 		{
 			MarkIndex.at(0) = TName[LocateIndex];
 		}
-		else if (LocateIndex == static_cast<size_t>(MarkIndex.at(0)) + static_cast<size_t>(MarkIndex.at(1U)) + 1U)
+		else if (LocateIndex == static_cast<const size_t>(MarkIndex.at(0)) + static_cast<const size_t>(MarkIndex.at(1U)) + 1U)
 		{
 			MarkIndex.at(0) = TName[LocateIndex];
 			if (MarkIndex.at(0) == 0)
 				break;
-			MarkIndex.at(1U) = static_cast<int>(LocateIndex);
+			MarkIndex.at(1U) = static_cast<const int>(LocateIndex);
 
 			FName[LocateIndex - 1U] = ASCII_PERIOD;
 		}
@@ -1232,7 +1232,7 @@ void PrintSecondsInDateTime(
 //Years
 	if (DateTime / SECONDS_IN_YEAR > 0)
 	{
-		fwprintf_s(FileHandle, L"%u year", static_cast<unsigned int>(DateTime / SECONDS_IN_YEAR));
+		fwprintf_s(FileHandle, L"%u year", static_cast<const unsigned int>(DateTime / SECONDS_IN_YEAR));
 		if (DateTime / SECONDS_IN_YEAR > 1U)
 			fwprintf_s(FileHandle, L"s");
 		DateTime %= SECONDS_IN_YEAR;
@@ -1243,7 +1243,7 @@ void PrintSecondsInDateTime(
 	{
 		if (IsBefore)
 			fwprintf_s(FileHandle, L" ");
-		fwprintf_s(FileHandle, L"%u month", static_cast<unsigned int>(DateTime / SECONDS_IN_MONTH));
+		fwprintf_s(FileHandle, L"%u month", static_cast<const unsigned int>(DateTime / SECONDS_IN_MONTH));
 		if (DateTime / SECONDS_IN_MONTH > 1U)
 			fwprintf_s(FileHandle, L"s");
 		DateTime %= SECONDS_IN_MONTH;
@@ -1254,7 +1254,7 @@ void PrintSecondsInDateTime(
 	{
 		if (IsBefore)
 			fwprintf_s(FileHandle, L" ");
-		fwprintf_s(FileHandle, L"%u day", static_cast<unsigned int>(DateTime / SECONDS_IN_DAY));
+		fwprintf_s(FileHandle, L"%u day", static_cast<const unsigned int>(DateTime / SECONDS_IN_DAY));
 		if (DateTime / SECONDS_IN_DAY > 1U)
 			fwprintf_s(FileHandle, L"s");
 		DateTime %= SECONDS_IN_DAY;
@@ -1265,7 +1265,7 @@ void PrintSecondsInDateTime(
 	{
 		if (IsBefore)
 			fwprintf_s(FileHandle, L" ");
-		fwprintf_s(FileHandle, L"%u hour", static_cast<unsigned int>(DateTime / SECONDS_IN_HOUR));
+		fwprintf_s(FileHandle, L"%u hour", static_cast<const unsigned int>(DateTime / SECONDS_IN_HOUR));
 		if (DateTime / SECONDS_IN_HOUR > 1U)
 			fwprintf_s(FileHandle, L"s");
 		DateTime %= SECONDS_IN_HOUR;
@@ -1276,7 +1276,7 @@ void PrintSecondsInDateTime(
 	{
 		if (IsBefore)
 			fwprintf_s(FileHandle, L" ");
-		fwprintf_s(FileHandle, L"%u minute", static_cast<unsigned int>(DateTime / SECONDS_IN_MINUTE));
+		fwprintf_s(FileHandle, L"%u minute", static_cast<const unsigned int>(DateTime / SECONDS_IN_MINUTE));
 		if (DateTime / SECONDS_IN_MINUTE > 1U)
 			fwprintf_s(FileHandle, L"s");
 		DateTime %= SECONDS_IN_MINUTE;
@@ -1287,7 +1287,7 @@ void PrintSecondsInDateTime(
 	{
 		if (IsBefore)
 			fwprintf_s(FileHandle, L" ");
-		fwprintf_s(FileHandle, L"%u second", static_cast<unsigned int>(DateTime));
+		fwprintf_s(FileHandle, L"%u second", static_cast<const unsigned int>(DateTime));
 		if (DateTime > 1U)
 			fwprintf_s(FileHandle, L"s");
 	}

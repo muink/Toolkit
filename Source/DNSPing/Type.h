@@ -47,13 +47,13 @@ public:
 	bool                                 IsValidated;
 	bool                                 IsShowResponse;
 	bool                                 IsShowHexResponse;
-#if (defined(PLATFORM_WIN) || defined(PLATFORM_LINUX))
+#if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_WIN) || defined(PLATFORM_LINUX))
 	bool                                 IsDoNotFragment;
 #endif
 #if defined(PLATFORM_WIN)
 	DWORD                                PacketHopLimits;
 	DWORD                                SocketTimeout;
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	int                                  PacketHopLimits;
 	timeval                              SocketTimeout;
 #endif
@@ -74,7 +74,7 @@ public:
 	std::string                          TestDomainString;
 	std::string                          TargetAddressString;
 	std::string                          TargetString_Normal;
-#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string                          OutputFileName;
 #endif
 	std::wstring                         WideTargetString;

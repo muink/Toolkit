@@ -67,7 +67,7 @@
 #if defined(PLATFORM_WIN)
 	#define DEFAULT_TIMEOUT                               2000U                       //Default timeout, 2000 ms(2 seconds)
 	#define STANDARD_TIMEOUT                              1000U                       //Standard timeout(1000 ms/1 second)
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	#define DEFAULT_TIMEOUT                               2U                          //Default timeout, 2 seconds
 	#define STANDARD_TIMEOUT                              1000000U                    //Standard timeout, 1000000 us(1000 ms or 1 second)
 #endif
@@ -102,7 +102,7 @@
 #define DNS_PACKET_MINSIZE                            (sizeof(dns_hdr) + NULL_TERMINATE_LENGTH + sizeof(dns_qry))   //Minimum DNS packet size(DNS Header + Minimum Domain<ROOT> + DNS Query)
 
 //Version definitions
-#define FULL_VERSION                                  L"0.3.9.3"
+#define FULL_VERSION                                  L"0.4.0.0"
 #define COPYRIGHT_MESSAGE                             L"Copyright (C) 2014-2018 Chengr28"
 
 //Function definitions
@@ -125,10 +125,20 @@
 														(sizeof(uint32_t) * BYTES_TO_BITS)) | static_cast<const uint32_t>(hton32(static_cast<const uint32_t>((Value) >>     \
 														(sizeof(uint32_t) * BYTES_TO_BITS))))))
 #define ntoh64_Force                                  hton64_Force
+#if defined(PLATFORM_WIN)
+#if defined(PLATFORM_WIN_XP)
+	#define hton64                                        hton64_Force
+	#define ntoh64                                        hton64
+#else
+	#define hton64                                        htonll
+	#define ntoh64                                        ntohll
+#endif
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 #if BYTE_ORDER == LITTLE_ENDIAN
 	#define hton64(Value)                                 hton64_Force(Value)
 #else //BIG_ENDIAN
 	#define hton64(Value)                                 (Value)
 #endif
-#define ntoh64                                        hton64
+	#define ntoh64                                        hton64
+#endif
 #endif

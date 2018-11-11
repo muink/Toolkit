@@ -789,7 +789,7 @@ void BLAKE_512_Final(
 bool ReadCommand_BLAKE(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command
 #endif
 )
@@ -892,19 +892,19 @@ bool BLAKE_Hash(
 		else {
 			if (BLAKE_HashFunctionID == HASH_ID_BLAKE_224) //BLAKE 224 bits
 			{
-				BLAKE_224_Update(&State224, Buffer.get(), static_cast<uint32_t>(ReadLength));
+				BLAKE_224_Update(&State224, Buffer.get(), static_cast<const uint32_t>(ReadLength));
 			}
 			else if (BLAKE_HashFunctionID == HASH_ID_BLAKE_256) //BLAKE 256 bits
 			{
-				BLAKE_256_Update(&State256, Buffer.get(), static_cast<uint32_t>(ReadLength));
+				BLAKE_256_Update(&State256, Buffer.get(), static_cast<const uint32_t>(ReadLength));
 			}
 			else if (BLAKE_HashFunctionID == HASH_ID_BLAKE_384) //BLAKE 384 bits
 			{
-				BLAKE_384_Update(&State384, Buffer.get(), static_cast<uint32_t>(ReadLength));
+				BLAKE_384_Update(&State384, Buffer.get(), static_cast<const uint32_t>(ReadLength));
 			}
 			else if (BLAKE_HashFunctionID == HASH_ID_BLAKE_512) //BLAKE 512 bits
 			{
-				BLAKE_512_Update(&State512, Buffer.get(), static_cast<uint32_t>(ReadLength));
+				BLAKE_512_Update(&State512, Buffer.get(), static_cast<const uint32_t>(ReadLength));
 			}
 			else { //Commands error
 				fwprintf_s(stderr, L"[Error] Commands error.\n");

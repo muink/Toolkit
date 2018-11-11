@@ -41,7 +41,7 @@
 #define ASCII_PERIOD                                  46                          //"."
 
 //Version definitions
-#define FULL_VERSION                                  L"0.3.9.3"
+#define FULL_VERSION                                  L"0.4.0.0"
 #define COPYRIGHT_MESSAGE                             L"Copyright (C) 2012-2018 Chengr28"
 
 //Command definitions
@@ -55,7 +55,7 @@
 	#define COMMAND_SIGN_HELP                             L"-?"
 	#define COMMAND_LOWERCASE                             L"--LOWERCASE"
 	#define COMMAND_OUTPUT_FILE                           L"--OUTPUT"
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	#define COMMAND_LONG_PRINT_VERSION                    ("--VERSION")
 	#define COMMAND_SHORT_PRINT_VERSION                   ("-V")
 	#define COMMAND_LONG_HELP                             ("--HELP")
@@ -102,7 +102,7 @@
 	#define HASH_COMMAND_SHA2_512                         L"-SHA512"
 	#define HASH_COMMAND_SHA3                             L"-SHA3"
 	#define HASH_COMMAND_SHA3_UNDERLINE                   L"-SHA_3"
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	#define HASH_COMMAND_BLAKE                            ("-BLAKE")
 	#define HASH_COMMAND_BLAKE2                           ("-BLAKE2")
 	#define HASH_COMMAND_CRC                              ("-CRC")
@@ -145,10 +145,20 @@
 														(sizeof(uint32_t) * BYTES_TO_BITS)) | static_cast<const uint32_t>(hton32(static_cast<const uint32_t>((Value) >>     \
 														(sizeof(uint32_t) * BYTES_TO_BITS))))))
 #define ntoh64_Force                                  hton64_Force
+#if defined(PLATFORM_WIN)
+#if defined(PLATFORM_WIN_XP)
+	#define hton64                                        hton64_Force
+	#define ntoh64                                        hton64
+#else
+	#define hton64                                        htonll
+	#define ntoh64                                        ntohll
+#endif
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 #if BYTE_ORDER == LITTLE_ENDIAN
 	#define hton64(Value)                                 hton64_Force(Value)
 #else //BIG_ENDIAN
 	#define hton64(Value)                                 (Value)
 #endif
-#define ntoh64                                        hton64
+	#define ntoh64                                        hton64
+#endif
 #endif

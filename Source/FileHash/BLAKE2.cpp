@@ -370,7 +370,7 @@ void BLAKE_2S_Final(
 bool ReadCommand_BLAKE2(
 #if defined(PLATFORM_WIN)
 	std::wstring &Command
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string &Command
 #endif
 )

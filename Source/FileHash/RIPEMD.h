@@ -42,7 +42,7 @@
 	#define COMMAND_RIPEMD_160          L"-RIPEMD_160"
 	#define COMMAND_RIPEMD_256          L"-RIPEMD_256"
 	#define COMMAND_RIPEMD_320          L"-RIPEMD_320"
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	#define COMMAND_RIPEMD_128          ("-RIPEMD_128")
 	#define COMMAND_RIPEMD_160          ("-RIPEMD_160")
 	#define COMMAND_RIPEMD_256          ("-RIPEMD_256")

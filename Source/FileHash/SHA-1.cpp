@@ -234,7 +234,7 @@ bool SHA1_Hash(
 			return false;
 		}
 		else {
-			SHA1_Process(&HashInstance, Buffer.get(), static_cast<unsigned long>(ReadLength));
+			SHA1_Process(&HashInstance, Buffer.get(), static_cast<const unsigned long>(ReadLength));
 		}
 	}
 

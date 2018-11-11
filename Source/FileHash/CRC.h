@@ -126,7 +126,7 @@
 	#define COMMAND_CRC_32                L"-CRC32"
 	#define COMMAND_CRC_32_JAM            L"-CRC32_JAM"
 	#define COMMAND_CRC_32C               L"-CRC32C"
-	#define COMMAND_CRC_32D				  L"-CRC32D"
+	#define COMMAND_CRC_32D               L"-CRC32D"
 	#define COMMAND_CRC_32_C              L"-CRC32_C"
 	#define COMMAND_CRC_32_D              L"-CRC32_D"
 	#define COMMAND_CRC_32_BZIP2          L"-CRC32_BZIP2"
@@ -142,7 +142,7 @@
 	#define COMMAND_CRC_64_1B             L"-CRC64_1B"
 	#define COMMAND_CRC_64_WE             L"-CRC64_WE"
 	#define COMMAND_CRC_64_JONES          L"-CRC64_JONES"
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	#define COMMAND_CRC_8                 ("-CRC8")
 	#define COMMAND_CRC_8_ITU             ("-CRC8_ITU")
 	#define COMMAND_CRC_8_ATM             ("-CRC8_ATM")
@@ -182,7 +182,7 @@
 	#define COMMAND_CRC_32                ("-CRC32")
 	#define COMMAND_CRC_32_JAM            ("-CRC32_JAM")
 	#define COMMAND_CRC_32C               ("-CRC32C")
-	#define COMMAND_CRC_32D				  ("-CRC32D")
+	#define COMMAND_CRC_32D               ("-CRC32D")
 	#define COMMAND_CRC_32_C              ("-CRC32_C")
 	#define COMMAND_CRC_32_D              ("-CRC32_D")
 	#define COMMAND_CRC_32_BZIP2          ("-CRC32_BZIP2")

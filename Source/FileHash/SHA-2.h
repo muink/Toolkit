@@ -51,7 +51,7 @@
 	#define COMMAND_SHA2_512_UL        L"-SHA2_512"
 	#define COMMAND_SHA2_512_224_UL    L"-SHA2_512_224"
 	#define COMMAND_SHA2_512_256_UL    L"-SHA2_512_256"
-#elif (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	#define COMMAND_SHA2_224           ("-SHA224")
 	#define COMMAND_SHA2_256           ("-SHA256")
 	#define COMMAND_SHA2_512_224       ("-SHA512_224")
