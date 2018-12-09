@@ -19,25 +19,6 @@
 
 #include "Protocol.h"
 
-#if defined(PLATFORM_WIN_XP)
-//Check current operation system which higher than Windows 7.
-bool IsLowerThanWin8(
-	void)
-{
-	OSVERSIONINFOEX OSVI;
-	memset(&OSVI, 0, sizeof(OSVI));
-	OSVI.dwOSVersionInfoSize = sizeof(OSVI);
-
-//Get system info.
-	const auto SystemVersionInfoEx = GetVersionExW(
-		reinterpret_cast<OSVERSIONINFO *>(&OSVI));
-	if (SystemVersionInfoEx && OSVI.dwPlatformId == VER_PLATFORM_WIN32_NT && (OSVI.dwMajorVersion < 6U || (OSVI.dwMajorVersion == 6U && OSVI.dwMinorVersion < 2U)))
-		return true;
-
-	return false;
-}
-#endif
-
 //Check empty buffer
 bool CheckEmptyBuffer(
 	const void * const Buffer, 
@@ -202,13 +183,7 @@ bool AddressStringToBinary(
 		*ErrorCode = 0;
 
 //Convert address.
-#if defined(PLATFORM_WIN_XP)
-	sockaddr_storage SockAddr;
-	memset(&SockAddr, 0, sizeof(SockAddr));
-	socklen_t SockLength = 0;
-#else
 	ssize_t ResultValue = 0;
-#endif
 	if (Protocol == AF_INET6)
 	{
 	//Check address.
@@ -236,23 +211,6 @@ bool AddressStringToBinary(
 		}
 
 	//Convert to binary.
-	#if defined(PLATFORM_WIN_XP)
-		SockLength = sizeof(sockaddr_in6);
-		if (WSAStringToAddressA(
-				const_cast<LPSTR>(AddrString.c_str()), 
-				AF_INET6, 
-				nullptr, 
-				reinterpret_cast<sockaddr *>(&SockAddr), 
-				&SockLength) == SOCKET_ERROR)
-		{
-			if (ErrorCode != nullptr)
-				*ErrorCode = WSAGetLastError();
-
-			return false;
-		}
-
-		memcpy_s(OriginalAddr, sizeof(reinterpret_cast<const sockaddr_in6 *>(&SockAddr)->sin6_addr), &reinterpret_cast<const sockaddr_in6 *>(&SockAddr)->sin6_addr, sizeof(reinterpret_cast<const sockaddr_in6 *>(&SockAddr)->sin6_addr));
-	#else
 		ResultValue = inet_pton(AF_INET6, AddrString.c_str(), OriginalAddr);
 		if (ResultValue == SOCKET_ERROR || ResultValue == 0)
 		{
@@ -261,7 +219,6 @@ bool AddressStringToBinary(
 
 			return false;
 		}
-	#endif
 	}
 	else if (Protocol == AF_INET)
 	{
@@ -310,23 +267,6 @@ bool AddressStringToBinary(
 			AddrString.append("0");
 
 	//Convert to binary.
-	#if defined(PLATFORM_WIN_XP)
-		SockLength = sizeof(sockaddr_in);
-		if (WSAStringToAddressA(
-				const_cast<LPSTR>(AddrString.c_str()), 
-				AF_INET, 
-				nullptr, 
-				reinterpret_cast<sockaddr *>(&SockAddr), 
-				&SockLength) == SOCKET_ERROR)
-		{
-			if (ErrorCode != nullptr)
-				*ErrorCode = WSAGetLastError();
-
-			return false;
-		}
-
-		memcpy_s(OriginalAddr, sizeof(reinterpret_cast<const sockaddr_in *>(&SockAddr)->sin_addr), &reinterpret_cast<const sockaddr_in *>(&SockAddr)->sin_addr, sizeof(reinterpret_cast<const sockaddr_in *>(&SockAddr)->sin_addr));
-	#else
 		ResultValue = inet_pton(AF_INET, AddrString.c_str(), OriginalAddr);
 		if (ResultValue == SOCKET_ERROR || ResultValue == 0)
 		{
@@ -335,7 +275,6 @@ bool AddressStringToBinary(
 
 			return false;
 		}
-	#endif
 	}
 	else {
 		return false;
@@ -357,33 +296,7 @@ bool BinaryToAddressString(
 		*ErrorCode = 0;
 
 //Convert address.
-#if defined(PLATFORM_WIN_XP)
-	sockaddr_storage SockAddr;
-	memset(&SockAddr, 0, sizeof(SockAddr));
-	if (Protocol == AF_INET6)
-	{
-		SockAddr.ss_family = AF_INET6;
-		reinterpret_cast<sockaddr_in6 *>(&SockAddr)->sin6_addr = *reinterpret_cast<const in6_addr *>(OriginalAddr);
-	}
-	else if (Protocol == AF_INET)
-	{
-		SockAddr.ss_family = AF_INET;
-		reinterpret_cast<sockaddr_in *>(&SockAddr)->sin_addr = *reinterpret_cast<const in_addr *>(OriginalAddr);
-	}
-	else {
-		return false;
-	}
-
-	DWORD BufferLength = StringSize;
-	if (WSAAddressToStringA(
-		reinterpret_cast<sockaddr *>(&SockAddr), 
-		sizeof(sockaddr_in6), 
-		nullptr, 
-		static_cast<LPSTR>(AddressString), 
-		&BufferLength) == SOCKET_ERROR)
-#else
 	if (inet_ntop(Protocol, OriginalAddr, static_cast<char *>(AddressString), static_cast<const socklen_t>(StringSize)) == nullptr)
-#endif
 	{
 		if (ErrorCode != nullptr)
 			*ErrorCode = WSAGetLastError();

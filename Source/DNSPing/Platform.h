@@ -355,9 +355,7 @@
 	#include <winsock2.h>                //WinSock 2.0+ support
 	#include <windns.h>                  //Windows DNS definitions and DNS API
 	#include <ws2tcpip.h>                //WinSock 2.0+ Extension for TCP/IP protocols
-#if !defined(PLATFORM_WIN_XP)
 	#include <versionhelpers.h>          //Version Helper functions
-#endif
 
 //Library linking
 	#pragma comment(lib, "ws2_32.lib")   //Windows WinSock 2.0+ support
@@ -409,19 +407,19 @@
 	#define __BYTE_ORDER                __LITTLE_ENDIAN              //x86 and x86-64/x64 is Little Endian.
 #endif
 
-//Windows compatible
-	#define FALSE                    0
+//Compatible definitions
+	#define FALSE                                                            0
 #ifndef INVALID_SOCKET
-	#define INVALID_SOCKET           (-1)
+	#define INVALID_SOCKET                                                   (-1)
 #endif
-	#define SOCKET_ERROR             (-1)
-	#define RETURN_ERROR             (-1)
-	typedef int                      SOCKET;
-
-//Linux and macOS compatible
+	#define SOCKET_ERROR                                                     (-1)
+	#define RETURN_ERROR                                                     (-1)
+	typedef int                                                              SOCKET;
 	#define SD_BOTH                                                          SHUT_RDWR
 	#define SD_RECV                                                          SHUT_RD
 	#define SD_SEND                                                          SHUT_WR
+
+//Function definitions
 	#define closesocket                                                      close
 	#define fwprintf_s                                                       fwprintf
 	#define GetLastError()                                                   errno

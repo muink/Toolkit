@@ -159,9 +159,7 @@ bool Parameter_CheckSetting(
 
 //Socket timeout settings
 #if defined(PLATFORM_WIN)
-#if !defined(PLATFORM_WIN_XP)
 	if (!IsWindows8OrGreater())
-#endif
 	{
 		if (ConfigurationParameter.SocketTimeout > SOCKET_MIN_TIMEOUT)
 			ConfigurationParameter.SocketTimeout -= SOCKET_MIN_TIMEOUT;

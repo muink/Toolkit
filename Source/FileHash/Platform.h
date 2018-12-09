@@ -387,8 +387,10 @@
 #endif
 
 #if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-//Linux and macOS compatible
+//Compatible definitions
 	#define RETURN_ERROR                                      (-1)
+
+//Function definitions
 	#define fwprintf_s                                        fwprintf
 	#define strnlen_s                                         strnlen
 	#define wcsnlen_s                                         wcsnlen

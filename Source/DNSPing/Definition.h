@@ -102,7 +102,7 @@
 #define DNS_PACKET_MINSIZE                            (sizeof(dns_hdr) + NULL_TERMINATE_LENGTH + sizeof(dns_qry))   //Minimum DNS packet size(DNS Header + Minimum Domain<ROOT> + DNS Query)
 
 //Version definitions
-#define FULL_VERSION                                  L"0.4.0.0"
+#define FULL_VERSION                                  L"0.4.0.1"
 #define COPYRIGHT_MESSAGE                             L"Copyright (C) 2014-2018 Chengr28"
 
 //Function definitions
@@ -126,13 +126,8 @@
 														(sizeof(uint32_t) * BYTES_TO_BITS))))))
 #define ntoh64_Force                                  hton64_Force
 #if defined(PLATFORM_WIN)
-#if defined(PLATFORM_WIN_XP)
-	#define hton64                                        hton64_Force
-	#define ntoh64                                        hton64
-#else
 	#define hton64                                        htonll
 	#define ntoh64                                        ntohll
-#endif
 #elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 #if BYTE_ORDER == LITTLE_ENDIAN
 	#define hton64(Value)                                 hton64_Force(Value)

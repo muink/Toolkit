@@ -708,7 +708,7 @@ void PrintResourseData(
 		fwprintf_s(FileHandle, L"\n         Target: ");
 		PrintDomainName(FileHandle, Buffer, Location + sizeof(dns_record_srv));
 	}
-//OPT/EDNS Record(Extension Mechanisms for Domain Name System)
+//EDNS Record(Extension Mechanisms for Domain Name System)
 	else if (ntoh16(Type) == DNS_TYPE_OPT)
 	{
 		fwprintf_s(FileHandle, L"   Data: ");
