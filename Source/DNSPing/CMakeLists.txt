@@ -1,6 +1,6 @@
 # This code is part of Toolkit(DNSPing)
 # DNSPing, a useful and powerful toolkit
-# Copyright (C) 2014-2018 Chengr28
+# Copyright (C) 2014-2019 Chengr28
 # 
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -51,9 +51,9 @@ add_executable(DNSPing ${DNSPING_SRC_FILES})
 ## See https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc.
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
-IF(APPLE)
+IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	add_definitions(-std=c++14)
-ENDIF(APPLE)
+ENDIF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 IF(NOT PLATFORM_OPENWRT)
 	IF(CMAKE_VERSION VERSION_LESS "3.9")
 		add_definitions(-flto)
@@ -66,10 +66,10 @@ IF(NOT PLATFORM_OPENWRT)
 	add_definitions(-fasynchronous-unwind-tables)
 #	add_definitions(-fcf-protection=full)
 	add_definitions(-fexceptions)
-	IF(NOT APPLE)
+	IF(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
 		add_definitions(-fopenmp)
 #		add_definitions(-fsplit-stack)
-	ENDIF(NOT APPLE)
+	ENDIF(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
 #	add_definitions(-fstack-clash-protection)
 	add_definitions(-fstack-protector-strong)
 	add_definitions(-g)

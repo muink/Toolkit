@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // DNSPing, a useful and powerful toolkit
-// Copyright (C) 2014-2018 Chengr28
+// Copyright (C) 2014-2019 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -50,10 +50,19 @@ bool ReadCommand(
 		SignedResult = 0;
 		UnsignedResult = 0;
 
-	//Description(Usage)
+	//Print description.
 		if (Command.find(L"?") != std::string::npos || Command == L"-h" || Command == L"--help")
 		{
 			PrintDescription();
+		}
+	//Print version.
+		else if (Command == L"-v" || Command == L"--version")
+		{
+			fwprintf_s(stderr, L"DNSPing ");
+			fwprintf_s(stderr, FULL_VERSION);
+			fwprintf_s(stderr, L"\n");
+
+			return false;
 		}
 	//Pings the specified host until stopped. To see statistics and continue type Control-Break. To stop type Control-C.
 		else if (Command == L"-t" || Command == L"--until-break")

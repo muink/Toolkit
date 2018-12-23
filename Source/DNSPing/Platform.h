@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // DNSPing, a useful and powerful toolkit
-// Copyright (C) 2014-2018 Chengr28
+// Copyright (C) 2014-2019 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -369,66 +369,61 @@
 	#define BYTE_ORDER                  __BYTE_ORDER
 
 //Winsock definitions
-	#define WINSOCK_VERSION_LOW_BYTE    2                           //Low byte of Winsock version 2.2
-	#define WINSOCK_VERSION_HIGH_BYTE   2                           //High byte of Winsock version 2.2
+	#define WINSOCK_VERSION_LOW_BYTE    2                            //Low byte of Winsock version 2.2
+	#define WINSOCK_VERSION_HIGH_BYTE   2                            //High byte of Winsock version 2.2
 
 //Windows compatible definitions
 	typedef SSIZE_T                     ssize_t;
 #elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 //Portable Operating System Interface/POSIX and Unix system header
-	#include <cerrno>                   //Error report support
-	#include <climits>                  //Limits support
-	#include <cstdio>                   //File Input/Output support
-	#include <cstdlib>                  //C Standard Library support
-	#include <ctime>                    //Get and manipulate date and time information support
-	#include <netdb.h>                  //Network database operations support
-	#include <pthread.h>                //Threads support
-	#include <signal.h>                 //Signals support
-	#include <unistd.h>                 //Standard library API support
-	#include <arpa/inet.h>              //Internet operations support
-	#include <sys/time.h>               //Date and time support
+	#include <cerrno>                                                //Error report support
+	#include <climits>                                               //Limits support
+	#include <cstdio>                                                //File Input/Output support
+	#include <cstdlib>                                               //C Standard Library support
+	#include <ctime>                                                 //Get and manipulate date and time information support
+	#include <netdb.h>                                               //Network database operations support
+	#include <pthread.h>                                             //Threads support
+	#include <signal.h>                                              //Signals support
+	#include <unistd.h>                                              //Standard library API support
+	#include <arpa/inet.h>                                           //Internet operations support
+	#include <sys/time.h>                                            //Date and time support
 #if defined(PLATFORM_FREEBSD)
-	#include <netinet/in.h>             //Internet Protocol family support
-	#include <sys/socket.h>             //Main sockets header support
-#elif defined(PLATFORM_MACOS)
-	#include <mach/kern_return.h>       //Mach kernel return codes
-	#include <mach/mach.h>              //Mach includes all the types that a normal user of Mach programs should need
-	#include <mach/mach_time.h>         //Mach time structure support
-#endif
-
-//Portable Operating System Interface/POSIX and Unix system header
-#if defined(PLATFORM_FREEBSD)
+	#include <netinet/in.h>                                          //Internet Protocol family support
 	#include <sys/endian.h>                                          //Endian support
+	#include <sys/socket.h>                                          //Main sockets header support
 #elif defined(PLATFORM_LINUX)
 	#include <endian.h>                                              //Endian support
 #elif defined(PLATFORM_MACOS)
+	#include <mach/kern_return.h>                                    //Mach kernel return codes
+	#include <mach/mach.h>                                           //Mach includes all the types that a normal user of Mach programs should need
+	#include <mach/mach_time.h>                                      //Mach time structure support
 	#define __LITTLE_ENDIAN             1234                         //Little Endian
 	#define __BIG_ENDIAN                4321                         //Big Endian
 	#define __BYTE_ORDER                __LITTLE_ENDIAN              //x86 and x86-64/x64 is Little Endian.
 #endif
 
 //Compatible definitions
-	#define FALSE                                                            0
+	#define FALSE                                                    0
 #ifndef INVALID_SOCKET
-	#define INVALID_SOCKET                                                   (-1)
+	#define INVALID_SOCKET                                           (-1)
 #endif
-	#define SOCKET_ERROR                                                     (-1)
-	#define RETURN_ERROR                                                     (-1)
-	typedef int                                                              SOCKET;
-	#define SD_BOTH                                                          SHUT_RDWR
-	#define SD_RECV                                                          SHUT_RD
-	#define SD_SEND                                                          SHUT_WR
+	#define SOCKET_ERROR                                             (-1)
+	#define RETURN_ERROR                                             (-1)
+	typedef int                                                      SOCKET;
+	#define SD_BOTH                                                  SHUT_RDWR
+	#define SD_RECV                                                  SHUT_RD
+	#define SD_SEND                                                  SHUT_WR
 
 //Function definitions
-	#define closesocket                                                      close
-	#define fwprintf_s                                                       fwprintf
-	#define GetLastError()                                                   errno
-	#define _set_errno(Value)                                                errno = (Value)
-	#define strnlen_s                                                        strnlen
-	#define wcsnlen_s                                                        wcsnlen
-	#define WSAGetLastError()                                                errno
-	#define localtime_s(TimeStructure, TimeValue)                            localtime_r(TimeValue, TimeStructure)
-	#define memcpy_s(Dst, DstSize, Src, Size)                                memcpy(Dst, Src, Size)
-	#define memmove_s(Dst, DstSize, Src, Size)                               memmove(Dst, Src, Size)
+	#define closesocket                                              close
+	#define fwprintf_s                                               fwprintf
+	#define GetLastError()                                           errno
+	#define _set_errno(Value)                                        errno = (Value)
+	#define strnlen_s                                                strnlen
+	#define wcsnlen_s                                                wcsnlen
+	#define WSAGetLastError()                                        errno
+	#define localtime_s(TimeStructure, TimeValue)                    localtime_r(TimeValue, TimeStructure)
+	#define memcpy_s(Dst, DstSize, Src, Size)                        memcpy(Dst, Src, Size)
+	#define memmove_s(Dst, DstSize, Src, Size)                       memmove(Dst, Src, Size)
 #endif
 #endif

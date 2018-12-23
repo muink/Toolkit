@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // FileHash, a useful and powerful toolkit
-// Copyright (C) 2012-2018 Chengr28
+// Copyright (C) 2012-2019 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License

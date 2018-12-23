@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // FileHash, a useful and powerful toolkit
-// Copyright (C) 2012-2018 Chengr28
+// Copyright (C) 2012-2019 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -48,37 +48,36 @@ int main(
 		fwprintf_s(stderr, L"[Error] Commands error.\n");
 		return EXIT_FAILURE;
 	}
-	else {
-	//List all commands.
-	#if defined(PLATFORM_WIN)
-		std::vector<std::wstring> CommandList;
-	#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-		std::vector<std::string> CommandList;
-	#endif
-		for (size_t Index = 1U;static_cast<const int>(Index) < argc;++Index)
-		{
-			CommandList.push_back(argv[Index]);
-			if (CommandList.at(Index - 1U).empty())
-			{
-				fwprintf_s(stderr, L"[Error] Commands error.\n");
-				return EXIT_FAILURE;
-			}
-		}
 
-	//Read command process
-		if (!ReadCommand(CommandList, FileName, OutputFile))
-		{
-			return EXIT_FAILURE;
-		}
-		else if (FileName.empty())
+//List all commands.
+#if defined(PLATFORM_WIN)
+	std::vector<std::wstring> CommandList;
+#elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	std::vector<std::string> CommandList;
+#endif
+	for (size_t Index = 1U;static_cast<const int>(Index) < argc;++Index)
+	{
+		CommandList.push_back(argv[Index]);
+		if (CommandList.at(Index - 1U).empty())
 		{
 			fwprintf_s(stderr, L"[Error] Commands error.\n");
 			return EXIT_FAILURE;
 		}
-		else if (HashFamilyID == 0)
-		{
-			HashFamilyID = DEFAULT_HASH_ID;
-		}
+	}
+
+//Read command process
+	if (!ReadCommand(CommandList, FileName, OutputFile))
+	{
+		return EXIT_FAILURE;
+	}
+	else if (FileName.empty())
+	{
+		fwprintf_s(stderr, L"[Error] Commands error.\n");
+		return EXIT_FAILURE;
+	}
+	else if (HashFamilyID == 0)
+	{
+		HashFamilyID = DEFAULT_HASH_ID;
 	}
 
 //Open file.

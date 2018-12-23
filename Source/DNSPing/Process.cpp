@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // DNSPing, a useful and powerful toolkit
-// Copyright (C) 2014-2018 Chengr28
+// Copyright (C) 2014-2019 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -733,7 +733,7 @@ bool OutputResultToFile(
 #endif
 	if (ConfigurationParameter.OutputFile == nullptr)
 	{
-	#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
+	#if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 		SignedResult = errno;
 	#endif
 		std::wstring Message(L"[Error] Create output result file ");

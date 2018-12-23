@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(FileHash)
 // FileHash, a useful and powerful toolkit
-// Copyright (C) 2012-2018 Chengr28
+// Copyright (C) 2012-2019 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -364,9 +364,9 @@
 	#pragma comment(lib, "ws2_32.lib")   //Windows WinSock 2.0+ support
 
 //Endian definitions
-	#define __LITTLE_ENDIAN            1234                      //Little Endian
-	#define __BIG_ENDIAN               4321                      //Big Endian
-	#define __BYTE_ORDER               __LITTLE_ENDIAN           //x86 and x86-64/x64 is Little Endian.
+	#define __LITTLE_ENDIAN            1234                          //Little Endian
+	#define __BIG_ENDIAN               4321                          //Big Endian
+	#define __BYTE_ORDER               __LITTLE_ENDIAN               //x86 and x86-64/x64 is Little Endian.
 	#define LITTLE_ENDIAN              __LITTLE_ENDIAN
 	#define BIG_ENDIAN                 __BIG_ENDIAN
 	#define BYTE_ORDER                 __BYTE_ORDER
@@ -381,21 +381,21 @@
 	#include <endian.h>                                              //Endian
 #elif defined(PLATFORM_MACOS)
 //Endian definitions
-	#define __LITTLE_ENDIAN            1234                      //Little Endian
-	#define __BIG_ENDIAN               4321                      //Big Endian
-	#define __BYTE_ORDER               __LITTLE_ENDIAN           //x86 and x86-64/x64 is Little Endian.
+	#define __LITTLE_ENDIAN            1234                          //Little Endian
+	#define __BIG_ENDIAN               4321                          //Big Endian
+	#define __BYTE_ORDER               __LITTLE_ENDIAN               //x86 and x86-64/x64 is Little Endian.
 #endif
 
 #if (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 //Compatible definitions
-	#define RETURN_ERROR                                      (-1)
+	#define RETURN_ERROR                                             (-1)
 
 //Function definitions
-	#define fwprintf_s                                        fwprintf
-	#define strnlen_s                                         strnlen
-	#define wcsnlen_s                                         wcsnlen
-	#define _set_errno(Value)                                 errno = (Value)
-	#define fread_s(Dst, DstSize, ElementSize, Count, File)   fread((Dst), (ElementSize), (Count), (File))
-	#define memcpy_s(Dst, DstSize, Src, Size)                 memcpy((Dst), (Src), (Size))
+	#define fwprintf_s                                               fwprintf
+	#define strnlen_s                                                strnlen
+	#define wcsnlen_s                                                wcsnlen
+	#define _set_errno(Value)                                        errno = (Value)
+	#define fread_s(Dst, DstSize, ElementSize, Count, File)          fread((Dst), (ElementSize), (Count), (File))
+	#define memcpy_s(Dst, DstSize, Src, Size)                        memcpy((Dst), (Src), (Size))
 #endif
 #endif

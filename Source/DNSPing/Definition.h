@@ -1,6 +1,6 @@
 ﻿// This code is part of Toolkit(DNSPing)
 // DNSPing, a useful and powerful toolkit
-// Copyright (C) 2014-2018 Chengr28
+// Copyright (C) 2014-2019 Chengr28
 // 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -103,7 +103,7 @@
 
 //Version definitions
 #define FULL_VERSION                                  L"0.4.0.1"
-#define COPYRIGHT_MESSAGE                             L"Copyright (C) 2014-2018 Chengr28"
+#define COPYRIGHT_MESSAGE                             L"Copyright (C) 2014-2019 Chengr28"
 
 //Function definitions
 #define hton16_Force(Value)                           (static_cast<const uint16_t>((reinterpret_cast<const uint8_t *>(&(Value)))[0] <<                                      \
