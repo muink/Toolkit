@@ -220,7 +220,7 @@ bool SHA3_Hash(
 		}
 		else if (Keccak_HashUpdate(&HashInstance, reinterpret_cast<const BitSequence *>(Buffer.get()), ReadLength * BYTES_TO_BITS) != SUCCESS)
 		{
-			fwprintf_s(stderr, L"[Error] Hash process error");
+			fwprintf_s(stderr, L"[Error] Hash process error.\n");
 			return false;
 		}
 	}
@@ -229,7 +229,7 @@ bool SHA3_Hash(
 	memset(Buffer.get(), 0, FILE_BUFFER_SIZE);
 	if (Keccak_HashFinal(&HashInstance, reinterpret_cast<BitSequence *>(Buffer.get())) != SUCCESS)
 	{
-		fwprintf_s(stderr, L"[Error] Hash process error");
+		fwprintf_s(stderr, L"[Error] Hash process error.\n");
 		return false;
 	}
 	else if ((SHA3_HashFunctionID == HASH_ID_SHA3_SHAKE_128 || SHA3_HashFunctionID == HASH_ID_SHA3_SHAKE_256) && 

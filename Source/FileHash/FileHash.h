@@ -27,6 +27,10 @@ size_t HashFamilyID = 0;
 auto IsLowerCase = false;
 
 //Functions
+#if defined(PLATFORM_WIN)
+bool EnvironmentInitialization(
+	void);
+#endif
 bool ReadCommand(
 #if defined(PLATFORM_WIN)
 	std::vector<std::wstring> CommandList, 

@@ -51,6 +51,7 @@
 		D942ECB41D12F73800F7C65A /* SnP-interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SnP-interface.h"; path = "FileHash/SHA3/SnP-interface.h"; sourceTree = "<group>"; };
 		D942ECB51D12F73800F7C65A /* SnP-Relaned.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SnP-Relaned.h"; path = "FileHash/SHA3/SnP-Relaned.h"; sourceTree = "<group>"; };
 		D942ECB61D12F73800F7C65A /* SnP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SnP.h; path = FileHash/SHA3/SnP.h; sourceTree = "<group>"; };
+		D98D97A9224536DE0026D745 /* Version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Version.h; sourceTree = "<group>"; };
 		D99427D51D12F15900280D91 /* FileHash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FileHash; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9C383A9209CA15600F85555 /* Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base.h; sourceTree = "<group>"; };
 		D9C383AA209CA15600F85555 /* Checksum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Checksum.h; sourceTree = "<group>"; };
@@ -134,36 +135,37 @@
 		D99427D71D12F15900280D91 /* FileHash */ = {
 			isa = PBXGroup;
 			children = (
+				D942ECA91D12F72500F7C65A /* SHA-3 */,
 				D9C383B0209CA15600F85555 /* Base.cpp */,
-				D9C383AF209CA15600F85555 /* BLAKE.cpp */,
-				D9C383AE209CA15600F85555 /* BLAKE2.cpp */,
-				D9C383AC209CA15600F85555 /* Checksum.cpp */,
-				D9C383B9209CA16200F85555 /* CRC.cpp */,
-				D9C383B8209CA16200F85555 /* FileHash.cpp */,
-				D9C383BD209CA16C00F85555 /* MD2.cpp */,
-				D9C383C3209CA16D00F85555 /* MD4.cpp */,
-				D9C383BC209CA16C00F85555 /* MD5.cpp */,
-				D9C383C8209CA17700F85555 /* RIPEMD.cpp */,
-				D9C383CC209CA17800F85555 /* SHA-1.cpp */,
-				D9C383CB209CA17800F85555 /* SHA-2.cpp */,
-				D9C383CA209CA17800F85555 /* SHA-3.cpp */,
 				D9C383A9209CA15600F85555 /* Base.h */,
+				D9C383AF209CA15600F85555 /* BLAKE.cpp */,
 				D9C383AD209CA15600F85555 /* BLAKE.h */,
+				D9C383AE209CA15600F85555 /* BLAKE2.cpp */,
 				D9C383AB209CA15600F85555 /* BLAKE2.h */,
+				D9C383AC209CA15600F85555 /* Checksum.cpp */,
 				D9C383AA209CA15600F85555 /* Checksum.h */,
+				D9C383B9209CA16200F85555 /* CRC.cpp */,
 				D9C383B6209CA16200F85555 /* CRC.h */,
 				D9C383B7209CA16200F85555 /* Definition.h */,
+				D9C383B8209CA16200F85555 /* FileHash.cpp */,
 				D9C383B5209CA16100F85555 /* FileHash.h */,
 				D9C383C1209CA16D00F85555 /* Include.h */,
+				D9C383BD209CA16C00F85555 /* MD2.cpp */,
 				D9C383C2209CA16D00F85555 /* MD2.h */,
+				D9C383C3209CA16D00F85555 /* MD4.cpp */,
 				D9C383BF209CA16C00F85555 /* MD4.h */,
+				D9C383BC209CA16C00F85555 /* MD5.cpp */,
 				D9C383C0209CA16D00F85555 /* MD5.h */,
 				D9C383BE209CA16C00F85555 /* Platform.h */,
+				D9C383C8209CA17700F85555 /* RIPEMD.cpp */,
 				D9C383C7209CA17700F85555 /* RIPEMD.h */,
+				D9C383CC209CA17800F85555 /* SHA-1.cpp */,
 				D9C383C9209CA17700F85555 /* SHA-1.h */,
+				D9C383CB209CA17800F85555 /* SHA-2.cpp */,
 				D9C383CD209CA17800F85555 /* SHA-2.h */,
+				D9C383CA209CA17800F85555 /* SHA-3.cpp */,
 				D9C383CE209CA17800F85555 /* SHA-3.h */,
-				D942ECA91D12F72500F7C65A /* SHA-3 */,
+				D98D97A9224536DE0026D745 /* Version.h */,
 			);
 			path = FileHash;
 			sourceTree = "<group>";

@@ -20,6 +20,8 @@
 #ifndef TOOLKIT_FILEHASH_PLATFORM_H
 #define TOOLKIT_FILEHASH_PLATFORM_H
 
+#include "Version.h"
+
 //////////////////////////////////////////////////
 // Operating system selection
 // 

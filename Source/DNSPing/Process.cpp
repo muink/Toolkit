@@ -941,6 +941,7 @@ void PrintDescription(
 //Supported options:
 	fwprintf_s(stderr, L"\nSupported options:\n");
 	fwprintf_s(stderr, L"   ?/-h              Description.\n");
+	fwprintf_s(stderr, L"   -v                Print current version on screen.\n");
 	fwprintf_s(stderr, L"   -t                Pings the specified host until stopped.\n");
 	fwprintf_s(stderr, L"                     To see statistics and continue type Control-Break.\n");
 	fwprintf_s(stderr, L"                     To stop type Control-C.\n");

@@ -26,6 +26,10 @@
 extern ConfigurationTable ConfigurationParameter;
 
 //Functions
+#if defined(PLATFORM_WIN)
+bool EnvironmentInitialization(
+	void);
+#endif
 bool ConfigurationInitialization(
 	void);
 bool Parameter_CheckSetting(

@@ -34,6 +34,4 @@
 
 
 //Resource including and defining
-#define FULL_VERSION        L"0.4.0.1"
-#define DETACH_VERSION      0,4,0,1
-#define COPYRIGHT_MESSAGE   L"Copyright (C) 2012-2019 Chengr28"
+#include "Version.h"

@@ -37,6 +37,7 @@ set(DNSPING_SRC_FILES
 		"Structure.h"
 		"Terminal.h"
 		"Type.h"
+		"Version.h"
 		"Console.cpp"
 		"DNSPing.cpp"
 		"Initialization.cpp"

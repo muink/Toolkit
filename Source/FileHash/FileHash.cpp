@@ -30,14 +30,18 @@ int main(
 	char *argv[])
 #endif
 {
-//Initialization(Part 1)
+#if defined(PLATFORM_WIN)
+//Environment initialization
+	if (!EnvironmentInitialization())
+		return EXIT_FAILURE;
+#endif
+
+//Read commands.
 #if defined(PLATFORM_WIN)
 	std::wstring FileName, OutputFile;
 #elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
 	std::string FileName, OutputFile;
 #endif
-
-//Read commands.
 	if (argc < COMMAND_MIN_COUNT)
 	{
 		PrintDescription();
@@ -144,6 +148,30 @@ int main(
 
 	return EXIT_SUCCESS;
 }
+
+#if defined(PLATFORM_WIN)
+//Environment initialization process
+bool EnvironmentInitialization(
+	void)
+{
+//Screen output buffer settings
+	_set_errno(0);
+	if (setvbuf(stderr, nullptr, _IONBF, 0) != 0)
+	{
+		fwprintf_s(stderr, L"[Error] Screen output buffer setting error.\n");
+		return false;
+	}
+
+//Set console codepage.
+	if (SetConsoleCP(CP_UTF8) == 0 || SetConsoleOutputCP(CP_UTF8) == 0)
+	{
+		fwprintf_s(stderr, L"[Error] Set console codepage error.\n");
+		return false;
+	}
+
+	return true;
+}
+#endif
 
 //Read commands
 bool ReadCommand(

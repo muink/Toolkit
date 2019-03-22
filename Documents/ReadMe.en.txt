@@ -12,6 +12,7 @@
   e.g. DNSPing -a -qt AAAA -n 5 -w 500 -edns www.google.com 8.8.4.4
 
    ?/-h              Description.
+   -v                Print current version on screen.
    -t                Pings the specified host until stopped.
                      To see statistics and continue type Control-Break.
                      To stop type Control-C.

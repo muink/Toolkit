@@ -26,6 +26,7 @@ mkdir Release
 chmod -R 755 Auxiliary/Scripts
 
 # Set thread number variable.
+## FreeBSD and macOS will use sysctl to get thread number.
 if (uname -s | grep -iq "FreeBSD" || uname -s | grep -iq "Darwin"); then
 	ThreadNum=`sysctl -n hw.ncpu`
 else 

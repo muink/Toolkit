@@ -27,22 +27,18 @@
 // 
 //Code definitions
 #define BYTES_TO_BITS                                 8U
-#define DEFAULT_LARGE_BUFFER_SIZE                     4096U                       //Default size of large buffer(4KB/4096 bytes)
-#define FILE_BUFFER_SIZE                              DEFAULT_LARGE_BUFFER_SIZE   //Maximum size of file buffer(4KB/4096 bytes)
+#define DEFAULT_LARGE_BUFFER_SIZE                     4096U                       //Default size of large buffer, in bytes
+#define FILE_BUFFER_SIZE                              DEFAULT_LARGE_BUFFER_SIZE   //Maximum size of file buffer, in bytes
 #if defined(PLATFORM_WIN)
 	#define MBSTOWCS_NULL_TERMINATE                       (-1)                        //MultiByteToWideChar function find null-terminate.
 #endif
 #define NULL_TERMINATE_LENGTH                         1U                          //Length of C style string null
-#define MEMORY_RESERVED_BYTES                         2U                          //Padding reserved bytes(2 bytes)
+#define MEMORY_RESERVED_BYTES                         2U                          //Padding reserved bytes, in bytes
 
 //Character value definitions
 #define ASCII_SPACE                                   32                          //" "
 #define ASCII_MINUS                                   45                          //"-"
 #define ASCII_PERIOD                                  46                          //"."
-
-//Version definitions
-#define FULL_VERSION                                  L"0.4.0.1"
-#define COPYRIGHT_MESSAGE                             L"Copyright (C) 2012-2019 Chengr28"
 
 //Command definitions
 #define COMMAND_MIN_COUNT                             2

@@ -20,6 +20,8 @@
 #ifndef TOOLKIT_DNSPING_PLATFORM_H
 #define TOOLKIT_DNSPING_PLATFORM_H
 
+#include "Version.h"
+
 //////////////////////////////////////////////////
 // Operating system selection
 // 
@@ -369,8 +371,8 @@
 	#define BYTE_ORDER                  __BYTE_ORDER
 
 //Winsock definitions
-	#define WINSOCK_VERSION_LOW_BYTE    2                            //Low byte of Winsock version 2.2
-	#define WINSOCK_VERSION_HIGH_BYTE   2                            //High byte of Winsock version 2.2
+	#define WINSOCK_VERSION_LOW_BYTE    2                            //Low byte of Winsock version
+	#define WINSOCK_VERSION_HIGH_BYTE   2                            //High byte of Winsock version
 
 //Windows compatible definitions
 	typedef SSIZE_T                     ssize_t;

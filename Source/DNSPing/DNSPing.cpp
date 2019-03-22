@@ -30,7 +30,15 @@ int main(
 	char *argv[])
 #endif
 {
+#if defined(PLATFORM_WIN)
+//Environment initialization
+	if (!EnvironmentInitialization())
+	{
+		return EXIT_FAILURE;
+	}
 //Main process
+	else 
+#endif
 	if (argc <= COMMAND_MIN_COUNT)
 	{
 		PrintDescription();
@@ -48,6 +56,30 @@ int main(
 	return EXIT_SUCCESS;
 }
 
+#if defined(PLATFORM_WIN)
+//Environment initialization process
+bool EnvironmentInitialization(
+	void)
+{
+//Screen output buffer settings
+	_set_errno(0);
+	if (setvbuf(stderr, nullptr, _IONBF, 0) != 0)
+	{
+		PrintErrorToScreen(L"\n[Error] Screen output buffer setting error", errno);
+		return false;
+	}
+
+//Set console codepage.
+	if (SetConsoleCP(CP_UTF8) == 0 || SetConsoleOutputCP(CP_UTF8) == 0)
+	{
+		PrintErrorToScreen(L"\n[Error] Set console codepage error", GetLastError());
+		return false;
+	}
+
+	return true;
+}
+#endif
+
 //Configuration initialization process
 bool ConfigurationInitialization(
 	void)
@@ -59,14 +91,6 @@ bool ConfigurationInitialization(
 			TRUE) == FALSE)
 	{
 		PrintErrorToScreen(L"\n[Error] Set console ctrl handler error", GetLastError());
-		return false;
-	}
-
-//Screen output buffer settings
-	_set_errno(0);
-	if (setvbuf(stderr, nullptr, _IONBF, 0) != 0)
-	{
-		PrintErrorToScreen(L"\n[Error] Screen output buffer setting error", errno);
 		return false;
 	}
 

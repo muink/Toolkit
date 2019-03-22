@@ -12,6 +12,7 @@
   e.g. DNSPing -a -qt AAAA -n 5 -w 500 -edns www.google.com 8.8.4.4
 
    ?/-h              打印说明
+   -v                输出当前程序的版本号
    -t                直到按下 Control-Break 或 Control-C 才停止 Ping
                      想看从 Ping 开始到按下时的统计信息但不想停止请按 Control-Break
                      想停止 Ping 并查看统计信息请按 Control-C

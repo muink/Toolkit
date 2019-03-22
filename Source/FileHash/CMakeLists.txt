@@ -40,6 +40,7 @@ set(FILEHASH_SRC_FILES
 		"SHA-1.h"
 		"SHA-2.h"
 		"SHA-3.h"
+		"Version.h"
 		"Base.cpp"
 		"BLAKE.cpp"
 		"BLAKE2.cpp"

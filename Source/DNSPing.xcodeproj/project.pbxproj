@@ -30,6 +30,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D98D97AA2245370B0026D745 /* Version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Version.h; path = DNSPing/Version.h; sourceTree = "<group>"; };
 		D99427BC1D12F0FE00280D91 /* DNSPing */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = DNSPing; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9C383D3209CA1B600F85555 /* Console.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Console.cpp; path = DNSPing/Console.cpp; sourceTree = "<group>"; };
 		D9C383D4209CA1B600F85555 /* DNSPing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DNSPing.h; path = DNSPing/DNSPing.h; sourceTree = "<group>"; };
@@ -86,26 +87,27 @@
 			isa = PBXGroup;
 			children = (
 				D9C383D3209CA1B600F85555 /* Console.cpp */,
-				D9C383D5209CA1B600F85555 /* DNSPing.cpp */,
-				D9C383DC209CA1C600F85555 /* Initialization.cpp */,
-				D9C383E0209CA1C700F85555 /* Process.cpp */,
-				D9C383DD209CA1C600F85555 /* Protocol.cpp */,
-				D9C383DB209CA1C600F85555 /* ReadCommand.cpp */,
-				D9C383EE209CA1EF00F85555 /* Resolver.cpp */,
-				D9C383EC209CA1E000F85555 /* Terminal.cpp */,
 				D9C383D6209CA1B600F85555 /* Console.h */,
 				D9C383D7209CA1B600F85555 /* Definition.h */,
+				D9C383D5209CA1B600F85555 /* DNSPing.cpp */,
 				D9C383D4209CA1B600F85555 /* DNSPing.h */,
 				D9C383DE209CA1C600F85555 /* Include.h */,
+				D9C383DC209CA1C600F85555 /* Initialization.cpp */,
 				D9C383DA209CA1C600F85555 /* Initialization.h */,
 				D9C383E2209CA1C700F85555 /* Platform.h */,
+				D9C383E0209CA1C700F85555 /* Process.cpp */,
 				D9C383E1209CA1C700F85555 /* Process.h */,
+				D9C383DD209CA1C600F85555 /* Protocol.cpp */,
 				D9C383E3209CA1C700F85555 /* Protocol.h */,
+				D9C383DB209CA1C600F85555 /* ReadCommand.cpp */,
 				D9C383DF209CA1C600F85555 /* ReadCommand.h */,
+				D9C383EE209CA1EF00F85555 /* Resolver.cpp */,
 				D9C383EF209CA1EF00F85555 /* Resolver.h */,
 				D9C383EA209CA1E000F85555 /* Structure.h */,
+				D9C383EC209CA1E000F85555 /* Terminal.cpp */,
 				D9C383E9209CA1E000F85555 /* Terminal.h */,
 				D9C383EB209CA1E000F85555 /* Type.h */,
+				D98D97AA2245370B0026D745 /* Version.h */,
 			);
 			name = DNSPing;
 			sourceTree = "<group>";

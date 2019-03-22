@@ -65,45 +65,41 @@
 
 //Time definitions
 #if defined(PLATFORM_WIN)
-	#define DEFAULT_TIMEOUT                               2000U                       //Default timeout, 2000 ms(2 seconds)
-	#define STANDARD_TIMEOUT                              1000U                       //Standard timeout(1000 ms/1 second)
+	#define DEFAULT_TIMEOUT                               2000U                       //Default timeout, in ms
+	#define STANDARD_TIMEOUT                              1000U                       //Standard timeout, in ms
 #elif (defined(PLATFORM_FREEBSD) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS))
-	#define DEFAULT_TIMEOUT                               2U                          //Default timeout, 2 seconds
-	#define STANDARD_TIMEOUT                              1000000U                    //Standard timeout, 1000000 us(1000 ms or 1 second)
+	#define DEFAULT_TIMEOUT                               2U                          //Default timeout, in seconds
+	#define STANDARD_TIMEOUT                              1000000U                    //Standard timeout, in us
 #endif
-#define MICROSECOND_TO_MILLISECOND                    1000U                       //1000 microseconds(1 millisecond)
-#define NANOSECOND_TO_MICROSECOND                     1000U                       //1000 nanoseconds(1 microsecond)
+#define MICROSECOND_TO_MILLISECOND                    1000U                       //1000 microsecond, in milliseconds
+#define NANOSECOND_TO_MICROSECOND                     1000U                       //1000 nanoseconds, in microseconds
 #define SECONDS_IN_DAY                                86400U                      //86400 seconds in a day
 #define SECONDS_IN_HOUR                               3600U                       //3600 seconds in an hour
 #define SECONDS_IN_MINUTE                             60U                         //60 seconds in a minute
-#define SECONDS_IN_MONTH                              2592000U                    //2592000 seconds in a month(30 days in a month)
-#define SECONDS_IN_YEAR                               31536000U                   //31536000 seconds in a year(30 days in a month and 12 months in a year)
-#define SECOND_TO_MILLISECOND                         1000U                       //1000 milliseconds(1 second)
+#define SECONDS_IN_MONTH                              2592000U                    //2592000 seconds in a month
+#define SECONDS_IN_YEAR                               31536000U                   //31536000 seconds in a year
+#define SECOND_TO_MILLISECOND                         1000U                       //1000 milliseconds
 #if defined(PLATFORM_WIN)
 	#define SOCKET_MIN_TIME_INTERVAL                      1
 #endif
-#define SOCKET_MIN_TIMEOUT                            500U                        //The shortest socket timeout(500 ms)
+#define SOCKET_MIN_TIMEOUT                            500U                        //The shortest socket timeout, in ms
 
 //Size and length definitions
-#define ADDRESS_STRING_MAXSIZE                        64U                                                           //Maximum size of addresses(IPv4/IPv6) words(64 bytes)
+#define ADDRESS_STRING_MAXSIZE                        64U                                                           //Maximum size of addresses(IPv4/IPv6) words, in bytes
 #define BYTES_TO_BITS                                 8U
-#define DEFAULT_LARGE_BUFFER_SIZE                     4096U                                                         //Default size of large buffer(4KB/4096 bytes)
-#define DOMAIN_MAXSIZE                                256U                                                          //Maximum size of whole level domain is 256 bytes(Section 2.3.1 in RFC 1035).
-#define DOMAIN_MINSIZE                                2U                                                            //Minimum size of whole level domain is 3 bytes(Section 2.3.1 in RFC 1035).
-#define FILE_BUFFER_SIZE                              DEFAULT_LARGE_BUFFER_SIZE                                     //Maximum size of file buffer(4KB/4096 bytes)
+#define DEFAULT_LARGE_BUFFER_SIZE                     4096U                                                         //Default size of large buffer, in bytes
+#define DOMAIN_MAXSIZE                                256U                                                          //Maximum size of whole level domain, in bytes(Section 2.3.1 in RFC 1035).
+#define DOMAIN_MINSIZE                                2U                                                            //Minimum size of whole level domain, in bytes(Section 2.3.1 in RFC 1035).
+#define FILE_BUFFER_SIZE                              DEFAULT_LARGE_BUFFER_SIZE                                     //Maximum size of file buffer, in bytes
 #define IPV4_SHORTEST_ADDR_STRING                     6U                                                            //The shortest IPv4 address strings(*.*.*.*)
 #define IPV4_LONGEST_ADDR_STRING                      15U                                                           //The longest IPv6 address strings(***.***.***.***)
 #define IPV6_SHORTEST_ADDR_STRING                     2U                                                            //The shortest IPv6 address strings(::)
 #define IPV6_LONGEST_ADDR_STRING                      46U                                                           //The longest IPv6 address strings(xxxx::xxxx::xxxx::xxxx::xxxx::xxxx::xxxx::xxxx)
-#define MEMORY_RESERVED_BYTES                         2U                                                            //Memory reserved bytes(2 bytes)
+#define MEMORY_RESERVED_BYTES                         2U                                                            //Memory reserved bytes, in bytes
 #define NULL_TERMINATE_LENGTH                         1U                                                            //Length of C style string null
-#define PACKET_MAXSIZE                                2048U                                                         //Maximum size of packets, 2048 bytes
-#define PACKET_MINSIZE                                64U                                                           //Minimum size of packets in Ethernet network.
+#define PACKET_MAXSIZE                                2048U                                                         //Maximum size of packets, in bytes
+#define PACKET_MINSIZE                                64U                                                           //Minimum size of packets in Ethernet network, in bytes
 #define DNS_PACKET_MINSIZE                            (sizeof(dns_hdr) + NULL_TERMINATE_LENGTH + sizeof(dns_qry))   //Minimum DNS packet size(DNS Header + Minimum Domain<ROOT> + DNS Query)
-
-//Version definitions
-#define FULL_VERSION                                  L"0.4.0.1"
-#define COPYRIGHT_MESSAGE                             L"Copyright (C) 2014-2019 Chengr28"
 
 //Function definitions
 #define hton16_Force(Value)                           (static_cast<const uint16_t>((reinterpret_cast<const uint8_t *>(&(Value)))[0] <<                                      \
