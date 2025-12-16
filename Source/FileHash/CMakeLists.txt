@@ -18,7 +18,7 @@
 
 
 # CMake minimum version
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.5)
 
 # Project name, build type, list all source files and sub directories.
 project(FileHash)
